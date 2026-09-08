@@ -1,22 +1,39 @@
+"use client";
+
 import Link from "next/link";
-import { getOwnerDojang } from "@/lib/dojang/queries";
-import { createClient } from "@/lib/supabase/server";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError } from "@/lib/api/types";
+import { fetchMyDojang } from "@/lib/api/dashboard";
+import type { DojangLandingContent } from "@/types/dojang";
 
-export default async function DashboardPage() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const [dojang, setDojang] = useState<DojangLandingContent | null>(null);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("name, role")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  useEffect(() => {
+    let cancelled = false;
+    void fetchMyDojang()
+      .then((data) => {
+        if (!cancelled) {
+          setDojang(data);
+        }
+      })
+      .catch((error: unknown) => {
+        if (cancelled) {
+          return;
+        }
+        if (error instanceof ApiError && error.status === 404) {
+          setDojang(null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const dojang = await getOwnerDojang();
-  const displayName = profile?.name ?? user?.email ?? "관장님";
-  const roleLabel = profile?.role === "INSTRUCTOR" ? "강사" : "관장";
+  const displayName = user?.name ?? user?.email ?? "관장님";
+  const roleLabel = user?.role === "INSTRUCTOR" ? "강사" : "관장";
 
   return (
     <section>
@@ -34,6 +51,16 @@ export default async function DashboardPage() {
           <h2 className="mt-1 text-lg font-semibold">랜딩페이지 만들기</h2>
           <p className="mt-2 text-sm leading-6 text-zinc-600">
             이름, 소개, 사진만 입력하면 공개 홍보 페이지가 생성됩니다.
+          </p>
+        </Link>
+        <Link
+          href="/dashboard/templates/new"
+          className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:border-zinc-300"
+        >
+          <p className="text-sm font-medium text-zinc-500">홍보</p>
+          <h2 className="mt-1 text-lg font-semibold">카드뉴스 만들기</h2>
+          <p className="mt-2 text-sm leading-6 text-zinc-600">
+            대회 수상, 띠 승급, 모집, 행사 카드를 편집하고 바로 내려받으세요.
           </p>
         </Link>
         {dojang ? (

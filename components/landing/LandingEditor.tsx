@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
-import { updateDojangLanding } from "@/app/dashboard/landing/actions";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { DojangLanding } from "@/components/landing/DojangLanding";
-import { createClient } from "@/lib/supabase/client";
+import { updateMyDojang } from "@/lib/api/dashboard";
+import { ApiError } from "@/lib/api/types";
+import { normalizeHexColor } from "@/lib/dojang/brand";
 import {
   BRAND_COLOR_PRESETS,
   DEFAULT_BRAND_COLOR,
@@ -19,25 +19,29 @@ type LandingEditorProps = {
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900";
 
-function SaveButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
-
+function SaveButton({
+  disabled,
+  saving,
+}: {
+  disabled: boolean;
+  saving: boolean;
+}) {
   return (
     <button
       type="submit"
-      disabled={disabled || pending}
+      disabled={disabled || saving}
       className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60 sm:w-auto"
     >
-      {pending ? "저장 중..." : "저장하기"}
+      {saving ? "저장 중..." : "저장하기"}
     </button>
   );
 }
 
 export function LandingEditor({ initial }: LandingEditorProps) {
   const [content, setContent] = useState(initial);
-  const [uploading, setUploading] = useState<"logo" | "hero" | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [state, formAction] = useFormState(updateDojangLanding, {});
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const previewContent = useMemo(() => content, [content]);
 
@@ -50,42 +54,36 @@ export function LandingEditor({ initial }: LandingEditorProps) {
     value: DojangLandingContent[K],
   ) {
     setContent((current) => ({ ...current, [key]: value }));
+    setSuccess(null);
   }
 
-  async function uploadImage(kind: "logo" | "hero", file: File) {
-    const field = kind === "logo" ? "logoUrl" : "heroImageUrl";
-    const previous = content[field];
-    setUploadError(null);
-    setUploading(kind);
-
-    const objectUrl = URL.createObjectURL(file);
-    updateField(field, objectUrl);
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
 
     try {
-      const supabase = createClient();
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `${content.id}/${kind}-${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("dojang-media")
-        .upload(path, file, {
-          contentType: file.type || "image/jpeg",
-          upsert: false,
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      const { data } = supabase.storage.from("dojang-media").getPublicUrl(path);
-      updateField(field, data.publicUrl);
-    } catch {
-      updateField(field, previous);
-      setUploadError(
-        "사진 업로드에 실패했습니다. Storage 버킷(dojang-media)을 만들었는지 확인하거나, 이미지 주소를 붙여넣어 주세요.",
-      );
+      const saved = await updateMyDojang({
+        name: content.name,
+        description: content.description,
+        logoUrl: content.logoUrl,
+        heroImageUrl: content.heroImageUrl,
+        brandColor: normalizeHexColor(
+          content.brandColor,
+          DEFAULT_BRAND_COLOR,
+        ),
+      });
+      setContent(saved);
+      setSuccess("랜딩페이지를 저장했습니다.");
+    } catch (saveError) {
+      const message =
+        saveError instanceof ApiError
+          ? saveError.message
+          : "저장에 실패했습니다.";
+      setError(message);
     } finally {
-      URL.revokeObjectURL(objectUrl);
-      setUploading(null);
+      setSaving(false);
     }
   }
 
@@ -110,7 +108,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           </Link>
         </div>
 
-        <form action={formAction} className="mt-6 space-y-4">
+        <form onSubmit={(event) => void handleSubmit(event)} className="mt-6 space-y-4">
           <label className="block text-sm font-medium">
             도장 이름
             <input
@@ -148,20 +146,9 @@ export function LandingEditor({ initial }: LandingEditorProps) {
               className={inputClassName}
               placeholder="https://..."
             />
-            <label className="block text-sm text-zinc-600">
-              사진 올리기
-              <input
-                type="file"
-                accept="image/*"
-                className="mt-1 block w-full text-sm"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    void uploadImage("hero", file);
-                  }
-                }}
-              />
-            </label>
+            <p className="text-sm text-zinc-500">
+              이미지 주소(https://...)를 붙여넣으면 됩니다. 파일 직접 업로드는 R2 연동 단계에서 붙입니다.
+            </p>
           </fieldset>
 
           <fieldset className="space-y-2">
@@ -176,20 +163,6 @@ export function LandingEditor({ initial }: LandingEditorProps) {
               className={inputClassName}
               placeholder="https://..."
             />
-            <label className="block text-sm text-zinc-600">
-              로고 올리기
-              <input
-                type="file"
-                accept="image/*"
-                className="mt-1 block w-full text-sm"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    void uploadImage("logo", file);
-                  }
-                }}
-              />
-            </label>
           </fieldset>
 
           <fieldset>
@@ -218,35 +191,25 @@ export function LandingEditor({ initial }: LandingEditorProps) {
             </div>
           </fieldset>
 
-          {uploading ? (
-            <p className="text-sm text-zinc-500">
-              {uploading === "hero" ? "대표 사진" : "로고"} 올리는 중...
-            </p>
-          ) : null}
-          {uploadError ? (
-            <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
-              {uploadError}
-            </p>
-          ) : null}
-          {state.error ? (
+          {error ? (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-              {state.error}
+              {error}
             </p>
           ) : null}
-          {state.success ? (
+          {success ? (
             <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-              {state.success}
+              {success}
             </p>
           ) : null}
 
-          <SaveButton disabled={Boolean(uploading)} />
+          <SaveButton disabled={false} saving={saving} />
         </form>
       </section>
 
       <section className="xl:sticky xl:top-4">
         <p className="mb-3 text-sm font-medium text-zinc-600">실시간 미리보기</p>
         <div className="overflow-hidden rounded-[1.5rem] border border-zinc-200 bg-white shadow-sm max-xl:max-h-[70vh] max-xl:overflow-y-auto xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
-          <div className={uploading ? "pointer-events-none opacity-80" : "pointer-events-none"}>
+          <div className="pointer-events-none">
             <DojangLanding content={previewContent} preview />
           </div>
         </div>

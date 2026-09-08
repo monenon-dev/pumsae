@@ -2,32 +2,42 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
+import { GuestGuard } from "@/components/auth/AuthGuard";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError } from "@/lib/api/types";
 import { mapAuthError } from "@/lib/auth/errors";
 
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none ring-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1";
 
-type RegisterResponse = {
-  ok?: true;
-  needsEmailConfirm?: boolean;
-  error?: string;
-};
-
 export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <p className="text-sm text-zinc-500">등록 화면을 불러오는 중...</p>
+      }
+    >
+      <GuestGuard>
+        <RegisterForm />
+      </GuestGuard>
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const { register } = useAuth();
   const [dojangName, setDojangName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setInfo(null);
 
     const gymName = dojangName.trim();
     const displayName = name.trim();
@@ -40,41 +50,21 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          dojangName: gymName,
-          name: displayName,
-          email: email.trim(),
-          password,
-        }),
+      await register({
+        dojangName: gymName,
+        name: displayName,
+        email: email.trim(),
+        password,
       });
-
-      const payload = (await response.json()) as RegisterResponse;
-
-      if (!response.ok || payload.error) {
-        setError(payload.error ?? "요청을 처리하지 못했습니다.");
-        return;
-      }
-
-      if (payload.needsEmailConfirm) {
-        setInfo("가입 확인 메일을 보냈습니다. 메일 인증 후 로그인해 주세요.");
-        return;
-      }
-
       router.replace("/dashboard");
-      router.refresh();
     } catch (submitError) {
       const message =
-        submitError instanceof Error
+        submitError instanceof ApiError
           ? submitError.message
-          : "요청을 처리하지 못했습니다.";
-      setError(
-        message.includes("URL and Key")
-          ? "Supabase 환경변수가 없습니다. .env.local을 확인해 주세요."
-          : mapAuthError(message),
-      );
+          : submitError instanceof Error
+            ? submitError.message
+            : "요청을 처리하지 못했습니다.";
+      setError(mapAuthError(message));
     } finally {
       setLoading(false);
     }
@@ -152,12 +142,6 @@ export default function RegisterPage() {
         {error ? (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
             {error}
-          </p>
-        ) : null}
-
-        {info ? (
-          <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-            {info}
           </p>
         ) : null}
 

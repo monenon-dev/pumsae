@@ -1,4 +1,8 @@
 export function mapAuthError(message: string): string {
+  if (/[가-힣]/.test(message)) {
+    return message;
+  }
+
   const normalized = message.toLowerCase();
 
   if (

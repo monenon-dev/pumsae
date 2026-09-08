@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 type LogoutButtonProps = {
   className?: string;
@@ -10,20 +10,23 @@ type LogoutButtonProps = {
 
 export function LogoutButton({ className }: LogoutButtonProps) {
   const router = useRouter();
+  const { logout } = useAuth();
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
     setLoading(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace("/login");
-    router.refresh();
+    try {
+      await logout();
+      router.replace("/login");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <button
       type="button"
-      onClick={handleLogout}
+      onClick={() => void handleLogout()}
       disabled={loading}
       className={
         className ??

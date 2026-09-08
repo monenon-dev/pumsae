@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 const links = [
   { href: "/dashboard", label: "홈" },
   { href: "/dashboard/landing", label: "랜딩페이지" },
+  { href: "/dashboard/templates", label: "카드뉴스" },
 ];
 
 export function DashboardHeader() {
@@ -14,7 +15,7 @@ export function DashboardHeader() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         <div className="flex min-w-0 items-center gap-4">
           <p className="shrink-0 text-sm font-semibold tracking-wide text-zinc-500">
             PUMSAE

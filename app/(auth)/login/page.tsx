@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
-import { ensureOwnerProfile } from "@/lib/auth/ensure-owner-profile";
+import { GuestGuard } from "@/components/auth/AuthGuard";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError } from "@/lib/api/types";
 import { mapAuthError } from "@/lib/auth/errors";
-import { createClient } from "@/lib/supabase/client";
 
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none ring-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1";
@@ -20,6 +21,7 @@ function safeNextPath(next: string | null): string {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -31,54 +33,19 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const { data, error: signInError } = await supabase.auth.signInWithPassword(
-        {
-          email: email.trim(),
-          password,
-        },
-      );
-
-      if (signInError || !data.user) {
-        setError(
-          mapAuthError(signInError?.message ?? "invalid login credentials"),
-        );
-        return;
-      }
-
-      const name =
-        (typeof data.user.user_metadata?.name === "string" &&
-          data.user.user_metadata.name) ||
-        data.user.email?.split("@")[0] ||
-        "관장";
-      const dojangName =
-        typeof data.user.user_metadata?.dojangName === "string"
-          ? data.user.user_metadata.dojangName
-          : undefined;
-
-      const { error: bootstrapError } = await ensureOwnerProfile(supabase, {
-        userId: data.user.id,
-        name,
-        dojangName,
+      await login({
+        email: email.trim(),
+        password,
       });
-
-      if (bootstrapError) {
-        setError(bootstrapError);
-        return;
-      }
-
       router.replace(safeNextPath(searchParams.get("next")));
-      router.refresh();
     } catch (submitError) {
       const message =
-        submitError instanceof Error
+        submitError instanceof ApiError
           ? submitError.message
-          : "요청을 처리하지 못했습니다.";
-      setError(
-        message.includes("URL and Key")
-          ? "Supabase 환경변수가 없습니다. .env.local을 확인해 주세요."
-          : mapAuthError(message),
-      );
+          : submitError instanceof Error
+            ? submitError.message
+            : "요청을 처리하지 못했습니다.";
+      setError(mapAuthError(message));
     } finally {
       setLoading(false);
     }
@@ -152,7 +119,9 @@ export default function LoginPage() {
         <p className="text-sm text-zinc-500">로그인 화면을 불러오는 중...</p>
       }
     >
-      <LoginForm />
+      <GuestGuard>
+        <LoginForm />
+      </GuestGuard>
     </Suspense>
   );
 }

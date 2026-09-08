@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { DojangLanding } from "@/components/landing/DojangLanding";
 import { getDojangBySlug } from "@/lib/dojang/queries";
 
+export const dynamic = "force-dynamic";
+
 type PublicLandingPageProps = {
   params: { slug: string };
 };

@@ -1,8 +1,40 @@
-import { LandingEditor } from "@/components/landing/LandingEditor";
-import { getOwnerDojang } from "@/lib/dojang/queries";
+"use client";
 
-export default async function LandingDashboardPage() {
-  const dojang = await getOwnerDojang();
+import { useEffect, useState } from "react";
+import { LandingEditor } from "@/components/landing/LandingEditor";
+import { fetchMyDojang } from "@/lib/api/dashboard";
+import type { DojangLandingContent } from "@/types/dojang";
+
+export default function LandingDashboardPage() {
+  const [dojang, setDojang] = useState<DojangLandingContent | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchMyDojang()
+      .then((data) => {
+        if (!cancelled) {
+          setDojang(data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDojang(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return <p className="text-sm text-zinc-500">랜딩페이지를 불러오는 중...</p>;
+  }
 
   if (!dojang) {
     return (
