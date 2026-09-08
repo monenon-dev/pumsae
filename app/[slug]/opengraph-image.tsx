@@ -47,8 +47,8 @@ async function loadLogoSrc(url: string | null): Promise<string | null> {
     }
     const bytes = new Uint8Array(await response.arrayBuffer());
     let binary = "";
-    for (const byte of bytes) {
-      binary += String.fromCharCode(byte);
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
     }
     return `data:${contentType};base64,${btoa(binary)}`;
   } catch {
