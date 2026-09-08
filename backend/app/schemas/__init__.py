@@ -7,7 +7,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator
 
 from app.models import Dojang, PromoTemplate, TrialRequest
-from app.models.enums import DesiredClass, PromoTemplateType, TrialRequestStatus
+from app.models.enums import DesiredClass, PromoTemplateType, TrialRequestStatus, UserRole
 
 
 class DojangOut(BaseModel):
@@ -157,3 +157,41 @@ class TrialRequestOut(BaseModel):
 
 class TrialRequestPatch(BaseModel):
     status: Literal[TrialRequestStatus.CONFIRMED, TrialRequestStatus.DECLINED]
+
+
+class MeOut(BaseModel):
+    name: str
+    email: str
+    role: UserRole
+    dojangName: str | None = None
+
+
+class MePatch(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        trimmed = value.strip()
+        if not trimmed:
+            raise ValueError("이름을 입력해 주세요.")
+        return trimmed
+
+
+class PasswordChange(BaseModel):
+    currentPassword: str = Field(min_length=1, max_length=72)
+    newPassword: str = Field(min_length=6, max_length=72)
+
+    @field_validator("newPassword")
+    @classmethod
+    def validate_new_password(cls, value: str) -> str:
+        if len(value) < 6:
+            raise ValueError("비밀번호는 6자 이상이어야 합니다.")
+        return value
+
+
+class PasswordChanged(BaseModel):
+    success: str = "비밀번호가 변경됐어요."
+

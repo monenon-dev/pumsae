@@ -50,10 +50,11 @@ function shouldAttemptRefresh(path: string): boolean {
 
 export async function apiFetch(
   path: string,
-  init: RequestInit = {},
+  init: RequestInit & { skipAuthRefresh?: boolean } = {},
   retry = true,
 ): Promise<Response> {
-  const headers = new Headers(init.headers);
+  const { skipAuthRefresh, ...requestInit } = init;
+  const headers = new Headers(requestInit.headers);
   const token = getAccessToken();
 
   if (token && !headers.has("Authorization")) {
@@ -61,18 +62,23 @@ export async function apiFetch(
   }
 
   const isFormData =
-    typeof FormData !== "undefined" && init.body instanceof FormData;
-  if (init.body && !headers.has("Content-Type") && !isFormData) {
+    typeof FormData !== "undefined" && requestInit.body instanceof FormData;
+  if (requestInit.body && !headers.has("Content-Type") && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
 
   const response = await fetch(`${getApiUrl()}${path}`, {
-    ...init,
+    ...requestInit,
     headers,
     credentials: "include",
   });
 
-  if (response.status !== 401 || !retry || !shouldAttemptRefresh(path)) {
+  if (
+    response.status !== 401 ||
+    !retry ||
+    skipAuthRefresh ||
+    !shouldAttemptRefresh(path)
+  ) {
     return response;
   }
 
@@ -134,7 +140,7 @@ export async function refreshAccessToken(): Promise<boolean> {
 
 export async function apiJson<T>(
   path: string,
-  init: RequestInit = {},
+  init: RequestInit & { skipAuthRefresh?: boolean } = {},
 ): Promise<T> {
   const response = await apiFetch(path, init);
   await throwIfNotOk(response);

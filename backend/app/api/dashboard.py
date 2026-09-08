@@ -8,14 +8,19 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_owner_user, get_staff_user
+from app.core.deps import get_current_user, get_owner_user, get_staff_user
 from app.core.export import screenshot_promo_png
+from app.core.security import hash_password, verify_password
 from app.db.session import get_db
 from app.models import Dojang, PromoTemplate, TrialRequest, User
 from app.promo.render import render_promo_html
 from app.schemas import (
     DojangOut,
     DojangPatch,
+    MeOut,
+    MePatch,
+    PasswordChange,
+    PasswordChanged,
     TemplateCreate,
     TemplateDetail,
     TemplateOut,
@@ -94,6 +99,55 @@ def _owned_trial(
             detail="다른 체육관의 신청입니다.",
         )
     return row
+
+
+@router.get("/me", response_model=MeOut, summary="내 계정 조회")
+def get_me(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MeOut:
+    dojang = db.get(Dojang, user.dojang_id) if user.dojang_id else None
+    return MeOut(
+        name=user.name,
+        email=user.email,
+        role=user.role,
+        dojangName=dojang.name if dojang else None,
+    )
+
+
+@router.patch("/me", response_model=MeOut, summary="내 이름 수정")
+def update_me(
+    body: MePatch,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MeOut:
+    if body.name is not None:
+        user.name = body.name
+        db.commit()
+        db.refresh(user)
+    dojang = db.get(Dojang, user.dojang_id) if user.dojang_id else None
+    return MeOut(
+        name=user.name,
+        email=user.email,
+        role=user.role,
+        dojangName=dojang.name if dojang else None,
+    )
+
+
+@router.post("/me/password", response_model=PasswordChanged, summary="비밀번호 변경")
+def change_my_password(
+    body: PasswordChange,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> PasswordChanged:
+    if not verify_password(body.currentPassword, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="현재 비밀번호가 올바르지 않습니다.",
+        )
+    user.password_hash = hash_password(body.newPassword)
+    db.commit()
+    return PasswordChanged()
 
 
 @router.get("/dojang", response_model=DojangOut, summary="내 도장 조회")

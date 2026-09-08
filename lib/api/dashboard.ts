@@ -24,6 +24,35 @@ export async function updateMyDojang(
   });
 }
 
+export type DashboardProfile = {
+  name: string;
+  email: string;
+  role: "OWNER" | "INSTRUCTOR";
+  dojangName: string | null;
+};
+
+export async function fetchMyProfile(): Promise<DashboardProfile> {
+  return apiJson<DashboardProfile>("/dashboard/me");
+}
+
+export async function updateMyProfile(name: string): Promise<DashboardProfile> {
+  return apiJson<DashboardProfile>("/dashboard/me", {
+    method: "PATCH",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function changeMyPassword(input: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<{ success: string }> {
+  return apiJson<{ success: string }>("/dashboard/me/password", {
+    method: "POST",
+    body: JSON.stringify(input),
+    skipAuthRefresh: true,
+  });
+}
+
 export type PromoTemplateListItem = {
   id: string;
   type: PromoTemplateType;

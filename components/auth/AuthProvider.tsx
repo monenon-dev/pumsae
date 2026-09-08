@@ -35,6 +35,7 @@ type AuthContextValue = {
   login: (input: Credentials) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (updates: Partial<AuthUser>) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -99,6 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async logout() {
         await logoutRequest();
         applySession(null);
+      },
+      updateUser(updates) {
+        setUser((current) => (current ? { ...current, ...updates } : current));
       },
     }),
     [accessToken, applySession, loading, user],
