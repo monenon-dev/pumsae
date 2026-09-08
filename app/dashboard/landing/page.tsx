@@ -3,24 +3,34 @@
 import { useEffect, useState } from "react";
 import { LandingEditor } from "@/components/landing/LandingEditor";
 import { fetchMyDojang } from "@/lib/api/dashboard";
+import { ApiError } from "@/lib/api/types";
 import type { DojangLandingContent } from "@/types/dojang";
 
 export default function LandingDashboardPage() {
   const [dojang, setDojang] = useState<DojangLandingContent | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     void fetchMyDojang()
       .then((data) => {
-        if (!cancelled) {
-          setDojang(data);
+        if (cancelled) {
+          return;
         }
+        setDojang(data);
+        setError(null);
       })
-      .catch(() => {
-        if (!cancelled) {
-          setDojang(null);
+      .catch((loadError: unknown) => {
+        if (cancelled) {
+          return;
         }
+        setDojang(null);
+        setError(
+          loadError instanceof ApiError
+            ? loadError.message
+            : "랜딩페이지를 불러오지 못했습니다.",
+        );
       })
       .finally(() => {
         if (!cancelled) {
@@ -41,7 +51,7 @@ export default function LandingDashboardPage() {
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h1 className="text-xl font-semibold">랜딩페이지</h1>
         <p className="mt-2 text-sm text-zinc-600">
-          소속 체육관을 찾지 못했습니다. 다시 로그인한 뒤 시도해 주세요.
+          {error ?? "소속 체육관을 찾지 못했습니다. 다시 로그인한 뒤 시도해 주세요."}
         </p>
       </section>
     );

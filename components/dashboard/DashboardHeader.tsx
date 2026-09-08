@@ -8,6 +8,7 @@ const links = [
   { href: "/dashboard", label: "홈" },
   { href: "/dashboard/landing", label: "랜딩페이지" },
   { href: "/dashboard/templates", label: "카드뉴스" },
+  { href: "/dashboard/trials", label: "체험 신청" },
 ];
 
 export function DashboardHeader() {

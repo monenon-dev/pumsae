@@ -22,6 +22,7 @@ class Settings:
     r2_access_key_id: str | None
     r2_secret_access_key: str | None
     r2_bucket_name: str | None
+    r2_public_url: str | None
     cors_origins: list[str]
 
     def __init__(self) -> None:
@@ -39,6 +40,9 @@ class Settings:
         self.r2_access_key_id = os.getenv("R2_ACCESS_KEY_ID") or None
         self.r2_secret_access_key = os.getenv("R2_SECRET_ACCESS_KEY") or None
         self.r2_bucket_name = os.getenv("R2_BUCKET_NAME") or None
+        self.r2_public_url = (
+            os.getenv("R2_PUBLIC_URL") or os.getenv("R2_PUBLIC_BASE_URL") or ""
+        ).rstrip("/") or None
         self.cors_origins = _csv_env(
             "CORS_ORIGINS",
             "http://localhost:3000,http://127.0.0.1:3000",

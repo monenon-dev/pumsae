@@ -60,7 +60,9 @@ export async function apiFetch(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  if (init.body && !headers.has("Content-Type")) {
+  const isFormData =
+    typeof FormData !== "undefined" && init.body instanceof FormData;
+  if (init.body && !headers.has("Content-Type") && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
 

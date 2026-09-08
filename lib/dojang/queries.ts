@@ -5,18 +5,18 @@ import type { DojangLandingContent } from "@/types/dojang";
 export const getDojangBySlug = cache(async (
   slug: string,
 ): Promise<DojangLandingContent | null> => {
-  try {
-    const response = await fetch(
-      `${getApiUrl()}/dojangs/${encodeURIComponent(slug)}`,
-      { cache: "no-store" },
-    );
+  const response = await fetch(
+    `${getApiUrl()}/dojangs/${encodeURIComponent(slug)}`,
+    { cache: "no-store" },
+  );
 
-    if (response.status === 404 || !response.ok) {
-      return null;
-    }
-
-    return (await response.json()) as DojangLandingContent;
-  } catch {
+  if (response.status === 404) {
     return null;
   }
+
+  if (!response.ok) {
+    throw new Error("체육관 페이지를 불러오지 못했습니다.");
+  }
+
+  return (await response.json()) as DojangLandingContent;
 });

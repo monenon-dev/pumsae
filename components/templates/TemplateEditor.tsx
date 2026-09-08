@@ -3,10 +3,11 @@
 import { toPng } from "html-to-image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { savePromoTemplate } from "@/lib/api/dashboard";
+import { downloadPromoPng, savePromoTemplate, updatePromoTemplate } from "@/lib/api/dashboard";
 import { ApiError } from "@/lib/api/types";
 import { sanitizePromoContent } from "@/lib/promo/content";
 import { PromoCard } from "@/components/templates/PromoCard";
+import { ImageField } from "@/components/upload/ImageField";
 import { applyLayout, createPromoContent, layoutsForType } from "@/lib/promo/layouts";
 import {
   BODY_FONT_SIZES,
@@ -24,6 +25,8 @@ import {
 
 type TemplateEditorProps = {
   dojangName: string;
+  templateId?: string;
+  initialContent?: PromoTemplateContent;
 };
 
 const inputClassName =
@@ -35,13 +38,19 @@ function fontSizeLabel(size: number): string {
   return `${size}px`;
 }
 
-export function TemplateEditor({ dojangName }: TemplateEditorProps) {
+export function TemplateEditor({
+  dojangName,
+  templateId,
+  initialContent,
+}: TemplateEditorProps) {
   const captureRef = useRef<HTMLDivElement>(null);
+  const [savedId, setSavedId] = useState<string | null>(templateId ?? null);
   const [content, setContent] = useState<PromoTemplateContent>(() =>
-    createPromoContent("AWARD", dojangName),
+    initialContent ?? createPromoContent("AWARD", dojangName),
   );
   const [saving, setSaving] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [message, setMessage] = useState<{
     type: "error" | "success";
     text: string;
@@ -58,7 +67,8 @@ export function TemplateEditor({ dojangName }: TemplateEditorProps) {
   }
 
   function changeType(type: PromoTemplateType) {
-    setContent(createPromoContent(type, content.dojangName));
+    const next = createPromoContent(type, content.dojangName);
+    setContent({ ...next, imageUrl: content.imageUrl });
     setMessage(null);
   }
 
@@ -78,7 +88,10 @@ export function TemplateEditor({ dojangName }: TemplateEditorProps) {
         return;
       }
 
-      const result = await savePromoTemplate(sanitized);
+      const result = savedId
+        ? await updatePromoTemplate(savedId, sanitized)
+        : await savePromoTemplate(sanitized);
+      setSavedId(result.id);
       setMessage({
         type: "success",
         text: result.success ?? "카드뉴스를 저장했습니다.",
@@ -130,6 +143,35 @@ export function TemplateEditor({ dojangName }: TemplateEditorProps) {
       });
     } finally {
       setDownloading(false);
+    }
+  }
+
+  async function handleHqDownload() {
+    if (!savedId) {
+      setMessage({
+        type: "error",
+        text: "고화질 PNG는 저장한 뒤에 받을 수 있습니다.",
+      });
+      return;
+    }
+
+    setExporting(true);
+    setMessage(null);
+    try {
+      await downloadPromoPng(
+        savedId,
+        `pumsae-${content.type.toLowerCase()}.png`,
+      );
+    } catch (exportError) {
+      setMessage({
+        type: "error",
+        text:
+          exportError instanceof ApiError
+            ? exportError.message
+            : "고화질 이미지를 만들지 못했습니다.",
+      });
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -247,6 +289,13 @@ export function TemplateEditor({ dojangName }: TemplateEditorProps) {
               className={inputClassName}
             />
           </label>
+
+          <ImageField
+            label="사진 (선택)"
+            hint="올리면 카드 배경에 들어갑니다."
+            value={content.imageUrl}
+            onChange={(next) => updateField("imageUrl", next)}
+          />
 
           <fieldset>
             <legend className="text-sm font-medium">배경색</legend>
@@ -394,10 +443,18 @@ export function TemplateEditor({ dojangName }: TemplateEditorProps) {
             <button
               type="button"
               onClick={() => void handleQuickDownload()}
-              disabled={downloading}
+              disabled={downloading || exporting}
               className="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-60"
             >
               {downloading ? "만드는 중..." : "빠른 다운로드"}
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleHqDownload()}
+              disabled={exporting || downloading || !savedId}
+              className="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-60"
+            >
+              {exporting ? "변환 중..." : "고화질 PNG"}
             </button>
             <button
               type="button"

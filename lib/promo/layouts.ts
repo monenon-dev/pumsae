@@ -107,9 +107,10 @@ export function createPromoContent(
     version: 1,
     type,
     layoutId: layout.id,
+    ...PROMO_TYPE_COPY[type],
     backgroundColor: layout.backgroundColor,
     dojangName,
-    ...PROMO_TYPE_COPY[type],
+    imageUrl: null,
   };
 }
 

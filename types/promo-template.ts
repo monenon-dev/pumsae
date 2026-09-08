@@ -27,6 +27,7 @@ export type PromoTemplateContent = {
   subtitleFontWeight: PromoFontWeight;
   bodyFontWeight: PromoFontWeight;
   dojangName: string;
+  imageUrl: string | null;
 };
 
 export const PROMO_CARD_SIZE = 1080;

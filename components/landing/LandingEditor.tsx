@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { DojangLanding } from "@/components/landing/DojangLanding";
+import { ImageField } from "@/components/upload/ImageField";
 import { updateMyDojang } from "@/lib/api/dashboard";
 import { ApiError } from "@/lib/api/types";
 import { normalizeHexColor } from "@/lib/dojang/brand";
+import { isHttpUrl } from "@/lib/dojang/url";
 import {
   BRAND_COLOR_PRESETS,
   DEFAULT_BRAND_COLOR,
@@ -17,37 +20,26 @@ type LandingEditorProps = {
 };
 
 const inputClassName =
-  "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900";
-
-function SaveButton({
-  disabled,
-  saving,
-}: {
-  disabled: boolean;
-  saving: boolean;
-}) {
-  return (
-    <button
-      type="submit"
-      disabled={disabled || saving}
-      className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60 sm:w-auto"
-    >
-      {saving ? "저장 중..." : "저장하기"}
-    </button>
-  );
-}
+  "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 disabled:bg-zinc-50 disabled:text-zinc-500";
 
 export function LandingEditor({ initial }: LandingEditorProps) {
+  const { user } = useAuth();
+  const canEdit = user?.role === "OWNER";
   const [content, setContent] = useState(initial);
+  const [saved, setSaved] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const previewContent = useMemo(() => content, [content]);
-
   useEffect(() => {
     setContent(initial);
+    setSaved(initial);
   }, [initial]);
+
+  const dirty = useMemo(
+    () => JSON.stringify(content) !== JSON.stringify(saved),
+    [content, saved],
+  );
 
   function updateField<K extends keyof DojangLandingContent>(
     key: K,
@@ -57,16 +49,42 @@ export function LandingEditor({ initial }: LandingEditorProps) {
     setSuccess(null);
   }
 
+  function validateImages(): string | null {
+    if (content.heroImageUrl && !isHttpUrl(content.heroImageUrl)) {
+      return "대표 사진은 http(s) 이미지 주소여야 합니다.";
+    }
+    if (content.logoUrl && !isHttpUrl(content.logoUrl)) {
+      return "로고는 http(s) 이미지 주소여야 합니다.";
+    }
+    return null;
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canEdit) {
+      return;
+    }
+
     setError(null);
     setSuccess(null);
+
+    const imageError = validateImages();
+    if (imageError) {
+      setError(imageError);
+      return;
+    }
+
+    if (!content.name.trim()) {
+      setError("도장 이름을 입력해 주세요.");
+      return;
+    }
+
     setSaving(true);
 
     try {
-      const saved = await updateMyDojang({
-        name: content.name,
-        description: content.description,
+      const next = await updateMyDojang({
+        name: content.name.trim(),
+        description: content.description?.trim() || null,
         logoUrl: content.logoUrl,
         heroImageUrl: content.heroImageUrl,
         brandColor: normalizeHexColor(
@@ -74,8 +92,9 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           DEFAULT_BRAND_COLOR,
         ),
       });
-      setContent(saved);
-      setSuccess("랜딩페이지를 저장했습니다.");
+      setContent(next);
+      setSaved(next);
+      setSuccess("랜딩페이지를 저장했습니다. 공개 주소에서 바로 확인할 수 있습니다.");
     } catch (saveError) {
       const message =
         saveError instanceof ApiError
@@ -96,7 +115,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
               랜딩페이지 편집
             </h1>
             <p className="mt-1 text-sm leading-6 text-zinc-600">
-              이름, 소개, 사진만 넣으면 공개 페이지가 바로 바뀝니다.
+              이름, 소개, 사진만 넣으면 공개 홍보 페이지가 바로 바뀝니다.
             </p>
           </div>
           <Link
@@ -108,12 +127,19 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           </Link>
         </div>
 
+        {!canEdit ? (
+          <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            랜딩페이지 수정은 관장만 할 수 있습니다.
+          </p>
+        ) : null}
+
         <form onSubmit={(event) => void handleSubmit(event)} className="mt-6 space-y-4">
           <label className="block text-sm font-medium">
             도장 이름
             <input
               name="name"
               required
+              disabled={!canEdit}
               value={content.name}
               onChange={(event) => updateField("name", event.target.value)}
               className={inputClassName}
@@ -125,6 +151,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
             <textarea
               name="description"
               rows={4}
+              disabled={!canEdit}
               value={content.description ?? ""}
               onChange={(event) =>
                 updateField("description", event.target.value)
@@ -134,36 +161,21 @@ export function LandingEditor({ initial }: LandingEditorProps) {
             />
           </label>
 
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium">대표 사진</legend>
-            <input
-              type="url"
-              name="hero_image_url"
-              value={content.heroImageUrl ?? ""}
-              onChange={(event) =>
-                updateField("heroImageUrl", event.target.value || null)
-              }
-              className={inputClassName}
-              placeholder="https://..."
-            />
-            <p className="text-sm text-zinc-500">
-              이미지 주소(https://...)를 붙여넣으면 됩니다. 파일 직접 업로드는 R2 연동 단계에서 붙입니다.
-            </p>
-          </fieldset>
+          <ImageField
+            label="대표 사진"
+            hint="파일을 올리거나 https 이미지 주소를 붙여넣으세요."
+            value={content.heroImageUrl}
+            disabled={!canEdit}
+            onChange={(next) => updateField("heroImageUrl", next)}
+          />
 
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium">로고</legend>
-            <input
-              type="url"
-              name="logo_url"
-              value={content.logoUrl ?? ""}
-              onChange={(event) =>
-                updateField("logoUrl", event.target.value || null)
-              }
-              className={inputClassName}
-              placeholder="https://..."
-            />
-          </fieldset>
+          <ImageField
+            label="로고"
+            hint="정사각형 이미지가 가장 잘 맞습니다."
+            value={content.logoUrl}
+            disabled={!canEdit}
+            onChange={(next) => updateField("logoUrl", next)}
+          />
 
           <fieldset>
             <legend className="text-sm font-medium">브랜드 컬러</legend>
@@ -171,18 +183,30 @@ export function LandingEditor({ initial }: LandingEditorProps) {
               <input
                 type="color"
                 name="brand_color"
+                disabled={!canEdit}
+                value={normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR)}
+                onChange={(event) =>
+                  updateField("brandColor", event.target.value)
+                }
+                className="h-10 w-14 cursor-pointer rounded border border-zinc-300 bg-white p-1 disabled:cursor-not-allowed"
+              />
+              <input
+                type="text"
+                disabled={!canEdit}
                 value={content.brandColor || DEFAULT_BRAND_COLOR}
                 onChange={(event) =>
                   updateField("brandColor", event.target.value)
                 }
-                className="h-10 w-14 cursor-pointer rounded border border-zinc-300 bg-white p-1"
+                className="w-28 rounded-lg border border-zinc-300 px-2 py-2 text-sm uppercase disabled:bg-zinc-50"
+                spellCheck={false}
               />
               {BRAND_COLOR_PRESETS.map((preset) => (
                 <button
                   key={preset.value}
                   type="button"
+                  disabled={!canEdit}
                   onClick={() => updateField("brandColor", preset.value)}
-                  className="h-8 w-8 rounded-full border border-zinc-200"
+                  className="h-8 w-8 rounded-full border border-zinc-200 disabled:opacity-50"
                   style={{ backgroundColor: preset.value }}
                   aria-label={preset.label}
                   title={preset.label}
@@ -202,7 +226,13 @@ export function LandingEditor({ initial }: LandingEditorProps) {
             </p>
           ) : null}
 
-          <SaveButton disabled={false} saving={saving} />
+          <button
+            type="submit"
+            disabled={!canEdit || saving || !dirty}
+            className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60 sm:w-auto"
+          >
+            {saving ? "저장 중..." : "저장하기"}
+          </button>
         </form>
       </section>
 
@@ -210,7 +240,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
         <p className="mb-3 text-sm font-medium text-zinc-600">실시간 미리보기</p>
         <div className="overflow-hidden rounded-[1.5rem] border border-zinc-200 bg-white shadow-sm max-xl:max-h-[70vh] max-xl:overflow-y-auto xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
           <div className="pointer-events-none">
-            <DojangLanding content={previewContent} preview />
+            <DojangLanding content={content} preview />
           </div>
         </div>
       </section>

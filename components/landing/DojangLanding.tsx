@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
   type DojangLandingContent,
@@ -35,6 +36,36 @@ function ClassPlaceholder({
   );
 }
 
+function TrialButton({
+  href,
+  large = false,
+}: {
+  href?: string;
+  large?: boolean;
+}) {
+  const className = large
+    ? "inline-flex min-h-12 items-center justify-center rounded-full px-7 py-3 text-sm font-semibold shadow-sm"
+    : "inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm";
+  const style = {
+    backgroundColor: "var(--landing-brand)",
+    color: "var(--landing-brand-fg)",
+  };
+
+  if (!href) {
+    return (
+      <span className={className} style={style}>
+        체험 신청하기
+      </span>
+    );
+  }
+
+  return (
+    <a href={href} className={className} style={style}>
+      체험 신청하기
+    </a>
+  );
+}
+
 export function DojangLanding({
   content,
   preview = false,
@@ -51,11 +82,13 @@ export function DojangLanding({
         {
           "--landing-brand": brand,
           "--landing-brand-fg": brandFg,
-          "--landing-brand-soft": hexToRgba(brand, 0.16),
+          "--landing-brand-soft": hexToRgba(brand, 0.14),
+          "--landing-brand-hero": `linear-gradient(160deg, ${brand} 0%, #111827 72%)`,
+          "--landing-brand-overlay": `linear-gradient(to top, ${hexToRgba("#000000", 0.78)} 0%, ${hexToRgba(brand, 0.32)} 48%, ${hexToRgba("#000000", 0.18)} 100%)`,
         } as CSSProperties
       }
     >
-      <header className="relative flex min-h-[70svh] flex-col justify-end overflow-hidden bg-zinc-900">
+      <header className="relative flex min-h-[78svh] flex-col justify-end overflow-hidden bg-zinc-900">
         {content.heroImageUrl ? (
           // User-provided URLs can be any host, so native img is used on purpose.
           // eslint-disable-next-line @next/next/no-img-element
@@ -67,24 +100,29 @@ export function DojangLanding({
         ) : (
           <div
             className="absolute inset-0"
-            style={{
-              background: `linear-gradient(160deg, ${brand} 0%, #111827 70%)`,
-            }}
+            style={{ background: "var(--landing-brand-hero)" }}
           />
         )}
         <div
           className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to top, ${hexToRgba("#000000", 0.72)} 0%, ${hexToRgba(brand, 0.28)} 48%, ${hexToRgba("#000000", 0.2)} 100%)`,
-          }}
+          style={{ background: "var(--landing-brand-overlay)" }}
         />
-        <div className="relative z-10 px-5 pb-8 pt-16 sm:px-8 sm:pb-10">
+
+        <div className="relative z-10 flex items-center justify-between px-5 pt-5 sm:px-8">
+          <p className="text-sm font-semibold tracking-wide text-white/90">
+            {content.name || "도장 이름"}
+          </p>
+          <TrialButton href={trialHref} />
+        </div>
+
+        <div className="relative z-10 px-5 pb-10 pt-20 sm:px-8 sm:pb-12">
           {content.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={content.logoUrl}
               alt={`${content.name} 로고`}
-              className="mb-4 h-14 w-14 rounded-full border border-white/40 bg-white object-cover shadow-sm sm:h-16 sm:w-16"
+              className="mb-5 h-16 w-16 rounded-full border-2 bg-white object-cover shadow-sm sm:h-[4.5rem] sm:w-[4.5rem]"
+              style={{ borderColor: "var(--landing-brand)" }}
             />
           ) : null}
           {location ? (
@@ -92,43 +130,27 @@ export function DojangLanding({
               {location}
             </p>
           ) : null}
-          <h1 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
             {content.name || "도장 이름"}
           </h1>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/90 sm:text-base">
+          <p className="mt-4 max-w-xl text-sm leading-7 text-white/90 sm:text-base">
             {content.description ||
               "소개글을 입력하면 이 자리에 체육관 이야기가 표시됩니다."}
           </p>
           {content.phone ? (
             <p className="mt-3 text-sm text-white/80">문의 {content.phone}</p>
           ) : null}
-          {trialHref ? (
-            <a
-              href={trialHref}
-              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm"
-              style={{
-                backgroundColor: "var(--landing-brand)",
-                color: "var(--landing-brand-fg)",
-              }}
-            >
-              체험 신청하기
-            </a>
-          ) : (
-            <span
-              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold"
-              style={{
-                backgroundColor: "var(--landing-brand)",
-                color: "var(--landing-brand-fg)",
-              }}
-            >
-              체험 신청하기
-            </span>
-          )}
+          <div className="mt-7">
+            <TrialButton href={trialHref} large />
+          </div>
         </div>
       </header>
 
       <section className="px-5 py-10 sm:px-8">
-        <p className="text-xs font-semibold tracking-wide text-zinc-500">
+        <p
+          className="text-xs font-semibold tracking-wide"
+          style={{ color: "var(--landing-brand)" }}
+        >
           KIDS / TEENS
         </p>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight">
@@ -150,7 +172,10 @@ export function DojangLanding({
       </section>
 
       <section className="border-t border-zinc-200 bg-[var(--landing-brand-soft)] px-5 py-10 sm:px-8">
-        <p className="text-xs font-semibold tracking-wide text-zinc-500">
+        <p
+          className="text-xs font-semibold tracking-wide"
+          style={{ color: "var(--landing-brand)" }}
+        >
           ADULT
         </p>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight">성인반</h2>
@@ -167,36 +192,28 @@ export function DojangLanding({
 
       <section
         id={preview ? undefined : "trial"}
-        className="px-5 py-12 text-center sm:px-8"
+        className="px-5 py-12 sm:px-8"
       >
-        <h2 className="text-2xl font-semibold tracking-tight">
-          우리 체육관, 먼저 체험해 보세요
-        </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-600">
-          학부모 체험 신청 폼은 다음 단계에서 이 버튼에 연결됩니다.
-        </p>
-        {trialHref ? (
-          <a
-            href={trialHref}
-            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold"
-            style={{
-              backgroundColor: "var(--landing-brand)",
-              color: "var(--landing-brand-fg)",
-            }}
-          >
-            체험 신청하기
-          </a>
-        ) : (
-          <span
-            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold"
-            style={{
-              backgroundColor: "var(--landing-brand)",
-              color: "var(--landing-brand-fg)",
-            }}
-          >
-            체험 신청하기
-          </span>
-        )}
+        <div
+          className="mx-auto max-w-2xl rounded-[1.75rem] px-6 py-10 text-center shadow-sm sm:px-10"
+          style={{
+            backgroundColor: "var(--landing-brand)",
+            color: "var(--landing-brand-fg)",
+          }}
+        >
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase opacity-80">
+            Trial Class
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            우리 체육관, 먼저 체험해 보세요
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 opacity-90">
+            방문 전 체험 수업을 신청하면 관장님이 일정과 안내를 도와드립니다.
+          </p>
+          <div className="mt-7 text-left">
+            <TrialRequestForm dojangId={content.id} disabled={preview} />
+          </div>
+        </div>
       </section>
     </article>
   );

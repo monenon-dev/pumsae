@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from app.models import Dojang, PromoTemplate
-from app.models.enums import PromoTemplateType
+from app.models import Dojang, PromoTemplate, TrialRequest
+from app.models.enums import DesiredClass, PromoTemplateType, TrialRequestStatus
 
 
 class DojangOut(BaseModel):
@@ -52,6 +52,13 @@ class DojangPatch(BaseModel):
 class TemplateCreate(BaseModel):
     type: PromoTemplateType
     content: dict[str, Any]
+    thumbnailUrl: str | None = None
+
+
+class TemplatePatch(BaseModel):
+    type: PromoTemplateType | None = None
+    content: dict[str, Any] | None = None
+    thumbnailUrl: str | None = None
 
 
 class TemplateOut(BaseModel):
@@ -59,6 +66,7 @@ class TemplateOut(BaseModel):
     type: PromoTemplateType
     typeLabel: str
     title: str
+    thumbnailUrl: str | None
     createdAt: datetime
 
     @classmethod
@@ -76,10 +84,76 @@ class TemplateOut(BaseModel):
             type=row.type,
             typeLabel=labels.get(row.type, row.type.value),
             title=title,
+            thumbnailUrl=row.thumbnail_url,
             createdAt=row.created_at,
         )
+
+
+class TemplateDetail(TemplateOut):
+    content: dict[str, Any]
+
+    @classmethod
+    def from_model(cls, row: PromoTemplate) -> TemplateDetail:
+        base = TemplateOut.from_model(row)
+        content = row.content if isinstance(row.content, dict) else {}
+        return cls(**base.model_dump(), content=content)
 
 
 class TemplateSaved(BaseModel):
     id: uuid.UUID
     success: str = "카드뉴스를 저장했습니다."
+
+
+class TrialRequestCreate(BaseModel):
+    dojangId: uuid.UUID
+    studentName: str = Field(min_length=1, max_length=80)
+    parentName: str = Field(min_length=1, max_length=80)
+    parentPhone: str = Field(min_length=7, max_length=30)
+    desiredClass: DesiredClass | None = None
+    memo: str | None = Field(default=None, max_length=500)
+
+    @field_validator("studentName", "parentName", "parentPhone")
+    @classmethod
+    def strip_required(cls, value: str) -> str:
+        trimmed = value.strip()
+        if not trimmed:
+            raise ValueError("필수 항목을 입력해 주세요.")
+        return trimmed
+
+    @field_validator("memo")
+    @classmethod
+    def empty_memo_to_none(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        trimmed = value.strip()
+        return trimmed or None
+
+
+class TrialRequestOut(BaseModel):
+    id: uuid.UUID
+    dojangId: uuid.UUID
+    studentName: str
+    parentName: str
+    parentPhone: str
+    desiredClass: DesiredClass | None
+    memo: str | None
+    status: TrialRequestStatus
+    createdAt: datetime
+
+    @classmethod
+    def from_model(cls, row: TrialRequest) -> TrialRequestOut:
+        return cls(
+            id=row.id,
+            dojangId=row.dojang_id,
+            studentName=row.student_name,
+            parentName=row.parent_name,
+            parentPhone=row.parent_phone,
+            desiredClass=row.desired_class,
+            memo=row.memo,
+            status=row.status,
+            createdAt=row.created_at,
+        )
+
+
+class TrialRequestPatch(BaseModel):
+    status: Literal[TrialRequestStatus.CONFIRMED, TrialRequestStatus.DECLINED]

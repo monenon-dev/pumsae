@@ -1,4 +1,5 @@
 import { normalizeHexColor } from "@/lib/dojang/brand";
+import { isHttpUrl } from "@/lib/dojang/url";
 import {
   BODY_FONT_SIZES,
   PROMO_FONT_WEIGHTS,
@@ -61,5 +62,7 @@ export function sanitizePromoContent(
       ? input.bodyFontWeight
       : 400,
     dojangName: input.dojangName.trim(),
+    imageUrl:
+      input.imageUrl && isHttpUrl(input.imageUrl) ? input.imageUrl : null,
   };
 }

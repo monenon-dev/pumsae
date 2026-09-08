@@ -1,6 +1,6 @@
 "use client";
 
-import { apiJson } from "@/lib/api/client";
+import { apiFetch, apiJson, throwIfNotOk } from "@/lib/api/client";
 import type { DojangLandingContent } from "@/types/dojang";
 import type { PromoTemplateContent } from "@/types/promo-template";
 import { PROMO_TYPE_LABELS, type PromoTemplateType } from "@/types/promo-template";
@@ -29,7 +29,12 @@ export type PromoTemplateListItem = {
   type: PromoTemplateType;
   typeLabel: string;
   title: string;
+  thumbnailUrl: string | null;
   createdAt: string;
+};
+
+export type PromoTemplateDetail = PromoTemplateListItem & {
+  content: PromoTemplateContent;
 };
 
 export async function fetchMyTemplates(): Promise<PromoTemplateListItem[]> {
@@ -40,6 +45,14 @@ export async function fetchMyTemplates(): Promise<PromoTemplateListItem[]> {
   }));
 }
 
+export async function fetchPromoTemplate(
+  id: string,
+): Promise<PromoTemplateDetail> {
+  return apiJson<PromoTemplateDetail>(
+    `/dashboard/templates/${encodeURIComponent(id)}`,
+  );
+}
+
 export async function savePromoTemplate(
   content: PromoTemplateContent,
 ): Promise<{ id: string; success: string }> {
@@ -48,6 +61,35 @@ export async function savePromoTemplate(
     body: JSON.stringify({
       type: content.type,
       content,
+      thumbnailUrl: content.imageUrl,
     }),
   });
+}
+
+export async function updatePromoTemplate(
+  id: string,
+  content: PromoTemplateContent,
+): Promise<{ id: string; success: string }> {
+  return apiJson(`/dashboard/templates/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      type: content.type,
+      content,
+      thumbnailUrl: content.imageUrl,
+    }),
+  });
+}
+
+export async function downloadPromoPng(id: string, filename?: string): Promise<void> {
+  const response = await apiFetch(
+    `/dashboard/templates/${encodeURIComponent(id)}/export`,
+  );
+  await throwIfNotOk(response, "고화질 이미지를 만들지 못했습니다.");
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename ?? `pumsae-${id.slice(0, 8)}.png`;
+  link.click();
+  URL.revokeObjectURL(url);
 }

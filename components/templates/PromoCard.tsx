@@ -1,5 +1,5 @@
 import { forwardRef, type ReactElement, type ReactNode } from "react";
-import { getReadableTextColor } from "@/lib/dojang/brand";
+import { getReadableTextColor, hexToRgba } from "@/lib/dojang/brand";
 import { getLayoutPreset } from "@/lib/promo/layouts";
 import {
   PROMO_CARD_SIZE,
@@ -16,11 +16,15 @@ type PromoCardProps = {
 
 function CardRoot({
   backgroundColor,
+  imageUrl,
   children,
 }: {
   backgroundColor: string;
+  imageUrl?: string | null;
   children: ReactNode;
 }) {
+  const overlay = hexToRgba(backgroundColor, 0.72);
+
   return (
     <div
       style={{
@@ -30,6 +34,11 @@ function CardRoot({
         height: PROMO_CARD_SIZE,
         overflow: "hidden",
         backgroundColor,
+        backgroundImage: imageUrl
+          ? `linear-gradient(${overlay}, ${overlay}), url(${JSON.stringify(imageUrl)})`
+          : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         color: getReadableTextColor(backgroundColor),
         fontFamily: CARD_FONT,
       }}
@@ -177,7 +186,7 @@ function AwardPodium({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           display: "flex",
@@ -221,7 +230,7 @@ function AwardRibbon({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           display: "flex",
@@ -299,7 +308,7 @@ function AwardSplit({
   accent: string;
 }) {
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div style={{ display: "flex", height: "100%" }}>
         <div
           style={{
@@ -364,7 +373,7 @@ function AwardStamp({
   const frame = 48;
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           position: "absolute",
@@ -448,7 +457,7 @@ function BeltStripe({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div style={{ display: "flex", height: 56 }}>
         {BELT_COLORS.map((color) => (
           <div key={color} style={{ flex: 1, backgroundColor: color }} />
@@ -487,7 +496,7 @@ function BeltColumn({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div style={{ display: "flex", height: "100%" }}>
         <div style={{ display: "flex", width: 88, flexDirection: "column" }}>
           {BELT_COLORS.map((color) => (
@@ -523,7 +532,7 @@ function BeltSeal({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           display: "flex",
@@ -565,7 +574,7 @@ function BeltStage({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           position: "absolute",
@@ -616,7 +625,7 @@ function RecruitPoster({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <p
         style={{
           position: "absolute",
@@ -663,7 +672,7 @@ function RecruitInfo({
   accent: string;
 }) {
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           display: "flex",
@@ -731,7 +740,7 @@ function RecruitSlash({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           position: "absolute",
@@ -773,7 +782,7 @@ function RecruitGrid({
   accent: string;
 }) {
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           display: "flex",
@@ -817,7 +826,7 @@ function EventFest({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       {[40, 200, 860, 980].map((top, index) => (
         <span
           key={top}
@@ -873,7 +882,7 @@ function EventInvite({
   accent: string;
 }) {
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           position: "absolute",
@@ -921,7 +930,7 @@ function EventBold({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           display: "flex",
@@ -979,7 +988,7 @@ function EventTicket({
   const text = getReadableTextColor(content.backgroundColor);
 
   return (
-    <CardRoot backgroundColor={content.backgroundColor}>
+    <CardRoot backgroundColor={content.backgroundColor} imageUrl={content.imageUrl}>
       <div
         style={{
           position: "absolute",

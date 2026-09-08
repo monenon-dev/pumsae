@@ -63,6 +63,16 @@ export default function DashboardPage() {
             대회 수상, 띠 승급, 모집, 행사 카드를 편집하고 바로 내려받으세요.
           </p>
         </Link>
+        <Link
+          href="/dashboard/trials"
+          className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:border-zinc-300"
+        >
+          <p className="text-sm font-medium text-zinc-500">접수</p>
+          <h2 className="mt-1 text-lg font-semibold">체험 신청 확인</h2>
+          <p className="mt-2 text-sm leading-6 text-zinc-600">
+            학부모 신청이 들어오면 바로 알림을 받고 확정·거절할 수 있습니다.
+          </p>
+        </Link>
         {dojang ? (
           <Link
             href={`/${dojang.slug}`}

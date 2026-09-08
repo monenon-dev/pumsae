@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  downloadPromoPng,
   fetchMyTemplates,
   type PromoTemplateListItem,
 } from "@/lib/api/dashboard";
@@ -66,17 +67,34 @@ export default function TemplatesPage() {
       ) : (
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
           {templates.map((template) => (
-            <li
-              key={template.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
-            >
-              <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-                {template.typeLabel}
-              </p>
-              <h2 className="mt-1 text-lg font-semibold">{template.title}</h2>
-              <p className="mt-2 text-sm text-zinc-500">
-                {new Date(template.createdAt).toLocaleDateString("ko-KR")}
-              </p>
+            <li key={template.id} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <Link href={`/dashboard/templates/${template.id}`} className="block hover:opacity-90">
+                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  {template.typeLabel}
+                </p>
+                <h2 className="mt-1 text-lg font-semibold">{template.title}</h2>
+                <p className="mt-2 text-sm text-zinc-500">
+                  {new Date(template.createdAt).toLocaleDateString("ko-KR")}
+                </p>
+              </Link>
+              <button
+                type="button"
+                className="mt-4 text-sm font-medium text-zinc-900 underline"
+                onClick={() =>
+                  void downloadPromoPng(
+                    template.id,
+                    `pumsae-${template.type.toLowerCase()}.png`,
+                  ).catch((error: unknown) => {
+                    window.alert(
+                      error instanceof Error
+                        ? error.message
+                        : "고화질 이미지를 만들지 못했습니다.",
+                    );
+                  })
+                }
+              >
+                고화질 PNG
+              </button>
             </li>
           ))}
         </ul>
