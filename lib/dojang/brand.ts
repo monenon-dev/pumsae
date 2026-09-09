@@ -1,3 +1,13 @@
+import type { CSSProperties } from "react";
+
+export function landingCssVars(brand: string, brandFg: string): CSSProperties {
+  return {
+    "--landing-brand": brand,
+    "--landing-brand-fg": brandFg,
+    "--landing-brand-soft": hexToRgba(brand, 0.14),
+  } as CSSProperties;
+}
+
 export function normalizeHexColor(
   value: string | null | undefined,
   fallback: string,

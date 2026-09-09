@@ -10,9 +10,9 @@ export type HeroLayout = (typeof HERO_LAYOUTS)[number];
 export const DEFAULT_HERO_LAYOUT: HeroLayout = "GRADIENT";
 
 export const HERO_LAYOUT_LABELS: Record<HeroLayout, string> = {
-  GRADIENT: "그라데이션",
-  SOLID: "단색",
-  PHOTO_COVER: "사진 풀커버",
+  GRADIENT: "모던 그라데이션",
+  SOLID: "미니멀 단색",
+  PHOTO_COVER: "포토 매거진",
   SPLIT: "좌우 분할",
 };
 

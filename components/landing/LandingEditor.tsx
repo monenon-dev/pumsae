@@ -237,7 +237,10 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           />
 
           <fieldset>
-            <legend className="text-sm font-medium">레이아웃</legend>
+            <legend className="text-sm font-medium">홈페이지 디자인</legend>
+            <p className="mt-1 text-xs text-zinc-500">
+              히어로부터 아래 섹션 구성까지 페이지 전체가 함께 바뀌어요.
+            </p>
             <div className="mt-2 grid grid-cols-4 gap-2">
               {HERO_LAYOUTS.map((layout) => {
                 const selected = content.heroLayout === layout;
