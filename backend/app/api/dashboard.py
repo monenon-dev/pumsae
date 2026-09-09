@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_current_user, get_owner_user, get_staff_user
+from app.core.deps import get_current_user, get_staff_user
 from app.core.export import screenshot_promo_png
 from app.core.security import hash_password, verify_password
 from app.db.session import get_db
@@ -167,10 +167,10 @@ def get_my_dojang(
     return DojangOut.from_model(dojang)
 
 
-@router.patch("/dojang", response_model=DojangOut, summary="내 도장 수정 (OWNER)")
+@router.patch("/dojang", response_model=DojangOut, summary="내 도장 수정")
 def update_my_dojang(
     body: DojangPatch,
-    user: User = Depends(get_owner_user),
+    user: User = Depends(get_staff_user),
     db: Session = Depends(get_db),
 ) -> DojangOut:
     dojang = db.get(Dojang, user.dojang_id)

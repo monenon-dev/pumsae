@@ -81,7 +81,7 @@ function HeroLayoutThumb({
 
 export function LandingEditor({ initial }: LandingEditorProps) {
   const { user } = useAuth();
-  const canEdit = user?.role === "OWNER";
+  const canEdit = user != null;
   const [content, setContent] = useState(() => withNormalizedHeroLayout(initial));
   const [saved, setSaved] = useState(() => withNormalizedHeroLayout(initial));
   const [saving, setSaving] = useState(false);
@@ -188,7 +188,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
 
         {!canEdit ? (
           <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            랜딩페이지 수정은 관장만 할 수 있습니다.
+            로그인 정보를 확인하는 중입니다...
           </p>
         ) : null}
 
