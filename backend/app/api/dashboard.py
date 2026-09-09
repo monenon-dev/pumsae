@@ -218,6 +218,9 @@ def update_my_dojang(
             )
         dojang.brand_color = color.lower()
 
+    if "heroLayout" in updates and updates["heroLayout"] is not None:
+        dojang.hero_layout = updates["heroLayout"]
+
     if "region" in updates:
         dojang.region = _empty_to_none(updates["region"])
     if "address" in updates:

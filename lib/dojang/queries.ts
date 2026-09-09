@@ -1,6 +1,9 @@
 import { cache } from "react";
 import { getApiUrl } from "@/lib/api/types";
-import type { DojangLandingContent } from "@/types/dojang";
+import {
+  type DojangLandingContent,
+  withNormalizedHeroLayout,
+} from "@/types/dojang";
 
 export const getDojangBySlug = cache(async (
   slug: string,
@@ -18,5 +21,7 @@ export const getDojangBySlug = cache(async (
     throw new Error("체육관 페이지를 불러오지 못했습니다.");
   }
 
-  return (await response.json()) as DojangLandingContent;
+  return withNormalizedHeroLayout(
+    (await response.json()) as DojangLandingContent,
+  );
 });

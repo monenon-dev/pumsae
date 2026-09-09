@@ -7,7 +7,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator
 
 from app.models import Dojang, PromoTemplate, TrialRequest
-from app.models.enums import DesiredClass, PromoTemplateType, TrialRequestStatus, UserRole
+from app.models.enums import DesiredClass, HeroLayout, PromoTemplateType, TrialRequestStatus, UserRole
 
 
 class DojangOut(BaseModel):
@@ -18,6 +18,7 @@ class DojangOut(BaseModel):
     logoUrl: str | None
     heroImageUrl: str | None
     brandColor: str | None
+    heroLayout: HeroLayout
     region: str | None
     address: str | None
     phone: str | None
@@ -32,6 +33,7 @@ class DojangOut(BaseModel):
             logoUrl=dojang.logo_url,
             heroImageUrl=dojang.hero_image_url,
             brandColor=dojang.brand_color,
+            heroLayout=dojang.hero_layout or HeroLayout.GRADIENT,
             region=dojang.region,
             address=dojang.address,
             phone=dojang.phone,
@@ -44,6 +46,7 @@ class DojangPatch(BaseModel):
     logoUrl: str | None = None
     heroImageUrl: str | None = None
     brandColor: str | None = None
+    heroLayout: HeroLayout | None = None
     region: str | None = None
     address: str | None = None
     phone: str | None = None

@@ -7,12 +7,16 @@ import { DojangLanding } from "@/components/landing/DojangLanding";
 import { ImageField } from "@/components/upload/ImageField";
 import { updateMyDojang } from "@/lib/api/dashboard";
 import { ApiError } from "@/lib/api/types";
-import { normalizeHexColor } from "@/lib/dojang/brand";
+import { hexToRgba, normalizeHexColor } from "@/lib/dojang/brand";
 import { isHttpUrl } from "@/lib/dojang/url";
 import {
   BRAND_COLOR_PRESETS,
   DEFAULT_BRAND_COLOR,
+  HERO_LAYOUTS,
+  HERO_LAYOUT_LABELS,
   type DojangLandingContent,
+  type HeroLayout,
+  withNormalizedHeroLayout,
 } from "@/types/dojang";
 
 type LandingEditorProps = {
@@ -22,18 +26,72 @@ type LandingEditorProps = {
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 disabled:bg-zinc-50 disabled:text-zinc-500";
 
+function HeroLayoutThumb({
+  layout,
+  brand,
+}: {
+  layout: HeroLayout;
+  brand: string;
+}) {
+  if (layout === "GRADIENT") {
+    return (
+      <span
+        className="block aspect-square"
+        style={{
+          background: `linear-gradient(160deg, ${brand} 0%, #111827 72%)`,
+        }}
+      />
+    );
+  }
+
+  if (layout === "SOLID") {
+    return (
+      <span className="block aspect-square" style={{ backgroundColor: brand }} />
+    );
+  }
+
+  if (layout === "PHOTO_COVER") {
+    return (
+      <span className="relative block aspect-square overflow-hidden bg-zinc-500">
+        <span
+          className="absolute inset-x-0 top-[18%] h-[28%] opacity-70"
+          style={{ backgroundColor: brand }}
+        />
+        <span
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to top, rgba(0,0,0,0.72), ${hexToRgba(brand, 0.28)})`,
+          }}
+        />
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex aspect-square overflow-hidden">
+      <span className="w-1/2" style={{ backgroundColor: brand }} />
+      <span className="relative w-1/2 bg-zinc-400">
+        <span
+          className="absolute inset-x-0 top-1/3 h-1/3 bg-zinc-300"
+        />
+      </span>
+    </span>
+  );
+}
+
 export function LandingEditor({ initial }: LandingEditorProps) {
   const { user } = useAuth();
   const canEdit = user?.role === "OWNER";
-  const [content, setContent] = useState(initial);
-  const [saved, setSaved] = useState(initial);
+  const [content, setContent] = useState(() => withNormalizedHeroLayout(initial));
+  const [saved, setSaved] = useState(() => withNormalizedHeroLayout(initial));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    setContent(initial);
-    setSaved(initial);
+    const next = withNormalizedHeroLayout(initial);
+    setContent(next);
+    setSaved(next);
   }, [initial]);
 
   const dirty = useMemo(
@@ -91,6 +149,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           content.brandColor,
           DEFAULT_BRAND_COLOR,
         ),
+        heroLayout: content.heroLayout,
       });
       setContent(next);
       setSaved(next);
@@ -176,6 +235,40 @@ export function LandingEditor({ initial }: LandingEditorProps) {
             disabled={!canEdit}
             onChange={(next) => updateField("logoUrl", next)}
           />
+
+          <fieldset>
+            <legend className="text-sm font-medium">레이아웃</legend>
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {HERO_LAYOUTS.map((layout) => {
+                const selected = content.heroLayout === layout;
+                return (
+                  <button
+                    key={layout}
+                    type="button"
+                    disabled={!canEdit}
+                    onClick={() => updateField("heroLayout", layout)}
+                    className={`overflow-hidden rounded-lg border text-left disabled:opacity-50 ${
+                      selected
+                        ? "border-zinc-900 ring-2 ring-zinc-900"
+                        : "border-zinc-200 hover:border-zinc-300"
+                    }`}
+                    aria-pressed={selected}
+                  >
+                    <HeroLayoutThumb
+                      layout={layout}
+                      brand={normalizeHexColor(
+                        content.brandColor,
+                        DEFAULT_BRAND_COLOR,
+                      )}
+                    />
+                    <span className="block truncate px-1.5 py-1 text-center text-[11px] font-medium text-zinc-600">
+                      {HERO_LAYOUT_LABELS[layout]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
           <fieldset>
             <legend className="text-sm font-medium">브랜드 컬러</legend>

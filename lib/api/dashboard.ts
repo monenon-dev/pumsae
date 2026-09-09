@@ -1,12 +1,17 @@
 "use client";
 
 import { apiFetch, apiJson, throwIfNotOk } from "@/lib/api/client";
-import type { DojangLandingContent } from "@/types/dojang";
+import {
+  type DojangLandingContent,
+  type HeroLayout,
+  withNormalizedHeroLayout,
+} from "@/types/dojang";
 import type { PromoTemplateContent } from "@/types/promo-template";
 import { PROMO_TYPE_LABELS, type PromoTemplateType } from "@/types/promo-template";
 
 export async function fetchMyDojang(): Promise<DojangLandingContent> {
-  return apiJson<DojangLandingContent>("/dashboard/dojang");
+  const data = await apiJson<DojangLandingContent>("/dashboard/dojang");
+  return withNormalizedHeroLayout(data);
 }
 
 export async function updateMyDojang(
@@ -16,12 +21,14 @@ export async function updateMyDojang(
     logoUrl: string | null;
     heroImageUrl: string | null;
     brandColor: string | null;
+    heroLayout: HeroLayout;
   }>,
 ): Promise<DojangLandingContent> {
-  return apiJson<DojangLandingContent>("/dashboard/dojang", {
+  const data = await apiJson<DojangLandingContent>("/dashboard/dojang", {
     method: "PATCH",
     body: JSON.stringify(input),
   });
+  return withNormalizedHeroLayout(data);
 }
 
 export type DashboardProfile = {

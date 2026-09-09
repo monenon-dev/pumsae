@@ -3,11 +3,12 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, Enum, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
+from app.models.enums import HeroLayout
 
 
 class Dojang(Base):
@@ -27,6 +28,12 @@ class Dojang(Base):
     logo_url: Mapped[str | None] = mapped_column(String)
     hero_image_url: Mapped[str | None] = mapped_column(String)
     brand_color: Mapped[str | None] = mapped_column(String)
+    hero_layout: Mapped[HeroLayout] = mapped_column(
+        Enum(HeroLayout, name="hero_layout", native_enum=True),
+        nullable=False,
+        server_default="GRADIENT",
+        default=HeroLayout.GRADIENT,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

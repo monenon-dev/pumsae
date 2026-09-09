@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { HeroSection } from "@/components/HeroSection";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
@@ -36,44 +37,12 @@ function ClassPlaceholder({
   );
 }
 
-function TrialButton({
-  href,
-  large = false,
-}: {
-  href?: string;
-  large?: boolean;
-}) {
-  const className = large
-    ? "inline-flex min-h-12 items-center justify-center rounded-full px-7 py-3 text-sm font-semibold shadow-sm"
-    : "inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm";
-  const style = {
-    backgroundColor: "var(--landing-brand)",
-    color: "var(--landing-brand-fg)",
-  };
-
-  if (!href) {
-    return (
-      <span className={className} style={style}>
-        체험 신청하기
-      </span>
-    );
-  }
-
-  return (
-    <a href={href} className={className} style={style}>
-      체험 신청하기
-    </a>
-  );
-}
-
 export function DojangLanding({
   content,
   preview = false,
 }: DojangLandingProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
   const brandFg = getReadableTextColor(brand);
-  const trialHref = preview ? undefined : "#trial";
-  const location = [content.region, content.address].filter(Boolean).join(" ");
 
   return (
     <article
@@ -83,68 +52,10 @@ export function DojangLanding({
           "--landing-brand": brand,
           "--landing-brand-fg": brandFg,
           "--landing-brand-soft": hexToRgba(brand, 0.14),
-          "--landing-brand-hero": `linear-gradient(160deg, ${brand} 0%, #111827 72%)`,
-          "--landing-brand-overlay": `linear-gradient(to top, ${hexToRgba("#000000", 0.78)} 0%, ${hexToRgba(brand, 0.32)} 48%, ${hexToRgba("#000000", 0.18)} 100%)`,
         } as CSSProperties
       }
     >
-      <header className="relative flex min-h-[78svh] flex-col justify-end overflow-hidden bg-zinc-900">
-        {content.heroImageUrl ? (
-          // User-provided URLs can be any host, so native img is used on purpose.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={content.heroImageUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{ background: "var(--landing-brand-hero)" }}
-          />
-        )}
-        <div
-          className="absolute inset-0"
-          style={{ background: "var(--landing-brand-overlay)" }}
-        />
-
-        <div className="relative z-10 flex items-center justify-between px-5 pt-5 sm:px-8">
-          <p className="text-sm font-semibold tracking-wide text-white/90">
-            {content.name || "도장 이름"}
-          </p>
-          <TrialButton href={trialHref} />
-        </div>
-
-        <div className="relative z-10 px-5 pb-10 pt-20 sm:px-8 sm:pb-12">
-          {content.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={content.logoUrl}
-              alt={`${content.name} 로고`}
-              className="mb-5 h-16 w-16 rounded-full border-2 bg-white object-cover shadow-sm sm:h-[4.5rem] sm:w-[4.5rem]"
-              style={{ borderColor: "var(--landing-brand)" }}
-            />
-          ) : null}
-          {location ? (
-            <p className="mb-2 text-xs font-medium tracking-wide text-white/80">
-              {location}
-            </p>
-          ) : null}
-          <h1 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            {content.name || "도장 이름"}
-          </h1>
-          <p className="mt-4 max-w-xl text-sm leading-7 text-white/90 sm:text-base">
-            {content.description ||
-              "소개글을 입력하면 이 자리에 체육관 이야기가 표시됩니다."}
-          </p>
-          {content.phone ? (
-            <p className="mt-3 text-sm text-white/80">문의 {content.phone}</p>
-          ) : null}
-          <div className="mt-7">
-            <TrialButton href={trialHref} large />
-          </div>
-        </div>
-      </header>
+      <HeroSection content={content} preview={preview} />
 
       <section className="px-5 py-10 sm:px-8">
         <p

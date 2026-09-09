@@ -24,3 +24,10 @@ class TrialRequestStatus(str, Enum):
     PENDING = "PENDING"
     CONFIRMED = "CONFIRMED"
     DECLINED = "DECLINED"
+
+
+class HeroLayout(str, Enum):
+    GRADIENT = "GRADIENT"
+    SOLID = "SOLID"
+    PHOTO_COVER = "PHOTO_COVER"
+    SPLIT = "SPLIT"
