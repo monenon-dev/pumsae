@@ -6,6 +6,7 @@ import {
   changeMyPassword,
   fetchMyProfile,
   updateMyProfile,
+  updateMyRole,
   type DashboardProfile,
 } from "@/lib/api/dashboard";
 import { ApiError } from "@/lib/api/types";
@@ -18,8 +19,10 @@ const readonlyClassName =
 
 const ROLE_LABELS = {
   OWNER: "관장",
-  INSTRUCTOR: "강사",
+  INSTRUCTOR: "사범",
 } as const;
+
+const ROLE_OPTIONS = ["OWNER", "INSTRUCTOR"] as const;
 
 export default function ProfilePage() {
   const { updateUser } = useAuth();
@@ -31,6 +34,9 @@ export default function ProfilePage() {
   const [nameSaving, setNameSaving] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
   const [nameSuccess, setNameSuccess] = useState<string | null>(null);
+
+  const [roleSaving, setRoleSaving] = useState(false);
+  const [roleError, setRoleError] = useState<string | null>(null);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -101,6 +107,25 @@ export default function ProfilePage() {
       );
     } finally {
       setNameSaving(false);
+    }
+  }
+
+  async function handleRoleSelect(role: "OWNER" | "INSTRUCTOR") {
+    if (!profile || profile.role === role || roleSaving) {
+      return;
+    }
+
+    setRoleSaving(true);
+    setRoleError(null);
+    try {
+      const next = await updateMyRole(role);
+      applyProfile(next);
+    } catch (error: unknown) {
+      setRoleError(
+        error instanceof ApiError ? error.message : "역할을 바꾸지 못했습니다.",
+      );
+    } finally {
+      setRoleSaving(false);
     }
   }
 
@@ -194,9 +219,29 @@ export default function ProfilePage() {
           </div>
           <div>
             <dt className="text-sm font-medium">역할</dt>
-            <dd className="mt-1 text-sm text-zinc-600">
-              {ROLE_LABELS[profile.role]}
+            <dd className="mt-2 flex gap-2">
+              {ROLE_OPTIONS.map((role) => {
+                const selected = profile.role === role;
+                return (
+                  <button
+                    key={role}
+                    type="button"
+                    disabled={roleSaving}
+                    onClick={() => void handleRoleSelect(role)}
+                    className={`rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 ${
+                      selected
+                        ? "bg-zinc-900 text-white"
+                        : "border border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50"
+                    }`}
+                  >
+                    {ROLE_LABELS[role]}
+                  </button>
+                );
+              })}
             </dd>
+            {roleError ? (
+              <p className="mt-2 text-sm text-red-700">{roleError}</p>
+            ) : null}
           </div>
         </dl>
       </div>

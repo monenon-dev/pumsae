@@ -14,7 +14,7 @@ export default function DashboardPage() {
     useDashboardStatus();
 
   const displayName = user?.name ?? user?.email ?? "관장님";
-  const roleLabel = user?.role === "INSTRUCTOR" ? "강사" : "관장";
+  const roleLabel = user?.role === "INSTRUCTOR" ? "사범" : "관장";
 
   return (
     <section>

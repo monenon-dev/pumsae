@@ -173,6 +173,7 @@ class MeOut(BaseModel):
 
 class MePatch(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=80)
+    role: UserRole | None = None
 
     @field_validator("name")
     @classmethod

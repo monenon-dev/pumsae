@@ -49,6 +49,15 @@ export async function updateMyProfile(name: string): Promise<DashboardProfile> {
   });
 }
 
+export async function updateMyRole(
+  role: "OWNER" | "INSTRUCTOR",
+): Promise<DashboardProfile> {
+  return apiJson<DashboardProfile>("/dashboard/me", {
+    method: "PATCH",
+    body: JSON.stringify({ role }),
+  });
+}
+
 export async function changeMyPassword(input: {
   currentPassword: string;
   newPassword: string;

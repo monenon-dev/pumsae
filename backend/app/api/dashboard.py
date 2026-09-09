@@ -115,7 +115,7 @@ def get_me(
     )
 
 
-@router.patch("/me", response_model=MeOut, summary="내 이름 수정")
+@router.patch("/me", response_model=MeOut, summary="내 이름/역할 수정")
 def update_me(
     body: MePatch,
     user: User = Depends(get_current_user),
@@ -123,6 +123,9 @@ def update_me(
 ) -> MeOut:
     if body.name is not None:
         user.name = body.name
+    if body.role is not None:
+        user.role = body.role
+    if body.name is not None or body.role is not None:
         db.commit()
         db.refresh(user)
     dojang = db.get(Dojang, user.dojang_id) if user.dojang_id else None
