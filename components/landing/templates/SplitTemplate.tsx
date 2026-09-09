@@ -1,7 +1,8 @@
-import { HeroSection } from "@/components/HeroSection";
+import { HeroLayoutSwitch } from "@/components/hero-layouts";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
+  HEADING_FONT_VARS,
   type DojangLandingContent,
 } from "@/types/dojang";
 import {
@@ -60,7 +61,7 @@ export function SplitTemplate({ content, preview = false }: TemplateProps) {
       className="min-h-full bg-white text-zinc-900"
       style={landingCssVars(brand, brandFg)}
     >
-      <HeroSection content={content} preview={preview} />
+      <HeroLayoutSwitch content={content} preview={preview} />
 
       <SplitRow
         label="KIDS / TEENS"
@@ -88,7 +89,10 @@ export function SplitTemplate({ content, preview = false }: TemplateProps) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] opacity-80">
             Trial Class
           </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+          <h2
+            className="mt-2 text-2xl font-semibold tracking-tight"
+            style={{ fontFamily: HEADING_FONT_VARS[content.headingFont] }}
+          >
             우리 체육관, 먼저 체험해 보세요
           </h2>
           <p className="mt-3 max-w-sm text-sm leading-6 opacity-90">

@@ -1,7 +1,8 @@
-import { HeroSection } from "@/components/HeroSection";
+import { HeroLayoutSwitch } from "@/components/hero-layouts";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
+  HEADING_FONT_VARS,
   type DojangLandingContent,
 } from "@/types/dojang";
 import {
@@ -45,7 +46,7 @@ export function GradientTemplate({ content, preview = false }: TemplateProps) {
       className="min-h-full bg-zinc-50 text-zinc-900"
       style={landingCssVars(brand, brandFg)}
     >
-      <HeroSection content={content} preview={preview} />
+      <HeroLayoutSwitch content={content} preview={preview} />
 
       <section className="px-5 py-10 sm:px-8">
         <p
@@ -54,7 +55,10 @@ export function GradientTemplate({ content, preview = false }: TemplateProps) {
         >
           KIDS / TEENS
         </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+        <h2
+          className="mt-1 text-2xl font-semibold tracking-tight"
+          style={{ fontFamily: HEADING_FONT_VARS[content.headingFont] }}
+        >
           유치부 · 초중고
         </h2>
         <p className="mt-2 text-sm leading-6 text-zinc-600">
@@ -79,7 +83,12 @@ export function GradientTemplate({ content, preview = false }: TemplateProps) {
         >
           ADULT
         </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight">성인반</h2>
+        <h2
+          className="mt-1 text-2xl font-semibold tracking-tight"
+          style={{ fontFamily: HEADING_FONT_VARS[content.headingFont] }}
+        >
+          성인반
+        </h2>
         <p className="mt-2 text-sm leading-6 text-zinc-600">
           체력과 자기 관리를 위한 성인 수련 자리입니다.
         </p>
@@ -105,7 +114,10 @@ export function GradientTemplate({ content, preview = false }: TemplateProps) {
           <p className="text-xs font-semibold tracking-[0.2em] uppercase opacity-80">
             Trial Class
           </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2
+            className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
+            style={{ fontFamily: HEADING_FONT_VARS[content.headingFont] }}
+          >
             우리 체육관, 먼저 체험해 보세요
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 opacity-90">

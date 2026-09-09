@@ -12,6 +12,9 @@ import { isHttpUrl } from "@/lib/dojang/url";
 import {
   BRAND_COLOR_PRESETS,
   DEFAULT_BRAND_COLOR,
+  HEADING_FONTS,
+  HEADING_FONT_LABELS,
+  HEADING_FONT_VARS,
   HERO_LAYOUTS,
   HERO_LAYOUT_LABELS,
   type DojangLandingContent,
@@ -67,14 +70,80 @@ function HeroLayoutThumb({
     );
   }
 
-  return (
-    <span className="flex aspect-square overflow-hidden">
-      <span className="w-1/2" style={{ backgroundColor: brand }} />
-      <span className="relative w-1/2 bg-zinc-400">
+  if (layout === "SPLIT") {
+    return (
+      <span className="flex aspect-square overflow-hidden">
+        <span className="w-1/2" style={{ backgroundColor: brand }} />
+        <span className="relative w-1/2 bg-zinc-400">
+          <span className="absolute inset-x-0 top-1/3 h-1/3 bg-zinc-300" />
+        </span>
+      </span>
+    );
+  }
+
+  if (layout === "TRADITIONAL") {
+    return (
+      <span
+        className="relative block aspect-square overflow-hidden"
+        style={{ backgroundColor: "#F5F0E4" }}
+      >
         <span
-          className="absolute inset-x-0 top-1/3 h-1/3 bg-zinc-300"
+          className="absolute -right-3 -top-3 h-10 w-10 rounded-full"
+          style={{ border: "1px solid rgba(28,28,28,0.25)" }}
+        />
+        <span
+          className="absolute bottom-0 right-1 text-2xl font-black leading-none"
+          style={{ color: "rgba(28,28,28,0.15)" }}
+        >
+          道
+        </span>
+        <span
+          className="absolute bottom-1.5 left-1.5 h-1 w-4 rounded-full"
+          style={{ backgroundColor: brand }}
         />
       </span>
+    );
+  }
+
+  if (layout === "DYNAMIC") {
+    return (
+      <span className="relative block aspect-square overflow-hidden bg-black">
+        <span
+          className="absolute -right-2 -top-3 h-7 w-7 rotate-[18deg]"
+          style={{ backgroundColor: brand }}
+        />
+        <span
+          className="absolute -right-4 top-3 h-6 w-6 rotate-[-12deg] opacity-50"
+          style={{ backgroundColor: brand }}
+        />
+      </span>
+    );
+  }
+
+  if (layout === "KIDS") {
+    return (
+      <span
+        className="relative block aspect-square overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #FDE68A 0%, #86EFAC 50%, #93C5FD 100%)",
+        }}
+      >
+        <span className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-white/50" />
+        <span className="absolute bottom-1 left-1 h-4 w-4 rounded-full bg-white/40" />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="relative block aspect-square overflow-hidden"
+      style={{ backgroundColor: "#0B0B0C" }}
+    >
+      <span className="absolute left-1.5 top-2 h-px w-6" style={{ backgroundColor: "#C9A15A" }} />
+      <span
+        className="absolute bottom-2 right-1.5 h-px w-8"
+        style={{ backgroundColor: "rgba(201,161,90,0.5)" }}
+      />
     </span>
   );
 }
@@ -150,6 +219,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           DEFAULT_BRAND_COLOR,
         ),
         heroLayout: content.heroLayout,
+        headingFont: content.headingFont,
       });
       setContent(next);
       setSaved(next);
@@ -266,6 +336,42 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                     />
                     <span className="block truncate px-1.5 py-1 text-center text-[11px] font-medium text-zinc-600">
                       {HERO_LAYOUT_LABELS[layout]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend className="text-sm font-medium">헤드라인 폰트</legend>
+            <p className="mt-1 text-xs text-zinc-500">
+              도장 이름과 섹션 제목에 적용돼요. 나머지 글씨는 그대로예요.
+            </p>
+            <div className="mt-2 space-y-2">
+              {HEADING_FONTS.map((font) => {
+                const selected = content.headingFont === font;
+                return (
+                  <button
+                    key={font}
+                    type="button"
+                    disabled={!canEdit}
+                    onClick={() => updateField("headingFont", font)}
+                    className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left disabled:opacity-50 ${
+                      selected
+                        ? "border-zinc-900 ring-2 ring-zinc-900"
+                        : "border-zinc-200 hover:border-zinc-300"
+                    }`}
+                    aria-pressed={selected}
+                  >
+                    <span
+                      className="truncate text-lg"
+                      style={{ fontFamily: HEADING_FONT_VARS[font] }}
+                    >
+                      {content.name.trim() || "미리보기"}
+                    </span>
+                    <span className="ml-3 shrink-0 text-xs font-medium text-zinc-500">
+                      {HEADING_FONT_LABELS[font]}
                     </span>
                   </button>
                 );

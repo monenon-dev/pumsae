@@ -31,3 +31,15 @@ class HeroLayout(str, Enum):
     SOLID = "SOLID"
     PHOTO_COVER = "PHOTO_COVER"
     SPLIT = "SPLIT"
+    TRADITIONAL = "TRADITIONAL"
+    DYNAMIC = "DYNAMIC"
+    KIDS = "KIDS"
+    PREMIUM = "PREMIUM"
+
+
+class HeadingFont(str, Enum):
+    PRETENDARD = "PRETENDARD"
+    SONG_MYUNG = "SONG_MYUNG"
+    BLACK_HAN_SANS = "BLACK_HAN_SANS"
+    GOWUN_BATANG = "GOWUN_BATANG"
+    GAEGU = "GAEGU"

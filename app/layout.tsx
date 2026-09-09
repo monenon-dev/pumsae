@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Black_Han_Sans, Gaegu, Gowun_Batang, Song_Myung } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
@@ -25,6 +26,32 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+// Optional headline fonts a dojang owner can pick per landing page.
+const songMyung = Song_Myung({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-song-myung",
+  display: "swap",
+});
+const blackHanSans = Black_Han_Sans({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-black-han-sans",
+  display: "swap",
+});
+const gowunBatang = Gowun_Batang({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-gowun-batang",
+  display: "swap",
+});
+const gaegu = Gaegu({
+  weight: ["300", "400", "700"],
+  subsets: ["latin"],
+  variable: "--font-gaegu",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: "PUMSAE",
@@ -39,7 +66,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${songMyung.variable} ${blackHanSans.variable} ${gowunBatang.variable} ${gaegu.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
       </body>

@@ -3,6 +3,7 @@
 import { apiFetch, apiJson, throwIfNotOk } from "@/lib/api/client";
 import {
   type DojangLandingContent,
+  type HeadingFont,
   type HeroLayout,
   withNormalizedHeroLayout,
 } from "@/types/dojang";
@@ -22,6 +23,7 @@ export async function updateMyDojang(
     heroImageUrl: string | null;
     brandColor: string | null;
     heroLayout: HeroLayout;
+    headingFont: HeadingFont;
   }>,
 ): Promise<DojangLandingContent> {
   const data = await apiJson<DojangLandingContent>("/dashboard/dojang", {

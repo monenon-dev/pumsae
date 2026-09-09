@@ -224,6 +224,9 @@ def update_my_dojang(
     if "heroLayout" in updates and updates["heroLayout"] is not None:
         dojang.hero_layout = updates["heroLayout"]
 
+    if "headingFont" in updates and updates["headingFont"] is not None:
+        dojang.heading_font = updates["headingFont"]
+
     if "region" in updates:
         dojang.region = _empty_to_none(updates["region"])
     if "address" in updates:

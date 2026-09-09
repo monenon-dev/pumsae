@@ -1,6 +1,7 @@
 from app.models.dojang import Dojang
 from app.models.enums import (
     DesiredClass,
+    HeadingFont,
     HeroLayout,
     PromoTemplateType,
     TrialRequestStatus,
@@ -13,6 +14,7 @@ from app.models.user import User
 __all__ = [
     "DesiredClass",
     "Dojang",
+    "HeadingFont",
     "HeroLayout",
     "PromoTemplate",
     "PromoTemplateType",

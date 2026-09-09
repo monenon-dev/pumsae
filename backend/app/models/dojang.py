@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
-from app.models.enums import HeroLayout
+from app.models.enums import HeadingFont, HeroLayout
 
 
 class Dojang(Base):
@@ -33,6 +33,12 @@ class Dojang(Base):
         nullable=False,
         server_default="GRADIENT",
         default=HeroLayout.GRADIENT,
+    )
+    heading_font: Mapped[HeadingFont] = mapped_column(
+        Enum(HeadingFont, name="heading_font", native_enum=True),
+        nullable=False,
+        server_default="PRETENDARD",
+        default=HeadingFont.PRETENDARD,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
