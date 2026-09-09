@@ -22,6 +22,7 @@ class DojangOut(BaseModel):
     region: str | None
     address: str | None
     phone: str | None
+    updatedAt: datetime | None
 
     @classmethod
     def from_model(cls, dojang: Dojang) -> DojangOut:
@@ -37,6 +38,7 @@ class DojangOut(BaseModel):
             region=dojang.region,
             address=dojang.address,
             phone=dojang.phone,
+            updatedAt=dojang.updated_at,
         )
 
 

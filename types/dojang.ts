@@ -36,6 +36,7 @@ export type DojangLandingContent = {
   region: string | null;
   address: string | null;
   phone: string | null;
+  updatedAt: string | null;
 };
 
 export function withNormalizedHeroLayout(
