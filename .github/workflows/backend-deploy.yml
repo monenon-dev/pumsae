@@ -31,6 +31,8 @@ jobs:
         with:
           context: ./backend
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/pumsae-backend:latest
             ${{ vars.DOCKERHUB_USERNAME }}/pumsae-backend:${{ github.sha }}
