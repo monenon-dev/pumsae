@@ -17,6 +17,23 @@ from app.models.enums import (
 )
 
 
+class CanvasElementPosition(BaseModel):
+    xPct: float
+    yPct: float
+    widthPct: float
+
+
+class CanvasElement(BaseModel):
+    id: str
+    text: str
+    fontSize: float
+    fontWeight: Literal["normal", "bold"]
+    color: str
+    align: Literal["left", "center", "right"]
+    desktop: CanvasElementPosition
+    mobile: CanvasElementPosition
+
+
 class DojangOut(BaseModel):
     id: uuid.UUID
     name: str
@@ -25,6 +42,11 @@ class DojangOut(BaseModel):
     logoUrl: str | None
     heroImageUrl: str | None
     brandColor: str | None
+    customBgColor: str | None
+    customTextColor: str | None
+    sectionSpacing: str
+    sectionText: dict[str, str] | None
+    canvasElements: list[CanvasElement] | None
     heroLayout: HeroLayout
     headingFont: HeadingFont
     region: str | None
@@ -42,6 +64,11 @@ class DojangOut(BaseModel):
             logoUrl=dojang.logo_url,
             heroImageUrl=dojang.hero_image_url,
             brandColor=dojang.brand_color,
+            customBgColor=dojang.custom_bg_color,
+            customTextColor=dojang.custom_text_color,
+            sectionSpacing=dojang.section_spacing or "NORMAL",
+            sectionText=dojang.section_text,
+            canvasElements=dojang.canvas_elements,
             heroLayout=dojang.hero_layout or HeroLayout.GRADIENT,
             headingFont=dojang.heading_font or HeadingFont.PRETENDARD,
             region=dojang.region,
@@ -57,6 +84,11 @@ class DojangPatch(BaseModel):
     logoUrl: str | None = None
     heroImageUrl: str | None = None
     brandColor: str | None = None
+    customBgColor: str | None = None
+    customTextColor: str | None = None
+    sectionSpacing: str | None = None
+    sectionText: dict[str, str] | None = None
+    canvasElements: list[CanvasElement] | None = None
     heroLayout: HeroLayout | None = None
     headingFont: HeadingFont | None = None
     region: str | None = None

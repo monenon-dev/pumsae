@@ -1,5 +1,10 @@
 import { DEFAULT_BRAND_COLOR } from "@/types/dojang";
-import { getReadableTextColor, hexToRgba, normalizeHexColor } from "@/lib/dojang/brand";
+import {
+  getReadableTextColor,
+  heroMinHeightClass,
+  hexToRgba,
+  normalizeHexColor,
+} from "@/lib/dojang/brand";
 import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
 
 export function DynamicHero({ content, preview = false }: HeroComponentProps) {
@@ -7,7 +12,9 @@ export function DynamicHero({ content, preview = false }: HeroComponentProps) {
   const brandFg = getReadableTextColor(brand);
 
   return (
-    <header className="relative flex min-h-[78svh] flex-col justify-end overflow-hidden bg-black">
+    <header
+      className={`relative flex flex-col justify-end overflow-hidden bg-black ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute -right-16 top-[-8rem] h-[26rem] w-[26rem] rotate-[18deg]"
@@ -27,6 +34,7 @@ export function DynamicHero({ content, preview = false }: HeroComponentProps) {
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
+        editable={preview}
         textColor="#ffffff"
         mutedColor={hexToRgba("#ffffff", 0.85)}
         buttonBg={brand}

@@ -7,29 +7,29 @@ import {
 } from "@/lib/dojang/brand";
 import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
 
-const INDIGO_DEEP = "#1e1b4b";
-const INDIGO_MID = "#4c1d95";
-const INK = "#0b0f1a";
+const TEAL_DEEP = "#0f766e";
+const CYAN_MID = "#0e7490";
+const NAVY_INK = "#082f49";
 
-export function GradientHero({ content, preview = false }: HeroComponentProps) {
+export function OceanHero({ content, preview = false }: HeroComponentProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
   const brandFg = getReadableTextColor(brand);
 
   return (
     <header
-      className={`relative flex flex-col justify-center overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
+      className={`relative flex flex-col justify-between overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
     >
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(135deg, ${INDIGO_DEEP} 0%, ${INDIGO_MID} 48%, ${INK} 100%)`,
+          background: `linear-gradient(135deg, ${TEAL_DEEP} 0%, ${CYAN_MID} 45%, ${NAVY_INK} 100%)`,
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 -top-24 h-[26rem] w-[26rem] rounded-full blur-3xl"
-        style={{ backgroundColor: hexToRgba(brand, 0.35) }}
+        className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full blur-3xl"
+        style={{ backgroundColor: hexToRgba(brand, 0.3) }}
       />
       <HeroCopy
         content={content}
@@ -42,6 +42,17 @@ export function GradientHero({ content, preview = false }: HeroComponentProps) {
         buttonFg={brandFg}
         headingFont={content.headingFont}
       />
+      <svg
+        aria-hidden
+        viewBox="0 0 400 40"
+        preserveAspectRatio="none"
+        className="relative z-10 h-10 w-full"
+      >
+        <path
+          d="M0 20 C 60 0, 140 40, 200 20 S 340 0, 400 20 V40 H0 Z"
+          fill="rgba(255,255,255,0.92)"
+        />
+      </svg>
     </header>
   );
 }

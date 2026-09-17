@@ -30,11 +30,16 @@ class HeroLayout(str, Enum):
     GRADIENT = "GRADIENT"
     SOLID = "SOLID"
     PHOTO_COVER = "PHOTO_COVER"
-    SPLIT = "SPLIT"
     TRADITIONAL = "TRADITIONAL"
     DYNAMIC = "DYNAMIC"
     KIDS = "KIDS"
     PREMIUM = "PREMIUM"
+    OCEAN = "OCEAN"
+    MONO = "MONO"
+    SPOTLIGHT = "SPOTLIGHT"
+    BADGE = "BADGE"
+    CUSTOM = "CUSTOM"
+    CANVAS = "CANVAS"
 
 
 class HeadingFont(str, Enum):

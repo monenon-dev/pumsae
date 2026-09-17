@@ -23,6 +23,23 @@ export default function DashboardPage() {
         안녕하세요, {displayName}님 ({roleLabel})
       </p>
 
+      {!loading && !landingSaved ? (
+        <div className="mb-6 rounded-2xl border border-pumsae-accent/30 bg-pumsae-accent/5 p-5">
+          <p className="text-xs font-medium text-pumsae-accent">다음 할 일</p>
+          <h2 className="mt-1 text-lg font-semibold">랜딩페이지부터 완성하세요</h2>
+          <p className="mt-2 text-sm text-pumsae-muted">
+            이름, 소개, 사진만 넣으면 학부모에게 공유할 홍보 페이지가 바로 생겨요.
+            카드뉴스와 체험 신청 알림도 이 페이지가 있어야 의미가 있어요.
+          </p>
+          <Link
+            href="/dashboard/landing"
+            className="mt-3 inline-block rounded-lg bg-pumsae-ink px-4 py-2 text-sm font-medium text-white"
+          >
+            지금 시작하기
+          </Link>
+        </div>
+      ) : null}
+
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Link href="/dashboard/landing" className={cardClassName}>
           <p className="text-sm font-medium text-pumsae-muted">홍보</p>

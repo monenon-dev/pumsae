@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, String, func
+from sqlalchemy import JSON, DateTime, Enum, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -28,6 +28,16 @@ class Dojang(Base):
     logo_url: Mapped[str | None] = mapped_column(String)
     hero_image_url: Mapped[str | None] = mapped_column(String)
     brand_color: Mapped[str | None] = mapped_column(String)
+    custom_bg_color: Mapped[str | None] = mapped_column(String)
+    custom_text_color: Mapped[str | None] = mapped_column(String)
+    section_spacing: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+        server_default="NORMAL",
+        default="NORMAL",
+    )
+    section_text: Mapped[dict | None] = mapped_column(JSON)
+    canvas_elements: Mapped[list | None] = mapped_column(JSON)
     hero_layout: Mapped[HeroLayout] = mapped_column(
         Enum(HeroLayout, name="hero_layout", native_enum=True),
         nullable=False,

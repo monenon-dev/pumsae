@@ -2,6 +2,8 @@ import { HeroLayoutSwitch } from "@/components/hero-layouts";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
+  DEFAULT_CUSTOM_BG_COLOR,
+  DEFAULT_CUSTOM_TEXT_COLOR,
   HEADING_FONT_VARS,
   type DojangLandingContent,
 } from "@/types/dojang";
@@ -19,50 +21,58 @@ type TemplateProps = {
   preview?: boolean;
 };
 
-const NEAR_BLACK = "#0B0B0C";
-const GOLD = "#C9A15A";
-
 function ProgramRow({
   label,
   title,
   description,
+  ink,
 }: {
   label: string;
   title: string;
   description: string;
+  ink: string;
 }) {
   return (
     <div
-      className="grid gap-2 py-7 sm:grid-cols-[7rem_1fr] sm:gap-6"
-      style={{ borderTop: `1px solid ${hexToRgba(GOLD, 0.2)}` }}
+      className="grid gap-2 border-t py-6 sm:grid-cols-[7rem_1fr] sm:gap-6"
+      style={{ borderColor: hexToRgba(ink, 0.15) }}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: GOLD }}>
+      <p
+        className="text-xs font-semibold uppercase tracking-wide"
+        style={{ color: "var(--landing-brand)" }}
+      >
         {label}
       </p>
       <div>
-        <h3 className="text-lg font-light tracking-wide text-white">{title}</h3>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">{description}</p>
+        <h3 className="text-lg font-semibold" style={{ color: ink }}>
+          {title}
+        </h3>
+        <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: hexToRgba(ink, 0.7) }}>
+          {description}
+        </p>
       </div>
     </div>
   );
 }
 
-export function PremiumTemplate({ content, preview = false }: TemplateProps) {
+export function CanvasTemplate({ content, preview = false }: TemplateProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
   const brandFg = getReadableTextColor(brand);
+  const bg = normalizeHexColor(content.customBgColor, DEFAULT_CUSTOM_BG_COLOR);
+  const ink = normalizeHexColor(content.customTextColor, DEFAULT_CUSTOM_TEXT_COLOR);
   const spacing = content.sectionSpacing;
 
   return (
     <article
-      className="min-h-full text-white"
-      style={{ ...landingCssVars(brand, brandFg), backgroundColor: NEAR_BLACK }}
+      className="min-h-full"
+      style={{ ...landingCssVars(brand, brandFg), backgroundColor: bg, color: ink }}
     >
       <HeroLayoutSwitch content={content} preview={preview} />
 
-      <section className={`mx-auto max-w-2xl px-5 sm:px-8 ${sectionPaddingClass(spacing, "py-16")}`}>
+      <section className={`mx-auto max-w-2xl px-5 sm:px-8 ${sectionPaddingClass(spacing, "py-14")}`}>
         <h2
-          className="text-xs font-semibold uppercase tracking-[0.3em]"
-          style={{ color: GOLD, fontFamily: HEADING_FONT_VARS[content.headingFont] }}
+          className="text-sm font-semibold uppercase tracking-[0.2em]"
+          style={{ color: hexToRgba(ink, 0.5), fontFamily: HEADING_FONT_VARS[content.headingFont] }}
         >
           {getCopy(content, "programEyebrow", "Program")}
         </h2>
@@ -75,6 +85,7 @@ export function PremiumTemplate({ content, preview = false }: TemplateProps) {
               "class1Desc",
               "처음 태권도를 접하는 아이들을 위한 기초 수련.",
             )}
+            ink={ink}
           />
           <ProgramRow
             label={getCopy(content, "class2Title", "초등·중고등")}
@@ -84,6 +95,7 @@ export function PremiumTemplate({ content, preview = false }: TemplateProps) {
               "class2Desc",
               "기본기, 품새, 겨루기를 단계별로 익히는 수업.",
             )}
+            ink={ink}
           />
           <ProgramRow
             label={getCopy(content, "class3Title", "성인반")}
@@ -93,27 +105,31 @@ export function PremiumTemplate({ content, preview = false }: TemplateProps) {
               "class3Desc",
               "퇴근 후에도 참여할 수 있는 성인 수업 안내가 들어갑니다.",
             )}
+            ink={ink}
           />
-          <div style={{ borderTop: `1px solid ${hexToRgba(GOLD, 0.2)}` }} />
+          <div className="border-t" style={{ borderColor: hexToRgba(ink, 0.15) }} />
         </div>
       </section>
 
       <section
         id={preview ? undefined : "trial"}
-        className={`px-5 sm:px-8 ${sectionPaddingClass(spacing, "py-16")}`}
-        style={{ borderTop: `1px solid ${hexToRgba(GOLD, 0.2)}` }}
+        className={`border-t px-5 sm:px-8 ${sectionPaddingClass(spacing, "py-14")}`}
+        style={{ borderColor: hexToRgba(ink, 0.15) }}
       >
         <div className="mx-auto max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: GOLD }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-[0.2em]"
+            style={{ color: "var(--landing-brand)" }}
+          >
             {getCopy(content, "ctaEyebrow", "Trial Class")}
           </p>
           <h2
-            className="mt-2 text-2xl font-light tracking-wide"
+            className="mt-2 text-2xl font-semibold tracking-tight"
             style={{ fontFamily: HEADING_FONT_VARS[content.headingFont] }}
           >
             {getCopy(content, "ctaTitle", "우리 체육관, 먼저 체험해 보세요")}
           </h2>
-          <p className="mt-3 max-w-md text-sm leading-6 text-zinc-400">
+          <p className="mt-3 max-w-md text-sm leading-6" style={{ color: hexToRgba(ink, 0.7) }}>
             {getCopy(
               content,
               "ctaDescription",

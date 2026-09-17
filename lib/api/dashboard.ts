@@ -2,9 +2,11 @@
 
 import { apiFetch, apiJson, throwIfNotOk } from "@/lib/api/client";
 import {
+  type CanvasTextElement,
   type DojangLandingContent,
   type HeadingFont,
   type HeroLayout,
+  type SectionSpacing,
   withNormalizedHeroLayout,
 } from "@/types/dojang";
 import type { PromoTemplateContent } from "@/types/promo-template";
@@ -22,6 +24,11 @@ export async function updateMyDojang(
     logoUrl: string | null;
     heroImageUrl: string | null;
     brandColor: string | null;
+    customBgColor: string | null;
+    customTextColor: string | null;
+    sectionSpacing: SectionSpacing;
+    sectionText: Record<string, string>;
+    canvasElements: CanvasTextElement[];
     heroLayout: HeroLayout;
     headingFont: HeadingFont;
   }>,

@@ -1,5 +1,10 @@
 import { DEFAULT_BRAND_COLOR } from "@/types/dojang";
-import { getReadableTextColor, hexToRgba, normalizeHexColor } from "@/lib/dojang/brand";
+import {
+  getReadableTextColor,
+  heroMinHeightClass,
+  hexToRgba,
+  normalizeHexColor,
+} from "@/lib/dojang/brand";
 import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
 
 const NEAR_BLACK = "#0B0B0C";
@@ -11,7 +16,7 @@ export function PremiumHero({ content, preview = false }: HeroComponentProps) {
 
   return (
     <header
-      className="relative flex min-h-[78svh] flex-col justify-end overflow-hidden"
+      className={`relative flex flex-col justify-end overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
       style={{ backgroundColor: NEAR_BLACK }}
     >
       <div
@@ -28,6 +33,7 @@ export function PremiumHero({ content, preview = false }: HeroComponentProps) {
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
+        editable={preview}
         textColor="#ffffff"
         mutedColor={hexToRgba(GOLD, 0.85)}
         buttonBg={brand}

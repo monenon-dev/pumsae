@@ -221,6 +221,56 @@ def update_my_dojang(
             )
         dojang.brand_color = color.lower()
 
+    if "customBgColor" in updates:
+        raw = (updates["customBgColor"] or "").strip()
+        if raw and not _HEX.match(raw):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="배경색은 #RRGGBB 형식이어야 합니다.",
+            )
+        dojang.custom_bg_color = raw.lower() or None
+
+    if "customTextColor" in updates:
+        raw = (updates["customTextColor"] or "").strip()
+        if raw and not _HEX.match(raw):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="글자색은 #RRGGBB 형식이어야 합니다.",
+            )
+        dojang.custom_text_color = raw.lower() or None
+
+    if "sectionSpacing" in updates and updates["sectionSpacing"] is not None:
+        spacing = updates["sectionSpacing"]
+        if spacing not in ("COMPACT", "NORMAL", "SPACIOUS"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="여백 설정값이 올바르지 않습니다.",
+            )
+        dojang.section_spacing = spacing
+
+    if "sectionText" in updates:
+        raw_text = updates["sectionText"] or {}
+        cleaned: dict[str, str] = {}
+        for key, text_value in raw_text.items():
+            if not isinstance(key, str) or not isinstance(text_value, str):
+                continue
+            trimmed = text_value.strip()
+            if not trimmed:
+                continue
+            cleaned[key[:80]] = trimmed[:300]
+        dojang.section_text = cleaned or None
+
+    if "canvasElements" in updates:
+        raw_elements = updates["canvasElements"] or []
+        if len(raw_elements) > 40:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="캔버스 요소는 최대 40개까지 만들 수 있습니다.",
+            )
+        for element in raw_elements:
+            element["text"] = str(element.get("text", ""))[:500]
+        dojang.canvas_elements = raw_elements or None
+
     if "heroLayout" in updates and updates["heroLayout"] is not None:
         dojang.hero_layout = updates["heroLayout"]
 

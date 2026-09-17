@@ -7,46 +7,40 @@ import {
 } from "@/lib/dojang/brand";
 import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
 
-const IVORY = "#F5F0E4";
-const INK = "#1C1C1C";
+const STAGE_INK = "#050507";
 
-export function TraditionalHero({ content, preview = false }: HeroComponentProps) {
+export function SpotlightHero({ content, preview = false }: HeroComponentProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
   const brandFg = getReadableTextColor(brand);
 
   return (
     <header
       className={`relative flex flex-col justify-end overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
-      style={{ backgroundColor: IVORY }}
+      style={{ backgroundColor: STAGE_INK }}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 -top-24 h-[26rem] w-[26rem] rounded-full"
-        style={{ border: `1px solid ${hexToRgba(INK, 0.12)}` }}
+        className="pointer-events-none absolute left-1/2 top-1/3 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[80px]"
+        style={{ backgroundColor: hexToRgba(brand, 0.4) }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-6 -top-6 h-[20rem] w-[20rem] rounded-full"
-        style={{ border: `1px solid ${hexToRgba(INK, 0.1)}` }}
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at 50% 30%, transparent 0%, ${hexToRgba(STAGE_INK, 0.85)} 70%)`,
+        }}
       />
-      <p
-        aria-hidden
-        className="pointer-events-none absolute -bottom-16 right-0 select-none text-[18rem] font-black leading-none"
-        style={{ color: hexToRgba(INK, 0.05) }}
-      >
-        道
-      </p>
       <HeroCopy
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
         editable={preview}
-        textColor={INK}
-        mutedColor={hexToRgba(INK, 0.65)}
+        textColor="#ffffff"
+        mutedColor={hexToRgba("#ffffff", 0.75)}
         buttonBg={brand}
         buttonFg={brandFg}
         headingFont={content.headingFont}
-        headingClassName="font-normal tracking-wide"
+        headingClassName="font-extrabold"
       />
     </header>
   );

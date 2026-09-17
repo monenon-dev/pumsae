@@ -10,6 +10,7 @@ type ImageFieldProps = {
   hint?: string;
   value: string | null;
   disabled?: boolean;
+  compact?: boolean;
   onChange: (next: string | null) => void;
 };
 
@@ -21,6 +22,7 @@ export function ImageField({
   hint = "파일을 올리거나 이미지 주소를 붙여넣으세요.",
   value,
   disabled = false,
+  compact = false,
   onChange,
 }: ImageFieldProps) {
   const [uploading, setUploading] = useState(false);
@@ -52,7 +54,7 @@ export function ImageField({
   return (
     <fieldset className="space-y-2">
       <legend className="text-sm font-medium">{label}</legend>
-      <div className="flex items-start gap-3">
+      <div className={compact ? "flex flex-col gap-3" : "flex items-start gap-3"}>
         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100">
           {previewable ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -63,7 +65,7 @@ export function ImageField({
             </div>
           )}
         </div>
-        <div className="min-w-0 flex-1 space-y-2">
+        <div className={compact ? "w-full min-w-0 space-y-2" : "min-w-0 flex-1 space-y-2"}>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -73,7 +75,11 @@ export function ImageField({
               event.target.value = "";
               void handleFile(file);
             }}
-            className="block w-full text-sm text-zinc-600 file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-900 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white disabled:opacity-60"
+            className={`block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-900 file:py-2 file:font-medium file:text-white disabled:opacity-60 ${
+              compact
+                ? "text-transparent file:px-2.5 file:text-xs"
+                : "text-zinc-600 file:px-3 file:text-sm"
+            }`}
           />
           <input
             type="url"
@@ -86,9 +92,11 @@ export function ImageField({
             className={inputClassName}
             placeholder="https://..."
           />
-          <p className="text-sm text-zinc-500">
-            {uploading ? "올리는 중..." : hint}
-          </p>
+          {!compact ? (
+            <p className="text-sm text-zinc-500">
+              {uploading ? "올리는 중..." : hint}
+            </p>
+          ) : null}
           {error ? <p className="text-sm text-red-700">{error}</p> : null}
         </div>
       </div>

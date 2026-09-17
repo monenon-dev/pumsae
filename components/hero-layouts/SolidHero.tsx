@@ -1,6 +1,14 @@
 import { DEFAULT_BRAND_COLOR } from "@/types/dojang";
-import { getReadableTextColor, hexToRgba, normalizeHexColor } from "@/lib/dojang/brand";
+import {
+  getReadableTextColor,
+  heroMinHeightClass,
+  hexToRgba,
+  normalizeHexColor,
+} from "@/lib/dojang/brand";
 import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+
+const PAPER = "#FAFAF9";
+const INK = "#18181b";
 
 export function SolidHero({ content, preview = false }: HeroComponentProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
@@ -8,17 +16,18 @@ export function SolidHero({ content, preview = false }: HeroComponentProps) {
 
   return (
     <header
-      className="relative flex min-h-[78svh] flex-col justify-end overflow-hidden"
-      style={{ backgroundColor: brand }}
+      className={`relative flex flex-col justify-end overflow-hidden border-b-4 ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
+      style={{ backgroundColor: PAPER, borderColor: brand }}
     >
       <HeroCopy
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
-        textColor={brandFg}
-        mutedColor={hexToRgba(brandFg, 0.85)}
-        buttonBg={brandFg}
-        buttonFg={brand}
+        editable={preview}
+        textColor={INK}
+        mutedColor={hexToRgba(INK, 0.55)}
+        buttonBg={brand}
+        buttonFg={brandFg}
         headingFont={content.headingFont}
       />
     </header>
