@@ -5,6 +5,15 @@
 :root {
   --background: #fafaf8;
   --foreground: #1c1c1c;
+
+  /* Loaded via a Google Fonts <link> in app/layout.tsx rather than
+     next/font/google — see the comment there for why. */
+  --font-song-myung: "Song Myung", serif;
+  --font-black-han-sans: "Black Han Sans", sans-serif;
+  --font-gowun-batang: "Gowun Batang", serif;
+  --font-gaegu: "Gaegu", cursive;
+  --font-nanum-myeongjo: "Nanum Myeongjo", serif;
+  --font-sunflower: "Sunflower", sans-serif;
 }
 
 body {

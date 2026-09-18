@@ -5,7 +5,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 export function DynamicHero({ content, preview = false }: HeroComponentProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
@@ -15,6 +15,12 @@ export function DynamicHero({ content, preview = false }: HeroComponentProps) {
     <header
       className={`relative flex flex-col justify-end overflow-hidden bg-black ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
     >
+      {content.heroImageUrl ? (
+        <>
+          <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} />
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-black/55" />
+        </>
+      ) : null}
       <div
         aria-hidden
         className="pointer-events-none absolute -right-16 top-[-8rem] h-[26rem] w-[26rem] rotate-[18deg]"

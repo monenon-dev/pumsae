@@ -84,16 +84,22 @@ class ApiClient {
       ..interceptors.add(CookieManager(_cookieJar))
       ..interceptors.add(_AuthInterceptor(this));
 
-    // A second, plain Dio used only to call /auth/refresh. It shares the
-    // same cookie jar but deliberately skips _AuthInterceptor: routing the
-    // refresh call through the queued interceptor above would enqueue it
-    // behind the very request that's waiting on it, deadlocking forever.
-    _refreshDio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl))
+    // A second, plain Dio used for /auth/refresh and for replaying a
+    // request after a 401. It shares the same cookie jar but deliberately
+    // skips _AuthInterceptor: that interceptor is a QueuedInterceptor,
+    // which serializes all interceptor processing on _dio to one request
+    // at a time. Refreshing or retrying through _dio itself would try to
+    // run a second request's onRequest/onError while the first request's
+    // onError (the one doing the refresh/retry) is still on the queue
+    // waiting for it — a self-deadlock. This only surfaces once a retried
+    // request fails again (e.g. a business-logic 401 like a wrong current
+    // password), since a retry that succeeds never re-enters onError.
+    _rawDio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl))
       ..interceptors.add(CookieManager(_cookieJar));
   }
 
   late final Dio _dio;
-  late final Dio _refreshDio;
+  late final Dio _rawDio;
   final PersistCookieJar _cookieJar;
 
   String? _accessToken;
@@ -135,9 +141,17 @@ class ApiClient {
     });
   }
 
+  /// Replays [options] (a request that just failed with a 401) on the
+  /// interceptor-free Dio instance, after the caller has refreshed the
+  /// access token and updated `options.headers`. See the constructor
+  /// comment on `_rawDio` for why this can't go through [dio] itself.
+  Future<Response<dynamic>> retry(RequestOptions options) {
+    return _rawDio.fetch(options);
+  }
+
   Future<Map<String, dynamic>?> _performRefresh() async {
     try {
-      final response = await _refreshDio.post<Map<String, dynamic>>(
+      final response = await _rawDio.post<Map<String, dynamic>>(
         '/auth/refresh',
       );
       final data = response.data;
@@ -199,7 +213,7 @@ class _AuthInterceptor extends QueuedInterceptor {
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';
       }
-      final response = await _client.dio.fetch(options);
+      final response = await _client.retry(options);
       handler.resolve(response);
     } on DioException catch (retryError) {
       handler.next(retryError);

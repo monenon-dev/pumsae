@@ -3,9 +3,14 @@
 import { useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import {
   createCanvasElement,
+  DEFAULT_HEADING_FONT,
+  HEADING_FONTS,
+  HEADING_FONT_LABELS,
+  HEADING_FONT_VARS,
   type CanvasBreakpoint,
   type CanvasElementPosition,
   type CanvasTextElement,
+  type HeadingFont,
 } from "@/types/dojang";
 import { beginInlineTextEdit } from "@/lib/dojang/inline-edit";
 
@@ -23,6 +28,7 @@ function elementStyle(
     width: `${position.widthPct}%`,
     fontSize: `${element.fontSize}px`,
     fontWeight: element.fontWeight === "bold" ? 700 : 400,
+    fontFamily: HEADING_FONT_VARS[element.fontFamily ?? DEFAULT_HEADING_FONT],
     fontStyle: element.italic ? "italic" : "normal",
     textDecoration: element.underline ? "underline" : "none",
     color: element.color,
@@ -163,6 +169,7 @@ export function EditableCanvasLayer({
       text: selected.text,
       fontSize: selected.fontSize,
       fontWeight: selected.fontWeight,
+      fontFamily: selected.fontFamily,
       italic: selected.italic,
       underline: selected.underline,
       color: selected.color,
@@ -312,6 +319,22 @@ export function EditableCanvasLayer({
               닫기
             </button>
           </div>
+
+          <select
+            value={selected.fontFamily ?? DEFAULT_HEADING_FONT}
+            onChange={(event) =>
+              updateElement(selected.id, {
+                fontFamily: event.target.value as HeadingFont,
+              })
+            }
+            className="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-sm"
+          >
+            {HEADING_FONTS.map((font) => (
+              <option key={font} value={font} style={{ fontFamily: HEADING_FONT_VARS[font] }}>
+                {HEADING_FONT_LABELS[font]}
+              </option>
+            ))}
+          </select>
 
           <div className="flex items-center gap-2">
             <button

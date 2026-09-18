@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_router.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const ProviderScope(child: PumsaeApp()));
@@ -20,10 +21,7 @@ class PumsaeApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'PUMSAE',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light(),
       routerConfig: router,
     );
   }

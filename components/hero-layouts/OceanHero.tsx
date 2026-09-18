@@ -5,7 +5,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 const TEAL_DEEP = "#0f766e";
 const CYAN_MID = "#0e7490";
@@ -19,11 +19,13 @@ export function OceanHero({ content, preview = false }: HeroComponentProps) {
     <header
       className={`relative flex flex-col justify-between overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
     >
+      {content.heroImageUrl ? <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} /> : null}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="pointer-events-none absolute inset-0"
         style={{
           background: `linear-gradient(135deg, ${TEAL_DEEP} 0%, ${CYAN_MID} 45%, ${NAVY_INK} 100%)`,
+          opacity: content.heroImageUrl ? 0.75 : 1,
         }}
       />
       <div

@@ -12,6 +12,7 @@ import {
   type CanvasBreakpoint,
   type CanvasTextElement,
   type DojangLandingContent,
+  type HeroImagePosition,
 } from "@/types/dojang";
 
 type EditableLandingViewProps = {
@@ -23,6 +24,7 @@ export function EditableLandingView({ initial }: EditableLandingViewProps) {
   const [content, setContent] = useState(() => withNormalizedHeroLayout(initial));
   const [canvasBreakpoint, setCanvasBreakpoint] = useState<CanvasBreakpoint>("desktop");
   const canvasSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const imagePositionSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isOwner = !authLoading && user?.dojangId === content.id;
 
@@ -63,6 +65,18 @@ export function EditableLandingView({ initial }: EditableLandingViewProps) {
     });
   }
 
+  function updateHeroImagePositionLive(position: HeroImagePosition) {
+    setContent((current) => {
+      if (imagePositionSaveTimer.current) {
+        clearTimeout(imagePositionSaveTimer.current);
+      }
+      imagePositionSaveTimer.current = setTimeout(() => {
+        save({ heroImagePosition: position });
+      }, 600);
+      return { ...current, heroImagePosition: position };
+    });
+  }
+
   function beginInlineEdit(target: HTMLElement, field: string) {
     beginInlineTextEdit(target, {
       multiline: field === "description",
@@ -87,6 +101,7 @@ export function EditableLandingView({ initial }: EditableLandingViewProps) {
         breakpoint: canvasBreakpoint,
         onBreakpointChange: setCanvasBreakpoint,
         onChange: updateCanvasElementsLive,
+        onImagePositionChange: updateHeroImagePositionLive,
       }}
     >
       <div

@@ -46,6 +46,11 @@ export const HEADING_FONTS = [
   "BLACK_HAN_SANS",
   "GOWUN_BATANG",
   "GAEGU",
+  "NANUM_MYEONGJO",
+  "DO_HYEON",
+  "JUA",
+  "SUNFLOWER",
+  "STYLISH",
 ] as const;
 
 export type HeadingFont = (typeof HEADING_FONTS)[number];
@@ -58,6 +63,11 @@ export const HEADING_FONT_LABELS: Record<HeadingFont, string> = {
   BLACK_HAN_SANS: "검은고딕",
   GOWUN_BATANG: "고운바탕",
   GAEGU: "개구체",
+  NANUM_MYEONGJO: "나눔명조",
+  DO_HYEON: "도현체",
+  JUA: "주아체",
+  SUNFLOWER: "선플라워",
+  STYLISH: "스타일리시",
 };
 
 export const HEADING_FONT_VARS: Record<HeadingFont, string> = {
@@ -66,6 +76,11 @@ export const HEADING_FONT_VARS: Record<HeadingFont, string> = {
   BLACK_HAN_SANS: "var(--font-black-han-sans)",
   GOWUN_BATANG: "var(--font-gowun-batang)",
   GAEGU: "var(--font-gaegu)",
+  NANUM_MYEONGJO: "var(--font-nanum-myeongjo)",
+  DO_HYEON: "var(--font-do-hyeon)",
+  JUA: "var(--font-jua)",
+  SUNFLOWER: "var(--font-sunflower)",
+  STYLISH: "var(--font-stylish)",
 };
 
 export function normalizeHeadingFont(
@@ -205,6 +220,13 @@ export const SECTION_TEXT_LAYOUT_FIELDS: Partial<
       placeholder: "아이부터 성인까지, 단계에 맞는 수련 프로그램을 운영합니다.",
     },
   ],
+  PHOTO_COVER: [
+    {
+      key: "photoQuote",
+      label: "인용구",
+      placeholder: "땀 흘린 만큼 강해집니다.",
+    },
+  ],
   SPOTLIGHT: [
     {
       key: "spotlightProgramTitle",
@@ -227,6 +249,7 @@ export type CanvasTextElement = {
   text: string;
   fontSize: number;
   fontWeight: "normal" | "bold";
+  fontFamily: HeadingFont;
   italic: boolean;
   underline: boolean;
   color: string;
@@ -246,6 +269,7 @@ export function createCanvasElement(
     text: "텍스트를 입력하세요",
     fontSize: 20,
     fontWeight: "normal",
+    fontFamily: DEFAULT_HEADING_FONT,
     italic: false,
     underline: false,
     color: "#ffffff",
@@ -256,6 +280,18 @@ export function createCanvasElement(
   };
 }
 
+export type HeroImagePosition = {
+  xPct: number;
+  yPct: number;
+  zoom: number;
+};
+
+export const DEFAULT_HERO_IMAGE_POSITION: HeroImagePosition = {
+  xPct: 50,
+  yPct: 50,
+  zoom: 1,
+};
+
 export type DojangLandingContent = {
   id: string;
   name: string;
@@ -263,6 +299,7 @@ export type DojangLandingContent = {
   description: string | null;
   logoUrl: string | null;
   heroImageUrl: string | null;
+  heroImagePosition: HeroImagePosition;
   brandColor: string | null;
   customBgColor: string | null;
   customTextColor: string | null;
@@ -280,13 +317,19 @@ export type DojangLandingContent = {
 export function withNormalizedHeroLayout(
   content: Omit<
     DojangLandingContent,
-    "heroLayout" | "headingFont" | "sectionSpacing" | "sectionText" | "canvasElements"
+    | "heroLayout"
+    | "headingFont"
+    | "sectionSpacing"
+    | "sectionText"
+    | "canvasElements"
+    | "heroImagePosition"
   > & {
     heroLayout?: string | null;
     headingFont?: string | null;
     sectionSpacing?: string | null;
     sectionText?: Record<string, string> | null;
     canvasElements?: CanvasTextElement[] | null;
+    heroImagePosition?: Partial<HeroImagePosition> | null;
   },
 ): DojangLandingContent {
   return {
@@ -296,6 +339,10 @@ export function withNormalizedHeroLayout(
     sectionSpacing: normalizeSectionSpacing(content.sectionSpacing),
     sectionText: content.sectionText ?? {},
     canvasElements: content.canvasElements ?? [],
+    heroImagePosition: {
+      ...DEFAULT_HERO_IMAGE_POSITION,
+      ...content.heroImagePosition,
+    },
   };
 }
 

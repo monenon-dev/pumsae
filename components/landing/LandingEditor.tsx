@@ -29,6 +29,7 @@ import {
   type CanvasBreakpoint,
   type CanvasTextElement,
   type DojangLandingContent,
+  type HeroImagePosition,
   type HeroLayout,
   withNormalizedHeroLayout,
 } from "@/types/dojang";
@@ -449,6 +450,10 @@ export function LandingEditor({ initial }: LandingEditorProps) {
       canvasElements: updater(current.canvasElements),
     }));
     setSuccess(null);
+  }
+
+  function updateHeroImagePosition(position: HeroImagePosition) {
+    updateField("heroImagePosition", position);
   }
 
   function beginInlineEdit(target: HTMLElement, field: string) {
@@ -1030,6 +1035,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                 breakpoint: canvasBreakpoint,
                 onBreakpointChange: setCanvasBreakpoint,
                 onChange: updateCanvasElements,
+                onImagePositionChange: updateHeroImagePosition,
               }}
             >
               <DojangLanding content={content} preview />

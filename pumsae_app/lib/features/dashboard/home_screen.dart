@@ -67,12 +67,14 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           _DashboardCard(
+            icon: Icons.event_available_outlined,
             title: '체험 신청',
             onTap: () => context.push('/trials'),
             child: Text('대기 중 $pendingCount건'),
           ),
           const SizedBox(height: 12),
           _DashboardCard(
+            icon: Icons.image_outlined,
             title: '카드뉴스',
             onTap: () => context.push('/templates'),
             child: _asyncContent<int>(
@@ -83,6 +85,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           _DashboardCard(
+            icon: Icons.public,
             title: '홍보 페이지',
             onTap: dojang.value == null
                 ? null
@@ -125,18 +128,22 @@ Widget _asyncContent<T>(
 
 class _DashboardCard extends StatelessWidget {
   const _DashboardCard({
+    required this.icon,
     required this.title,
     required this.child,
     required this.onTap,
   });
 
+  final IconData icon;
   final String title;
   final Widget child;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
+      elevation: 2,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -144,6 +151,12 @@ class _DashboardCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
+              CircleAvatar(
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.onPrimaryContainer,
+                child: Icon(icon),
+              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

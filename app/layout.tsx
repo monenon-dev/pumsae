@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Black_Han_Sans, Gaegu, Gowun_Batang, Song_Myung } from "next/font/google";
+import { Do_Hyeon, Jua, Stylish } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
@@ -27,30 +27,38 @@ const geistMono = localFont({
 });
 
 // Optional headline fonts a dojang owner can pick per landing page.
-const songMyung = Song_Myung({
+//
+// Song Myung, Black Han Sans, Gowun Batang, Gaegu, Nanum Myeongjo, and
+// Sunflower are loaded via the <link> tag below instead of next/font/google:
+// next/font/google (as bundled with next@14.2.35) fetches an incomplete
+// Google Fonts CSS response for these specific families — the resulting
+// @font-face rules cover Latin/CJK-punctuation ranges but not a single
+// Hangul syllable, so any Korean text silently fell back to the default
+// font. Confirmed via document.fonts.check("...", "가") returning false for
+// each of these, both before and after a full cache-cleared rebuild (so it
+// isn't a caching fluke). Do Hyeon, Jua, and Stylish load correctly through
+// next/font/google and are unaffected.
+const doHyeon = Do_Hyeon({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-song-myung",
+  variable: "--font-do-hyeon",
   display: "swap",
 });
-const blackHanSans = Black_Han_Sans({
+const jua = Jua({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-black-han-sans",
+  variable: "--font-jua",
   display: "swap",
 });
-const gowunBatang = Gowun_Batang({
-  weight: ["400", "700"],
+const stylish = Stylish({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-gowun-batang",
+  variable: "--font-stylish",
   display: "swap",
 });
-const gaegu = Gaegu({
-  weight: ["300", "400", "700"],
-  subsets: ["latin"],
-  variable: "--font-gaegu",
-  display: "swap",
-});
+
+const LINKED_GOOGLE_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Song+Myung&family=Black+Han+Sans&family=Gowun+Batang:wght@400;700&family=Gaegu:wght@300;400;700&family=Nanum+Myeongjo:wght@400;700&family=Sunflower:wght@300;700&display=swap";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
@@ -65,8 +73,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={LINKED_GOOGLE_FONTS_HREF} />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${songMyung.variable} ${blackHanSans.variable} ${gowunBatang.variable} ${gaegu.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${doHyeon.variable} ${jua.variable} ${stylish.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
       </body>

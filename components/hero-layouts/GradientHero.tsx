@@ -5,7 +5,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 const INDIGO_DEEP = "#1e1b4b";
 const INDIGO_MID = "#4c1d95";
@@ -19,11 +19,13 @@ export function GradientHero({ content, preview = false }: HeroComponentProps) {
     <header
       className={`relative flex flex-col justify-center overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
     >
+      {content.heroImageUrl ? <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} /> : null}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="pointer-events-none absolute inset-0"
         style={{
           background: `linear-gradient(135deg, ${INDIGO_DEEP} 0%, ${INDIGO_MID} 48%, ${INK} 100%)`,
+          opacity: content.heroImageUrl ? 0.78 : 1,
         }}
       />
       <div

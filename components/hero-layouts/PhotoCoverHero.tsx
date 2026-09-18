@@ -19,11 +19,11 @@ export function PhotoCoverHero({ content, preview = false }: HeroComponentProps)
       className={`relative flex flex-col justify-end overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
     >
       {content.heroImageUrl ? (
-        <HeroPhoto src={content.heroImageUrl} />
+        <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} />
       ) : (
         <div
           aria-hidden
-          className="absolute inset-0"
+          className="pointer-events-none absolute inset-0"
           style={{
             background: `linear-gradient(160deg, ${ESPRESSO_DEEP} 0%, ${ESPRESSO_INK} 72%)`,
           }}
@@ -31,7 +31,7 @@ export function PhotoCoverHero({ content, preview = false }: HeroComponentProps)
       )}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="pointer-events-none absolute inset-0"
         style={{
           background: `linear-gradient(to top, ${hexToRgba(ESPRESSO_INK, 0.92)} 0%, ${hexToRgba(ESPRESSO_INK, 0.35)} 55%, ${hexToRgba(ESPRESSO_INK, 0.15)} 100%)`,
         }}

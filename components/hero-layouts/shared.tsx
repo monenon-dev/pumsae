@@ -1,11 +1,14 @@
 "use client";
 
+import { useRef, type PointerEvent as ReactPointerEvent } from "react";
 import {
+  DEFAULT_HERO_IMAGE_POSITION,
   HEADING_FONT_VARS,
   createCanvasElement,
   type CanvasTextElement,
   type DojangLandingContent,
   type HeadingFont,
+  type HeroImagePosition,
 } from "@/types/dojang";
 import { getCopy } from "@/lib/dojang/copy";
 import { heroContentPaddingClass } from "@/lib/dojang/brand";
@@ -229,10 +232,94 @@ export function GradientLayer({ brand }: { brand: string }) {
   );
 }
 
-export function HeroPhoto({ src }: { src: string }) {
+export function HeroPhoto({
+  src,
+  className = "",
+  position,
+}: {
+  src: string;
+  className?: string;
+  position?: HeroImagePosition;
+}) {
+  const { editable, onImagePositionChange } = useCanvasEditor();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const resolved = position ?? DEFAULT_HERO_IMAGE_POSITION;
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!editable) return;
+    event.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startPos = resolved;
+
+    function onMove(moveEvent: PointerEvent) {
+      const dxPct = ((moveEvent.clientX - startX) / rect.width) * 100;
+      const dyPct = ((moveEvent.clientY - startY) / rect.height) * 100;
+      onImagePositionChange({
+        ...startPos,
+        xPct: Math.min(Math.max(startPos.xPct - dxPct, 0), 100),
+        yPct: Math.min(Math.max(startPos.yPct - dyPct, 0), 100),
+      });
+    }
+    function onUp() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  function adjustZoom(delta: number) {
+    onImagePositionChange({
+      ...resolved,
+      zoom: Math.min(Math.max(resolved.zoom + delta, 1), 2.5),
+    });
+  }
+
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" />
+    <div
+      ref={containerRef}
+      className={`absolute inset-0 overflow-hidden ${editable ? "cursor-move touch-none" : ""}`}
+      onPointerDown={handlePointerDown}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        draggable={false}
+        className={`h-full w-full object-cover ${className}`}
+        style={{
+          objectPosition: `${resolved.xPct}% ${resolved.yPct}%`,
+          transform: `scale(${resolved.zoom})`,
+          transformOrigin: `${resolved.xPct}% ${resolved.yPct}%`,
+        }}
+      />
+      {editable ? (
+        <div
+          className="absolute bottom-3 right-3 z-20 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-zinc-900 shadow-lg"
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => adjustZoom(-0.1)}
+            className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold hover:bg-zinc-100"
+          >
+            -
+          </button>
+          <span className="px-1 text-xs font-semibold text-zinc-600">사진 확대</span>
+          <button
+            type="button"
+            onClick={() => adjustZoom(0.1)}
+            className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold hover:bg-zinc-100"
+          >
+            +
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

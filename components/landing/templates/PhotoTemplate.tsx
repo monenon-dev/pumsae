@@ -12,6 +12,10 @@ import {
   sectionPaddingClass,
 } from "@/lib/dojang/brand";
 import { getCopy } from "@/lib/dojang/copy";
+import { useCanvasEditor } from "@/lib/dojang/canvas-context";
+
+const EDITABLE_HINT_CLASS =
+  "cursor-text rounded-md outline-dashed outline-1 outline-offset-4 outline-transparent transition hover:outline-current/30 focus:outline-current/60";
 
 type TemplateProps = {
   content: DojangLandingContent;
@@ -54,6 +58,7 @@ export function PhotoTemplate({ content, preview = false }: TemplateProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
   const brandFg = getReadableTextColor(brand);
   const spacing = content.sectionSpacing;
+  const { editable } = useCanvasEditor();
 
   return (
     <article
@@ -64,32 +69,15 @@ export function PhotoTemplate({ content, preview = false }: TemplateProps) {
 
       <section className={`px-5 sm:px-8 ${sectionPaddingClass(spacing, "py-14")}`}>
         <p
-          className="text-2xl font-semibold leading-snug tracking-tight sm:text-3xl"
+          className={`text-2xl font-semibold leading-snug tracking-tight sm:text-3xl${editable ? ` ${EDITABLE_HINT_CLASS}` : ""}`}
           style={{ color: "var(--landing-brand)" }}
+          data-editable-field={editable ? "photoQuote" : undefined}
         >
           &ldquo;
-          {content.description ||
-            "소개글을 입력하면 이 자리에 체육관 이야기가 표시됩니다."}
+          {getCopy(content, "photoQuote", "땀 흘린 만큼 강해집니다.")}
           &rdquo;
         </p>
       </section>
-
-      {content.heroImageUrl ? (
-        <section className="relative h-[36vh] w-full overflow-hidden sm:h-[46vh]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={content.heroImageUrl}
-            alt=""
-            className="h-full w-full object-cover opacity-90"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(to top, ${ESPRESSO_INK} 0%, transparent 60%)`,
-            }}
-          />
-        </section>
-      ) : null}
 
       <section className={`px-5 sm:px-8 ${sectionPaddingClass(spacing, "py-14")}`}>
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-500">

@@ -1,14 +1,20 @@
 import { DEFAULT_BRAND_COLOR } from "@/types/dojang";
 import { heroMinHeightClass, normalizeHexColor } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 export function MonoHero({ content, preview = false }: HeroComponentProps) {
   const brand = normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR);
 
   return (
     <header
-      className={`relative m-3 flex flex-col justify-end overflow-hidden border-2 border-zinc-900 bg-white sm:m-5 ${heroMinHeightClass(content.sectionSpacing, "min-h-[74svh]")}`}
+      className={`relative m-3 flex flex-col justify-end overflow-hidden border-2 border-zinc-900 sm:m-5 ${heroMinHeightClass(content.sectionSpacing, "min-h-[74svh]")}`}
     >
+      {content.heroImageUrl ? <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} className="grayscale" /> : null}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-white"
+        style={{ opacity: content.heroImageUrl ? 0.32 : 1 }}
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.08]"

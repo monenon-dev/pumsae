@@ -38,6 +38,7 @@ class Dojang(Base):
     )
     section_text: Mapped[dict | None] = mapped_column(JSON)
     canvas_elements: Mapped[list | None] = mapped_column(JSON)
+    hero_image_position: Mapped[dict | None] = mapped_column(JSON)
     hero_layout: Mapped[HeroLayout] = mapped_column(
         Enum(HeroLayout, name="hero_layout", native_enum=True),
         nullable=False,

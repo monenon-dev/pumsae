@@ -212,6 +212,20 @@ def update_my_dojang(
             )
         dojang.hero_image_url = hero
 
+    if "heroImagePosition" in updates:
+        raw_position = updates["heroImagePosition"]
+        if raw_position is None:
+            dojang.hero_image_position = None
+        else:
+            x_pct = float(raw_position.get("xPct", 50))
+            y_pct = float(raw_position.get("yPct", 50))
+            zoom = float(raw_position.get("zoom", 1))
+            dojang.hero_image_position = {
+                "xPct": min(max(x_pct, 0), 100),
+                "yPct": min(max(y_pct, 0), 100),
+                "zoom": min(max(zoom, 1), 2.5),
+            }
+
     if "brandColor" in updates:
         color = (updates["brandColor"] or "").strip()
         if not _HEX.match(color):

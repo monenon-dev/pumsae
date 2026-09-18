@@ -5,7 +5,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 const PARCHMENT = "#EDEAE1";
 const INK = "#2A2A28";
@@ -17,8 +17,13 @@ export function BadgeHero({ content, preview = false }: HeroComponentProps) {
   return (
     <header
       className={`relative m-3 flex flex-col justify-end overflow-hidden sm:m-5 ${heroMinHeightClass(content.sectionSpacing, "min-h-[74svh]")}`}
-      style={{ backgroundColor: PARCHMENT }}
     >
+      {content.heroImageUrl ? <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} /> : null}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundColor: PARCHMENT, opacity: content.heroImageUrl ? 0.72 : 1 }}
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-3 border sm:inset-4"

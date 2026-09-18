@@ -5,7 +5,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 const IVORY = "#F5F0E4";
 const INK = "#1C1C1C";
@@ -17,8 +17,13 @@ export function TraditionalHero({ content, preview = false }: HeroComponentProps
   return (
     <header
       className={`relative flex flex-col justify-end overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
-      style={{ backgroundColor: IVORY }}
     >
+      {content.heroImageUrl ? <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} /> : null}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundColor: IVORY, opacity: content.heroImageUrl ? 0.72 : 1 }}
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute -right-24 -top-24 h-[26rem] w-[26rem] rounded-full"

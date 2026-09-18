@@ -5,7 +5,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "@/lib/dojang/brand";
-import { HeroCopy, heroLocation, type HeroComponentProps } from "./shared";
+import { HeroCopy, HeroPhoto, heroLocation, type HeroComponentProps } from "./shared";
 
 const NEAR_BLACK = "#0B0B0C";
 const GOLD = "#C9A15A";
@@ -17,8 +17,13 @@ export function PremiumHero({ content, preview = false }: HeroComponentProps) {
   return (
     <header
       className={`relative flex flex-col justify-end overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
-      style={{ backgroundColor: NEAR_BLACK }}
     >
+      {content.heroImageUrl ? <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} /> : null}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundColor: NEAR_BLACK, opacity: content.heroImageUrl ? 0.68 : 1 }}
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute left-5 top-10 h-px w-16 sm:left-8"

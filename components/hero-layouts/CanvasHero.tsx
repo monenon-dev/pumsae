@@ -9,7 +9,7 @@ import {
 import { heroMinHeightClass, normalizeHexColor } from "@/lib/dojang/brand";
 import { useCanvasEditor } from "@/lib/dojang/canvas-context";
 import { EditableCanvasLayer } from "./EditableCanvasLayer";
-import type { HeroComponentProps } from "./shared";
+import { HeroPhoto, type HeroComponentProps } from "./shared";
 
 function defaultElements(
   content: HeroComponentProps["content"],
@@ -54,6 +54,16 @@ export function CanvasHero({ content }: HeroComponentProps) {
       className={`relative overflow-hidden ${heroMinHeightClass(content.sectionSpacing, "min-h-[78svh]")}`}
       style={{ backgroundColor: bg }}
     >
+      {content.heroImageUrl ? (
+        <>
+          <HeroPhoto src={content.heroImageUrl} position={content.heroImagePosition} />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundColor: bg, opacity: 0.55 }}
+          />
+        </>
+      ) : null}
       <EditableCanvasLayer
         elements={elements}
         onChange={onChange}
