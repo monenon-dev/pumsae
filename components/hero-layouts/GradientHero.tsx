@@ -35,12 +35,13 @@ export function GradientHero({ content, preview = false }: HeroComponentProps) {
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
-        editable={preview}
         textColor="#ffffff"
         mutedColor={hexToRgba("#ffffff", 0.85)}
         buttonBg={brand}
         buttonFg={brandFg}
         headingFont={content.headingFont}
+        canvasElements={content.canvasElements.length > 0 ? content.canvasElements : undefined}
+        layoutId="GRADIENT"
       />
     </header>
   );

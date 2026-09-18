@@ -10,7 +10,6 @@ export const HERO_LAYOUTS = [
   "MONO",
   "SPOTLIGHT",
   "BADGE",
-  "CUSTOM",
   "CANVAS",
 ] as const;
 
@@ -30,7 +29,6 @@ export const HERO_LAYOUT_LABELS: Record<HeroLayout, string> = {
   MONO: "모노크롬 에디토리얼",
   SPOTLIGHT: "스포트라이트",
   BADGE: "엠블럼 뱃지",
-  CUSTOM: "완전 커스텀",
   CANVAS: "자유 캔버스",
 };
 
@@ -229,6 +227,8 @@ export type CanvasTextElement = {
   text: string;
   fontSize: number;
   fontWeight: "normal" | "bold";
+  italic: boolean;
+  underline: boolean;
   color: string;
   align: "left" | "center" | "right";
   desktop: CanvasElementPosition;
@@ -246,6 +246,8 @@ export function createCanvasElement(
     text: "텍스트를 입력하세요",
     fontSize: 20,
     fontWeight: "normal",
+    italic: false,
+    underline: false,
     color: "#ffffff",
     align: "left",
     desktop: { xPct: 8, yPct: 40, widthPct: 50 },

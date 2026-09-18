@@ -38,7 +38,6 @@ class HeroLayout(str, Enum):
     MONO = "MONO"
     SPOTLIGHT = "SPOTLIGHT"
     BADGE = "BADGE"
-    CUSTOM = "CUSTOM"
     CANVAS = "CANVAS"
 
 

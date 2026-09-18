@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DojangLanding } from "@/components/landing/DojangLanding";
+import { EditableLandingView } from "@/components/landing/EditableLandingView";
 import { getDojangBySlug } from "@/lib/dojang/queries";
 import { dojangSeo } from "@/lib/dojang/seo";
 
@@ -51,5 +51,5 @@ export default async function PublicLandingPage({
     notFound();
   }
 
-  return <DojangLanding content={dojang} />;
+  return <EditableLandingView initial={dojang} />;
 }

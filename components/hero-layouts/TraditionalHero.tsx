@@ -40,12 +40,13 @@ export function TraditionalHero({ content, preview = false }: HeroComponentProps
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
-        editable={preview}
         textColor={INK}
         mutedColor={hexToRgba(INK, 0.65)}
         buttonBg={brand}
         buttonFg={brandFg}
         headingFont={content.headingFont}
+        canvasElements={content.canvasElements.length > 0 ? content.canvasElements : undefined}
+        layoutId="TRADITIONAL"
         headingClassName="font-normal tracking-wide"
       />
     </header>

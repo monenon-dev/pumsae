@@ -22,12 +22,13 @@ export function MonoHero({ content, preview = false }: HeroComponentProps) {
         content={content}
         location={heroLocation(content)}
         trialHref={preview ? undefined : "#trial"}
-        editable={preview}
         textColor="#18181b"
         mutedColor="rgba(24,24,27,0.6)"
         buttonBg="#18181b"
         buttonFg="#ffffff"
         headingFont={content.headingFont}
+        canvasElements={content.canvasElements.length > 0 ? content.canvasElements : undefined}
+        layoutId="MONO"
         headingClassName="uppercase"
       />
       <div aria-hidden className="absolute bottom-5 right-5 h-2 w-2 rounded-full sm:right-8" style={{ backgroundColor: brand }} />

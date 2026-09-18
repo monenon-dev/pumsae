@@ -1,7 +1,6 @@
 import { normalizeHeroLayout } from "@/types/dojang";
 import { BadgeHero } from "./BadgeHero";
 import { CanvasHero } from "./CanvasHero";
-import { CustomHero } from "./CustomHero";
 import { DynamicHero } from "./DynamicHero";
 import { GradientHero } from "./GradientHero";
 import { KidsHero } from "./KidsHero";
@@ -27,7 +26,6 @@ export function HeroLayoutSwitch({ content, preview = false }: HeroComponentProp
   if (layout === "MONO") return <MonoHero content={content} preview={preview} />;
   if (layout === "SPOTLIGHT") return <SpotlightHero content={content} preview={preview} />;
   if (layout === "BADGE") return <BadgeHero content={content} preview={preview} />;
-  if (layout === "CUSTOM") return <CustomHero content={content} preview={preview} />;
   if (layout === "CANVAS") return <CanvasHero content={content} preview={preview} />;
   return <GradientHero content={content} preview={preview} />;
 }
@@ -35,7 +33,6 @@ export function HeroLayoutSwitch({ content, preview = false }: HeroComponentProp
 export {
   BadgeHero,
   CanvasHero,
-  CustomHero,
   DynamicHero,
   GradientHero,
   KidsHero,

@@ -28,6 +28,8 @@ class CanvasElement(BaseModel):
     text: str
     fontSize: float
     fontWeight: Literal["normal", "bold"]
+    italic: bool = False
+    underline: bool = False
     color: str
     align: Literal["left", "center", "right"]
     desktop: CanvasElementPosition

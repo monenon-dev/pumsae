@@ -1,6 +1,20 @@
-import { HEADING_FONT_VARS, type DojangLandingContent, type HeadingFont } from "@/types/dojang";
+"use client";
+
+import {
+  HEADING_FONT_VARS,
+  createCanvasElement,
+  type CanvasTextElement,
+  type DojangLandingContent,
+  type HeadingFont,
+} from "@/types/dojang";
 import { getCopy } from "@/lib/dojang/copy";
 import { heroContentPaddingClass } from "@/lib/dojang/brand";
+import { useCanvasEditor } from "@/lib/dojang/canvas-context";
+import {
+  DEFAULT_CANVAS_POSITIONS,
+  type HeroLayoutId,
+} from "@/lib/dojang/hero-default-positions";
+import { EditableCanvasLayer } from "./EditableCanvasLayer";
 
 export type HeroComponentProps = {
   content: DojangLandingContent;
@@ -51,6 +65,54 @@ export function TrialButton({
   );
 }
 
+// Only used the moment a hero first switches into canvas mode (i.e.
+// canvasElements is present but still empty) - seeds the title,
+// description and trial button as real, draggable canvas elements at
+// positions matching where this layout's fixed CSS would have placed
+// them, instead of everything piling up at createCanvasElement()'s
+// hardcoded { xPct: 8, yPct: 40 } default.
+function defaultCanvasElementsForHero(
+  content: DojangLandingContent,
+  layoutId: HeroLayoutId,
+  textColor: string,
+  trialLabel: string,
+): CanvasTextElement[] {
+  const positions = DEFAULT_CANVAS_POSITIONS[layoutId];
+  return [
+    createCanvasElement({
+      id: "hero-title",
+      text: content.name || "도장 이름",
+      fontSize: 40,
+      fontWeight: "bold",
+      color: textColor,
+      align: "left",
+      desktop: positions.title.desktop,
+      mobile: positions.title.mobile,
+    }),
+    createCanvasElement({
+      id: "hero-description",
+      text:
+        content.description ||
+        "소개글을 입력하면 이 자리에 체육관 이야기가 표시됩니다.",
+      fontSize: 16,
+      color: textColor,
+      align: "left",
+      desktop: positions.description.desktop,
+      mobile: positions.description.mobile,
+    }),
+    createCanvasElement({
+      id: "hero-trial-button",
+      text: trialLabel,
+      fontSize: 16,
+      fontWeight: "bold",
+      color: textColor,
+      align: "left",
+      desktop: positions.trialButtonText.desktop,
+      mobile: positions.trialButtonText.mobile,
+    }),
+  ];
+}
+
 export function HeroCopy({
   content,
   location,
@@ -61,7 +123,8 @@ export function HeroCopy({
   buttonFg,
   headingFont,
   headingClassName = "",
-  editable = false,
+  canvasElements,
+  layoutId,
 }: {
   content: DojangLandingContent;
   location: string;
@@ -72,23 +135,36 @@ export function HeroCopy({
   buttonFg: string;
   headingFont: HeadingFont;
   headingClassName?: string;
-  editable?: boolean;
+  canvasElements?: CanvasTextElement[];
+  layoutId: HeroLayoutId;
 }) {
+  const { editable, breakpoint, onBreakpointChange, onChange } = useCanvasEditor();
   const trialLabel = getCopy(content, "trialButtonText", "체험 신청하기");
+
+  if (canvasElements) {
+    const elements =
+      canvasElements.length > 0
+        ? canvasElements
+        : defaultCanvasElementsForHero(content, layoutId, textColor, trialLabel);
+
+    return (
+      <EditableCanvasLayer
+        elements={elements}
+        onChange={onChange}
+        editable={editable}
+        breakpoint={breakpoint}
+        onBreakpointChange={onBreakpointChange}
+        defaultTextColor={textColor}
+      />
+    );
+  }
 
   return (
     <>
-      <div className="relative z-10 flex items-center justify-between px-5 pt-5 sm:px-8">
+      <div className="relative z-10 px-5 pt-5 sm:px-8">
         <p className="text-sm font-semibold tracking-wide" style={{ color: mutedColor }}>
           {content.name || "도장 이름"}
         </p>
-        <TrialButton
-          href={trialHref}
-          backgroundColor={buttonBg}
-          color={buttonFg}
-          label={trialLabel}
-          editable={editable}
-        />
       </div>
 
       <div className={`relative z-10 ${heroContentPaddingClass(content.sectionSpacing)}`}>

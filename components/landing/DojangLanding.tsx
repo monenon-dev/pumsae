@@ -1,6 +1,5 @@
 import { BadgeTemplate } from "@/components/landing/templates/BadgeTemplate";
 import { CanvasTemplate } from "@/components/landing/templates/CanvasTemplate";
-import { CustomTemplate } from "@/components/landing/templates/CustomTemplate";
 import { DynamicTemplate } from "@/components/landing/templates/DynamicTemplate";
 import { GradientTemplate } from "@/components/landing/templates/GradientTemplate";
 import { KidsTemplate } from "@/components/landing/templates/KidsTemplate";
@@ -53,9 +52,6 @@ export function DojangLanding({
   }
   if (layout === "BADGE") {
     return <BadgeTemplate content={content} preview={preview} />;
-  }
-  if (layout === "CUSTOM") {
-    return <CustomTemplate content={content} preview={preview} />;
   }
   if (layout === "CANVAS") {
     return <CanvasTemplate content={content} preview={preview} />;

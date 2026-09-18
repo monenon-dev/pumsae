@@ -214,18 +214,6 @@ function HeroLayoutThumb({
     );
   }
 
-  if (layout === "CUSTOM") {
-    return (
-      <span
-        className="relative flex aspect-square items-end justify-end overflow-hidden p-1.5"
-        style={{ backgroundColor: customBg }}
-      >
-        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: customText }} />
-        <span className="ml-1 h-2 w-2 rounded-full" style={{ backgroundColor: brand }} />
-      </span>
-    );
-  }
-
   if (layout === "CANVAS") {
     return (
       <span
@@ -521,11 +509,11 @@ export function LandingEditor({ initial }: LandingEditorProps) {
           DEFAULT_BRAND_COLOR,
         ),
         customBgColor:
-          content.heroLayout === "CUSTOM" || content.heroLayout === "CANVAS"
+          content.heroLayout === "CANVAS"
             ? normalizeHexColor(content.customBgColor, DEFAULT_CUSTOM_BG_COLOR)
             : content.customBgColor,
         customTextColor:
-          content.heroLayout === "CUSTOM" || content.heroLayout === "CANVAS"
+          content.heroLayout === "CANVAS"
             ? normalizeHexColor(content.customTextColor, DEFAULT_CUSTOM_TEXT_COLOR)
             : content.customTextColor,
         sectionSpacing: content.sectionSpacing,
@@ -681,14 +669,12 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                   })}
                 </div>
 
-                {content.heroLayout === "CUSTOM" || content.heroLayout === "CANVAS" ? (
+                {content.heroLayout === "CANVAS" ? (
                   <div className="mt-4 space-y-4 border-t border-zinc-200 pt-4">
                     <fieldset>
                       <legend className="text-sm font-medium">배경색</legend>
                       <p className="mt-1 text-xs text-zinc-500">
-                        {content.heroLayout === "CANVAS"
-                          ? "캔버스의 전체 배경색이에요."
-                          : "완전 커스텀 디자인의 전체 배경색이에요."}
+                        캔버스의 전체 배경색이에요.
                       </p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <input
@@ -731,9 +717,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                     <fieldset>
                       <legend className="text-sm font-medium">글자색</legend>
                       <p className="mt-1 text-xs text-zinc-500">
-                        {content.heroLayout === "CANVAS"
-                          ? "새로 추가하는 텍스트의 기본 색이에요. 각 텍스트는 나중에 따로 바꿀 수 있어요."
-                          : "제목, 소개글 등 본문 글자색이에요."}{" "}
+                        새로 추가하는 텍스트의 기본 색이에요. 각 텍스트는 나중에 따로 바꿀 수 있어요.
                         배경색과 대비가 잘 되는 색을 골라주세요.
                       </p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -1016,7 +1000,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
         <div className="mb-3 flex items-center justify-between gap-2">
           <p className="text-sm font-medium text-zinc-600">실시간 미리보기</p>
           <p className="text-xs text-zinc-400">
-            {content.heroLayout === "CANVAS"
+            {content.canvasElements.length > 0
               ? "텍스트를 드래그해서 옮기고, 더블클릭해서 고쳐 쓸 수 있어요"
               : "글자를 더블클릭하면 바로 수정할 수 있어요"}
           </p>

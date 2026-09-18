@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/Badge";
 import { useDashboardStatus } from "@/components/dashboard/DashboardStatusProvider";
 
 const links = [
-  { href: "/dashboard", label: "홈" },
   { href: "/dashboard/landing", label: "랜딩페이지" },
   { href: "/dashboard/templates", label: "카드뉴스" },
   { href: "/dashboard/trials", label: "체험 신청" },
@@ -23,7 +22,7 @@ export function DashboardHeader() {
     <header className="sticky top-0 z-20 border-b border-pumsae-line bg-pumsae-bg">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         <div className="flex min-w-0 items-center gap-4">
-          <Link href="/dashboard" className="shrink-0">
+          <Link href="/dashboard/landing" className="shrink-0">
             <PumsaeLogo />
           </Link>
           <nav className="flex gap-1 overflow-x-auto text-sm">
