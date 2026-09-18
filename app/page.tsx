@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense } from "react";
-import { GuestGuard } from "@/components/auth/AuthGuard";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { PumsaeLogo } from "@/components/ui/Logo";
 
 const FEATURES = [
@@ -55,24 +54,38 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 }
 
 function LandingHome() {
+  const { user, loading } = useAuth();
+  const isLoggedIn = !loading && !!user;
+
   return (
     <div className="min-h-screen bg-pumsae-bg text-pumsae-ink">
       <header className="border-b border-pumsae-line">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
           <PumsaeLogo />
           <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-pumsae-ink hover:bg-pumsae-line"
-            >
-              로그인
-            </Link>
-            <Link
-              href="/register"
-              className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
-            >
-              무료로 시작하기
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard/landing"
+                className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
+              >
+                대시보드로 가기
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-pumsae-ink hover:bg-pumsae-line"
+                >
+                  로그인
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
+                >
+                  무료로 시작하기
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -88,10 +101,10 @@ function LandingHome() {
           </p>
           <div className="mt-8">
             <Link
-              href="/register"
+              href={isLoggedIn ? "/dashboard/landing" : "/register"}
               className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
             >
-              무료로 시작하기
+              {isLoggedIn ? "대시보드로 가기" : "무료로 시작하기"}
             </Link>
           </div>
         </section>
@@ -126,10 +139,10 @@ function LandingHome() {
             </h2>
             <div className="mt-6">
               <Link
-                href="/register"
+                href={isLoggedIn ? "/dashboard/landing" : "/register"}
                 className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
               >
-                무료로 시작하기
+                {isLoggedIn ? "대시보드로 가기" : "무료로 시작하기"}
               </Link>
             </div>
           </div>
@@ -140,15 +153,23 @@ function LandingHome() {
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-8 text-sm text-pumsae-muted sm:px-6">
           <PumsaeLogo />
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hover:text-pumsae-ink hover:underline">
-              로그인
-            </Link>
-            <Link
-              href="/register"
-              className="hover:text-pumsae-ink hover:underline"
-            >
-              회원가입
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard/landing" className="hover:text-pumsae-ink hover:underline">
+                대시보드로 가기
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="hover:text-pumsae-ink hover:underline">
+                  로그인
+                </Link>
+                <Link
+                  href="/register"
+                  className="hover:text-pumsae-ink hover:underline"
+                >
+                  회원가입
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </footer>
@@ -157,11 +178,5 @@ function LandingHome() {
 }
 
 export default function HomePage() {
-  return (
-    <Suspense fallback={null}>
-      <GuestGuard>
-        <LandingHome />
-      </GuestGuard>
-    </Suspense>
-  );
+  return <LandingHome />;
 }

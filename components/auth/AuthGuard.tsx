@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { resolvePostLoginPath } from "@/lib/auth/post-login";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -42,12 +43,18 @@ export function GuestGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    let cancelled = false;
     const next = searchParams.get("next");
-    const target =
-      next && next.startsWith("/") && !next.startsWith("//")
-        ? next
-        : "/dashboard";
-    router.replace(target);
+
+    resolvePostLoginPath(next).then((target) => {
+      if (!cancelled) {
+        router.replace(target);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [loading, router, searchParams, user]);
 
   if (loading) {

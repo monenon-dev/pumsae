@@ -7,6 +7,7 @@ import { GuestGuard } from "@/components/auth/AuthGuard";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError } from "@/lib/api/types";
 import { mapAuthError } from "@/lib/auth/errors";
+import { resolvePostLoginPath } from "@/lib/auth/post-login";
 
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none ring-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1";
@@ -56,7 +57,8 @@ function RegisterForm() {
         email: email.trim(),
         password,
       });
-      router.replace("/dashboard");
+      const path = await resolvePostLoginPath(null);
+      router.replace(path);
     } catch (submitError) {
       const message =
         submitError instanceof ApiError

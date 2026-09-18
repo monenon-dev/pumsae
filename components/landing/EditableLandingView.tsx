@@ -112,6 +112,12 @@ export function EditableLandingView({ initial }: EditableLandingViewProps) {
         <Link href="/dashboard/landing" className="font-semibold underline">
           전체 편집
         </Link>
+        <Link href="/dashboard/templates" className="font-semibold underline">
+          카드뉴스
+        </Link>
+        <Link href="/dashboard/trials" className="font-semibold underline">
+          체험 신청
+        </Link>
       </div>
     </CanvasEditorContext.Provider>
   );
