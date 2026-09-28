@@ -16,6 +16,8 @@ import { SolidTemplate } from "@/components/landing/templates/SolidTemplate";
 import { SpotlightTemplate } from "@/components/landing/templates/SpotlightTemplate";
 import { TraditionalTemplate } from "@/components/landing/templates/TraditionalTemplate";
 import { HeroLogo } from "@/components/hero-layouts/shared";
+import { DojangNewsContext } from "@/lib/dojang/news-context";
+import type { PublicNewsItem } from "@/types/promo-template";
 import { normalizeHexColor } from "@/lib/dojang/brand";
 import {
   DEFAULT_BRAND_COLOR,
@@ -73,18 +75,21 @@ function LandingTemplate({
 export function DojangLanding({
   content,
   preview = false,
-}: DojangLandingProps) {
+  news = [],
+}: DojangLandingProps & { news?: PublicNewsItem[] }) {
   return (
-    <div className="relative" data-landing-root="">
-      <LandingTemplate content={content} preview={preview} />
-      {content.logoUrl && content.logoPosition ? (
-        <HeroLogo
-          src={content.logoUrl}
-          alt={`${content.name} 로고`}
-          borderColor={normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR)}
-          position={content.logoPosition}
-        />
-      ) : null}
-    </div>
+    <DojangNewsContext.Provider value={news}>
+      <div className="relative" data-landing-root="">
+        <LandingTemplate content={content} preview={preview} />
+        {content.logoUrl && content.logoPosition ? (
+          <HeroLogo
+            src={content.logoUrl}
+            alt={`${content.name} 로고`}
+            borderColor={normalizeHexColor(content.brandColor, DEFAULT_BRAND_COLOR)}
+            position={content.logoPosition}
+          />
+        ) : null}
+      </div>
+    </DojangNewsContext.Provider>
   );
 }

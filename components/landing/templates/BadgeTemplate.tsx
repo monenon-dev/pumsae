@@ -1,4 +1,5 @@
 import { HeroLayoutSwitch } from "@/components/hero-layouts";
+import { DojangNewsSection } from "@/components/landing/DojangNewsSection";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
@@ -96,6 +97,8 @@ export function BadgeTemplate({ content, preview = false }: TemplateProps) {
           <div className="border-t" style={{ borderColor: hexToRgba(INK, 0.15) }} />
         </div>
       </section>
+
+      <DojangNewsSection content={content} />
 
       <section
         id={preview ? undefined : "trial"}

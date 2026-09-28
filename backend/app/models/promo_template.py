@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, func, text
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, false, func, text
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -35,6 +35,13 @@ class PromoTemplate(Base):
         server_default=text("'{}'::json"),
     )
     thumbnail_url: Mapped[str | None] = mapped_column(String)
+    # 관장님이 고른 카드만 공개 홈페이지의 "우리 도장 소식"에 보인다.
+    is_public: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default=false(),
+        default=False,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

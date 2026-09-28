@@ -89,6 +89,7 @@ export type PromoTemplateListItem = {
   typeLabel: string;
   title: string;
   thumbnailUrl: string | null;
+  isPublic: boolean;
   createdAt: string;
 };
 
@@ -136,6 +137,16 @@ export async function updatePromoTemplate(
       content,
       thumbnailUrl: content.imageUrl,
     }),
+  });
+}
+
+export async function setPromoTemplatePublic(
+  id: string,
+  isPublic: boolean,
+): Promise<{ id: string; success: string }> {
+  return apiJson(`/dashboard/templates/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ isPublic }),
   });
 }
 

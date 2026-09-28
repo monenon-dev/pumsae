@@ -30,6 +30,14 @@ export type PromoTemplateContent = {
   imageUrl: string | null;
 };
 
+/** 공개 홈페이지 "우리 도장 소식"에 보이는 카드(관장님이 공개로 고른 것). */
+export type PublicNewsItem = {
+  id: string;
+  type: PromoTemplateType;
+  content: PromoTemplateContent;
+  createdAt: string;
+};
+
 export const PROMO_CARD_SIZE = 1080;
 
 export const TITLE_FONT_SIZES = [56, 72, 88, 108] as const;

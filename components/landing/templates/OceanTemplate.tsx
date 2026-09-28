@@ -1,4 +1,5 @@
 import { HeroLayoutSwitch } from "@/components/hero-layouts";
+import { DojangNewsSection } from "@/components/landing/DojangNewsSection";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
@@ -95,6 +96,8 @@ export function OceanTemplate({ content, preview = false }: TemplateProps) {
           />
         </div>
       </section>
+
+      <DojangNewsSection content={content} />
 
       <section
         id={preview ? undefined : "trial"}

@@ -423,6 +423,9 @@ def update_template(
             "썸네일은 http(s) 주소여야 합니다.",
         )
 
+    if updates.get("isPublic") is not None:
+        row.is_public = bool(updates["isPublic"])
+
     db.commit()
     db.refresh(row)
     return TemplateSaved(id=row.id, success="카드뉴스를 저장했습니다.")

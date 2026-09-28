@@ -1,4 +1,5 @@
 import { HeroLayoutSwitch } from "@/components/hero-layouts";
+import { DojangNewsSection } from "@/components/landing/DojangNewsSection";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
   DEFAULT_BRAND_COLOR,
@@ -93,6 +94,8 @@ export function TraditionalTemplate({ content, preview = false }: TemplateProps)
           <div className="border-t" style={{ borderColor: "rgba(28,28,28,0.12)" }} />
         </div>
       </section>
+
+      <DojangNewsSection content={content} />
 
       <section
         id={preview ? undefined : "trial"}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { DojangLanding } from "@/components/landing/DojangLanding";
-import { getDojangBySlug } from "@/lib/dojang/queries";
+import { getDojangBySlug, getDojangNews } from "@/lib/dojang/queries";
 import { dojangSeo } from "@/lib/dojang/seo";
 
 export const dynamic = "force-dynamic";
@@ -56,5 +56,7 @@ export default async function PublicLandingPage({
     permanentRedirect(`/${dojang.slug}`);
   }
 
-  return <DojangLanding content={dojang} />;
+  const news = await getDojangNews(dojang.slug, dojang.name);
+
+  return <DojangLanding content={dojang} news={news} />;
 }

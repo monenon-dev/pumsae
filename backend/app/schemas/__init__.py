@@ -128,6 +128,7 @@ class TemplatePatch(BaseModel):
     type: PromoTemplateType | None = None
     content: dict[str, Any] | None = None
     thumbnailUrl: str | None = None
+    isPublic: bool | None = None
 
 
 class TemplateOut(BaseModel):
@@ -136,6 +137,7 @@ class TemplateOut(BaseModel):
     typeLabel: str
     title: str
     thumbnailUrl: str | None
+    isPublic: bool = False
     createdAt: datetime
 
     @classmethod
@@ -154,6 +156,7 @@ class TemplateOut(BaseModel):
             typeLabel=labels.get(row.type, row.type.value),
             title=title,
             thumbnailUrl=row.thumbnail_url,
+            isPublic=bool(row.is_public),
             createdAt=row.created_at,
         )
 
@@ -166,6 +169,24 @@ class TemplateDetail(TemplateOut):
         base = TemplateOut.from_model(row)
         content = row.content if isinstance(row.content, dict) else {}
         return cls(**base.model_dump(), content=content)
+
+
+class PublicNewsItem(BaseModel):
+    """공개 홈페이지에 보여주는 카드뉴스. 카드는 프론트가 content로 직접 그린다."""
+
+    id: uuid.UUID
+    type: PromoTemplateType
+    content: dict[str, Any]
+    createdAt: datetime
+
+    @classmethod
+    def from_model(cls, row: PromoTemplate) -> PublicNewsItem:
+        return cls(
+            id=row.id,
+            type=row.type,
+            content=row.content if isinstance(row.content, dict) else {},
+            createdAt=row.created_at,
+        )
 
 
 class TemplateSaved(BaseModel):
