@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import uuid
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -97,6 +98,13 @@ def _refresh_max_age() -> int:
     return settings.refresh_token_ttl_days * 24 * 60 * 60
 
 
+def _refresh_samesite() -> Literal["lax", "none"]:
+    # 프론트(Vercel)와 백엔드(Railway)는 서로 다른 사이트라 Lax 쿠키는 fetch에
+    # 실리지 않는다. 그러면 새로고침마다 refresh가 실패해 로그인이 풀린다.
+    # HTTPS(secure)일 때는 None으로 보내 교차 사이트 요청에도 쿠키가 가게 한다.
+    return "none" if settings.cookie_secure else "lax"
+
+
 def _set_refresh_cookie(response: Response, token: str) -> None:
     response.set_cookie(
         key=REFRESH_COOKIE,
@@ -104,7 +112,7 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
         max_age=_refresh_max_age(),
         httponly=True,
         secure=settings.cookie_secure,
-        samesite="lax",
+        samesite=_refresh_samesite(),
         path="/auth",
     )
 
@@ -115,7 +123,7 @@ def _clear_refresh_cookie(response: Response) -> None:
         path="/auth",
         httponly=True,
         secure=settings.cookie_secure,
-        samesite="lax",
+        samesite=_refresh_samesite(),
     )
 
 

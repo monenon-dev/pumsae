@@ -96,7 +96,7 @@ access token은 메모리 보관용(짧은 만료, 예: 15분), refresh token은
      요청 바디: dojangName, name, email, password
      처리: password bcrypt 해싱 → Dojang 생성(slug는 dojangName 기반, 한글이면
      "dojang"+랜덤suffix) → User를 role=OWNER로 생성 → access token 응답 바디로,
-     refresh token은 Set-Cookie(httpOnly, secure, samesite=lax)로 반환
+     refresh token은 Set-Cookie(httpOnly, secure, samesite=none — 로컬 http에서는 lax)로 반환
    - POST /auth/login — email/password 검증 후 위와 동일하게 토큰 발급
    - POST /auth/refresh — 쿠키의 refresh token 검증 후 새 access token 발급
    - POST /auth/logout — refresh 쿠키 삭제

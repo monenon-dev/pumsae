@@ -77,7 +77,7 @@ uvicorn app.main:app --host 0.0.0.0 --port $PORT
 | 변수 | 값 |
 |---|---|
 | `R2_PUBLIC_URL` | 이미지가 브라우저에 열리는 공개 주소. 예: `https://pub-xxxxxxxx.r2.dev` (끝에 `/` 없이) |
-| `COOKIE_SECURE` | `true` (HTTPS에서 refresh 쿠키 전송) |
+| `COOKIE_SECURE` | `true` (HTTPS에서 refresh 쿠키 전송. SameSite=None이 되어 Vercel↔Railway 교차 사이트에서도 로그인 유지) |
 
 `R2_PUBLIC_URL`이 없으면 이미지 업로드 API가 503을 반환합니다.
 
