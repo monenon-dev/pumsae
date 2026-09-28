@@ -40,6 +40,30 @@ type LandingEditorProps = {
   initial: DojangLandingContent;
 };
 
+const siteHost = (process.env.NEXT_PUBLIC_SITE_URL ?? "pumsae.vercel.app")
+  .replace(/^https?:\/\//, "")
+  .replace(/\/$/, "");
+
+// 입력하는 동안 쓸 수 없는 글자는 바로 걸러 낸다(공백·밑줄은 하이픈으로).
+function sanitizeSlugInput(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-{2,}/g, "-")
+    .slice(0, 40);
+}
+
+function validateSlug(slug: string): string | null {
+  if (slug.length < 3) {
+    return "페이지 주소는 3자 이상으로 입력해 주세요.";
+  }
+  if (slug.startsWith("-") || slug.endsWith("-")) {
+    return "페이지 주소는 하이픈(-)으로 시작하거나 끝날 수 없어요.";
+  }
+  return null;
+}
+
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 disabled:bg-zinc-50 disabled:text-zinc-500";
 
@@ -507,11 +531,18 @@ export function LandingEditor({ initial }: LandingEditorProps) {
       return;
     }
 
+    const slugError = validateSlug(content.slug);
+    if (slugError) {
+      setError(slugError);
+      return;
+    }
+
     setSaving(true);
 
     try {
       const next = await updateMyDojang({
         name: content.name.trim(),
+        slug: content.slug,
         description: content.description?.trim() || null,
         logoUrl: content.logoUrl,
         heroImageUrl: content.heroImageUrl,
@@ -562,7 +593,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
             </p>
           </div>
           <Link
-            href={`/${content.slug}`}
+            href={`/${saved.slug}`}
             target="_blank"
             className="shrink-0 text-sm font-medium text-zinc-900 underline"
           >
@@ -593,6 +624,35 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                 className={inputClassName}
               />
             </label>
+
+            <div className="block text-sm font-medium">
+              <label htmlFor="landing-slug">내 페이지 주소</label>
+              <div className="mt-1 flex items-center overflow-hidden rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-900 focus-within:ring-1 focus-within:ring-zinc-900">
+                <span className="shrink-0 select-none bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500">
+                  {siteHost}/
+                </span>
+                <input
+                  id="landing-slug"
+                  name="slug"
+                  required
+                  disabled={!canEdit}
+                  value={content.slug}
+                  onChange={(event) =>
+                    updateField("slug", sanitizeSlugInput(event.target.value))
+                  }
+                  maxLength={40}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="min-w-0 flex-1 px-2 py-2.5 text-base text-zinc-900 outline-none disabled:bg-zinc-50"
+                  placeholder="gangnam-tkd"
+                />
+              </div>
+              <p className="mt-1 text-xs font-normal leading-5 text-zinc-500">
+                영문 소문자, 숫자, 하이픈(-)만 쓸 수 있어요. 주소를 바꿔도 예전
+                주소로 들어온 사람은 새 주소로 자동 이동돼요.
+              </p>
+            </div>
 
             <label className="block text-sm font-medium">
               소개글

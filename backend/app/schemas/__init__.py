@@ -99,6 +99,7 @@ class DojangOut(BaseModel):
 
 class DojangPatch(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=120)
+    slug: str | None = None
     description: str | None = None
     logoUrl: str | None = None
     heroImageUrl: str | None = None

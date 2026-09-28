@@ -21,7 +21,7 @@ from app.core.security import (
 )
 from app.core.slug import build_dojang_slug
 from app.db.session import get_db
-from app.models import Dojang, User
+from app.models import Dojang, DojangSlugAlias, User
 from app.models.enums import UserRole
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -164,7 +164,13 @@ def register(
     password_hash = hash_password(body.password)
 
     for attempt in range(8):
-        dojang = Dojang(name=body.dojangName, slug=build_dojang_slug(body.dojangName, attempt))
+        slug = build_dojang_slug(body.dojangName, attempt)
+        if attempt < 7 and db.scalar(
+            select(DojangSlugAlias.id).where(DojangSlugAlias.slug == slug)
+        ):
+            # 다른 체육관의 예전 주소는 새 주소로 넘겨주는 데 쓰이므로 피한다.
+            continue
+        dojang = Dojang(name=body.dojangName, slug=slug)
         user = User(
             email=body.email,
             password_hash=password_hash,

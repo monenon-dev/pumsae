@@ -12,7 +12,8 @@ from app.core.deps import get_current_user, get_staff_user
 from app.core.export import screenshot_promo_png
 from app.core.security import hash_password, verify_password
 from app.db.session import get_db
-from app.models import Dojang, PromoTemplate, TrialRequest, User
+from app.core.slug import validate_custom_slug
+from app.models import Dojang, DojangSlugAlias, PromoTemplate, TrialRequest, User
 from app.promo.render import render_promo_html
 from app.schemas import (
     DojangOut,
@@ -153,6 +154,35 @@ def change_my_password(
     return PasswordChanged()
 
 
+def _change_dojang_slug(db: Session, dojang: Dojang, raw: str) -> None:
+    try:
+        slug = validate_custom_slug(raw)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+    if slug == dojang.slug:
+        return
+
+    taken = db.scalar(select(Dojang.id).where(Dojang.slug == slug, Dojang.id != dojang.id))
+    alias = db.scalar(select(DojangSlugAlias).where(DojangSlugAlias.slug == slug))
+    if taken or (alias is not None and alias.dojang_id != dojang.id):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="이미 다른 체육관이 쓰고 있는 주소예요. 다른 주소를 입력해 주세요.",
+        )
+
+    # 예전에 쓰던 주소로 되돌리는 경우, 그 주소는 더 이상 넘겨줄 대상이 아니다.
+    if alias is not None:
+        db.delete(alias)
+        db.flush()
+
+    db.add(DojangSlugAlias(slug=dojang.slug, dojang_id=dojang.id))
+    dojang.slug = slug
+
+
 @router.get("/dojang", response_model=DojangOut, summary="내 도장 조회")
 def get_my_dojang(
     user: User = Depends(get_staff_user),
@@ -193,6 +223,9 @@ def update_my_dojang(
 
     if "description" in updates:
         dojang.description = _empty_to_none(updates["description"])
+
+    if updates.get("slug") is not None:
+        _change_dojang_slug(db, dojang, updates["slug"])
 
     if "logoUrl" in updates:
         logo = _empty_to_none(updates["logoUrl"])

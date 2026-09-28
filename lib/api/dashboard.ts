@@ -22,6 +22,7 @@ export async function fetchMyDojang(): Promise<DojangLandingContent> {
 export async function updateMyDojang(
   input: Partial<{
     name: string;
+    slug: string;
     description: string | null;
     logoUrl: string | null;
     heroImageUrl: string | null;

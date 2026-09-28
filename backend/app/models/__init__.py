@@ -1,4 +1,5 @@
 from app.models.dojang import Dojang
+from app.models.dojang_slug_alias import DojangSlugAlias
 from app.models.enums import (
     DesiredClass,
     HeadingFont,
@@ -14,6 +15,7 @@ from app.models.user import User
 __all__ = [
     "DesiredClass",
     "Dojang",
+    "DojangSlugAlias",
     "HeadingFont",
     "HeroLayout",
     "PromoTemplate",

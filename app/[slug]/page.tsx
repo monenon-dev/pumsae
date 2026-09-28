@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { DojangLanding } from "@/components/landing/DojangLanding";
 import { getDojangBySlug } from "@/lib/dojang/queries";
 import { dojangSeo } from "@/lib/dojang/seo";
@@ -49,6 +49,11 @@ export default async function PublicLandingPage({
 
   if (!dojang) {
     notFound();
+  }
+
+  // 관장님이 주소를 바꾼 뒤 예전 주소로 들어오면 새 주소로 영구 이동시킨다.
+  if (dojang.slug !== decodeURIComponent(params.slug).toLowerCase()) {
+    permanentRedirect(`/${dojang.slug}`);
   }
 
   return <DojangLanding content={dojang} />;
