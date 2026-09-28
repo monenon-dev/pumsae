@@ -11,6 +11,17 @@ def _csv_env(name: str, default: str) -> list[str]:
     return [item.strip() for item in raw.split(",") if item.strip()]
 
 
+def _normalize_database_url(url: str | None) -> str | None:
+    # 설치된 드라이버는 psycopg2뿐이다. postgres:// 나 postgresql+psycopg://
+    # (psycopg3) 형식으로 들어와도 psycopg2로 맞춰 ModuleNotFoundError를 막는다.
+    if not url:
+        return None
+    for prefix in ("postgres://", "postgresql://", "postgresql+psycopg://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg2://" + url[len(prefix):]
+    return url
+
+
 class Settings:
     database_url: str | None
     jwt_secret: str
@@ -26,7 +37,7 @@ class Settings:
     cors_origins: list[str]
 
     def __init__(self) -> None:
-        self.database_url = os.getenv("DATABASE_URL") or None
+        self.database_url = _normalize_database_url(os.getenv("DATABASE_URL"))
         self.jwt_secret = os.getenv("JWT_SECRET", "change-me")
         self.jwt_refresh_secret = os.getenv("JWT_REFRESH_SECRET", "change-me-too")
         self.access_token_ttl_minutes = int(os.getenv("JWT_ACCESS_TTL_MINUTES", "15"))
