@@ -96,9 +96,9 @@ function LoginForm() {
       </form>
 
       <p className="mt-6 text-center text-sm text-zinc-600">
-        아직 체육관이 없나요?{" "}
+        계정이 없으신가요?{" "}
         <Link href="/register" className="font-medium text-zinc-900 underline">
-          새로 등록
+          회원가입
         </Link>
       </p>
     </>
