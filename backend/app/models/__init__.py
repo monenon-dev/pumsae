@@ -1,4 +1,5 @@
 from app.models.dojang import Dojang
+from app.models.dojang_event import DojangEvent
 from app.models.dojang_slug_alias import DojangSlugAlias
 from app.models.enums import (
     DesiredClass,
@@ -15,6 +16,7 @@ from app.models.user import User
 __all__ = [
     "DesiredClass",
     "Dojang",
+    "DojangEvent",
     "DojangSlugAlias",
     "HeadingFont",
     "HeroLayout",

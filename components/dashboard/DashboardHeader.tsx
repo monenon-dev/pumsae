@@ -11,6 +11,7 @@ const links = [
   { href: "/dashboard", label: "내 작업물" },
   { href: "/dashboard/landing", label: "랜딩페이지" },
   { href: "/dashboard/templates", label: "카드뉴스" },
+  { href: "/dashboard/calendar", label: "캘린더" },
   { href: "/dashboard/trials", label: "체험 신청" },
 ];
 

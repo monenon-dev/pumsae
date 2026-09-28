@@ -1,4 +1,5 @@
 import { HeroLayoutSwitch } from "@/components/hero-layouts";
+import { DojangCalendarSection } from "@/components/landing/DojangCalendarSection";
 import { DojangNewsSection } from "@/components/landing/DojangNewsSection";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
 import {
@@ -94,6 +95,7 @@ export function SpotlightTemplate({ content, preview = false }: TemplateProps) {
       </section>
 
       <DojangNewsSection content={content} />
+      <DojangCalendarSection content={content} preview={preview} />
 
       <section
         id={preview ? undefined : "trial"}
