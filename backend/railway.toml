@@ -3,6 +3,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+# 대시보드에 Start Command가 따로 있으면 Dockerfile CMD가 무시되어 마이그레이션이
+# 건너뛰어진다. 여기에 적으면 대시보드 설정보다 우선한다.
+startCommand = "sh -c 'alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}'"
 healthcheckPath = "/health"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
