@@ -97,7 +97,7 @@ function LandingHome() {
           </p>
           <div className="mt-8">
             <Link
-              href={isLoggedIn ? "/dashboard/landing" : "/register"}
+              href={isLoggedIn ? "/dashboard" : "/register"}
               className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
             >
               {isLoggedIn ? "대시보드로 가기" : "무료로 시작하기"}
@@ -135,7 +135,7 @@ function LandingHome() {
             </h2>
             <div className="mt-6">
               <Link
-                href={isLoggedIn ? "/dashboard/landing" : "/register"}
+                href={isLoggedIn ? "/dashboard" : "/register"}
                 className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
               >
                 {isLoggedIn ? "대시보드로 가기" : "무료로 시작하기"}
@@ -150,7 +150,7 @@ function LandingHome() {
           <PumsaeLogo />
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
-              <Link href="/dashboard/landing" className="hover:text-pumsae-ink hover:underline">
+              <Link href="/dashboard" className="hover:text-pumsae-ink hover:underline">
                 대시보드로 가기
               </Link>
             ) : (
