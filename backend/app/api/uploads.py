@@ -4,7 +4,7 @@ import uuid
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel
 
 from app.core.deps import get_current_user
@@ -87,6 +87,28 @@ def _as_webp(data: bytes, content_type: str) -> bytes:
     buffer = BytesIO()
     _to_rgb(image).save(buffer, format="WEBP", quality=80)
     return buffer.getvalue()
+
+
+def open_image(data: bytes) -> Image.Image:
+    """업로드 바이트를 열고, 휴대폰 사진의 회전 정보(EXIF)대로 바로 세운다."""
+    try:
+        image = Image.open(BytesIO(data))
+        image.load()
+    except (UnidentifiedImageError, OSError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="이미지 파일을 읽지 못했습니다.",
+        ) from exc
+    return ImageOps.exif_transpose(image)
+
+
+def resized_webp(image: Image.Image, max_side: int, quality: int = 80) -> tuple[bytes, int, int]:
+    """긴 변이 max_side를 넘지 않게 줄여 webp로. (바이트, 너비, 높이)"""
+    copy = _to_rgb(image.copy())
+    copy.thumbnail((max_side, max_side), Image.LANCZOS)
+    buffer = BytesIO()
+    copy.save(buffer, format="WEBP", quality=quality)
+    return buffer.getvalue(), copy.width, copy.height
 
 
 @router.post("", response_model=UploadOut, summary="이미지 업로드")

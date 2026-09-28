@@ -50,3 +50,23 @@ def put_object(key: str, body: bytes, content_type: str) -> str:
             detail="이미지를 저장하지 못했습니다.",
         ) from exc
     return f"{public_base}/{key}"
+
+
+def delete_public_urls(urls: list[str]) -> None:
+    """put_object가 돌려준 공개 주소의 파일을 지운다. 실패해도 조용히 넘어간다
+    (DB에서는 이미 지웠고, 남은 파일은 화면 어디에도 쓰이지 않는다)."""
+    try:
+        client, bucket, public_base = r2_client()
+    except HTTPException:
+        return
+    prefix = f"{public_base}/"
+    keys = [url[len(prefix):] for url in urls if url.startswith(prefix)]
+    for start in range(0, len(keys), 1000):
+        batch = keys[start : start + 1000]
+        try:
+            client.delete_objects(
+                Bucket=bucket,
+                Delete={"Objects": [{"Key": key} for key in batch], "Quiet": True},
+            )
+        except (BotoCoreError, ClientError):
+            return

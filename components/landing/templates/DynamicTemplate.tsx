@@ -1,4 +1,5 @@
 import { HeroLayoutSwitch } from "@/components/hero-layouts";
+import { DojangAlbumSection } from "@/components/landing/DojangAlbumSection";
 import { DojangCalendarSection } from "@/components/landing/DojangCalendarSection";
 import { DojangNewsSection } from "@/components/landing/DojangNewsSection";
 import { TrialRequestForm } from "@/components/TrialRequestForm";
@@ -96,6 +97,7 @@ export function DynamicTemplate({ content, preview = false }: TemplateProps) {
       </section>
 
       <DojangNewsSection content={content} />
+      <DojangAlbumSection content={content} preview={preview} />
       <DojangCalendarSection content={content} preview={preview} />
 
       <section
