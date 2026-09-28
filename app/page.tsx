@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ExampleShowcase } from "@/components/home/ExampleShowcase";
 import { PumsaeLogo } from "@/components/ui/Logo";
 import { ProfileMenu } from "@/components/ProfileMenu";
 
@@ -120,6 +121,7 @@ function LandingHome() {
           </div>
         </section>
 
+        <ExampleShowcase />
       </main>
 
       <footer className="border-t border-pumsae-line">

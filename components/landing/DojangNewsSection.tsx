@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { PromoCard } from "@/components/templates/PromoCard";
+import { ScaledFrame } from "@/components/ui/ScaledFrame";
 import { sectionPaddingClass } from "@/lib/dojang/brand";
 import { getCopy } from "@/lib/dojang/copy";
 import { useDojangNews } from "@/lib/dojang/news-context";
@@ -13,31 +14,10 @@ import {
 
 // 1080px 카드를 부모 폭에 맞게 줄여 그린다.
 function ScaledPromoCard({ content }: { content: PromoTemplateContent }) {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.25);
-
-  useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setScale(entry.contentRect.width / PROMO_CARD_SIZE);
-    });
-    observer.observe(frame);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div
-      ref={frameRef}
-      className="relative aspect-square w-full overflow-hidden"
-    >
-      <div
-        className="pointer-events-none absolute left-0 top-0 origin-top-left"
-        style={{ transform: `scale(${scale})` }}
-      >
-        <PromoCard content={content} />
-      </div>
-    </div>
+    <ScaledFrame baseWidth={PROMO_CARD_SIZE} aspectRatio="1 / 1">
+      <PromoCard content={content} />
+    </ScaledFrame>
   );
 }
 

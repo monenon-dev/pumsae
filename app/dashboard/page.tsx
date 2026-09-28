@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DojangLanding } from "@/components/landing/DojangLanding";
 import { Badge } from "@/components/ui/Badge";
+import { ScaledFrame } from "@/components/ui/ScaledFrame";
 import {
   fetchMyDojang,
   fetchMyTemplates,
@@ -64,32 +65,14 @@ function SectionHeader({
 
 // 실제 페이지를 PC 폭(1280px)으로 그린 뒤 카드 폭에 맞게 줄여 첫 화면을 보여준다.
 function ScaledPreview({ content }: { content: DojangLandingContent }) {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.4);
-
-  useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setScale(entry.contentRect.width / PREVIEW_WIDTH);
-    });
-    observer.observe(frame);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div
-      ref={frameRef}
-      className="relative overflow-hidden rounded-xl border border-zinc-200"
-      style={{ aspectRatio: "16 / 10" }}
+    <ScaledFrame
+      baseWidth={PREVIEW_WIDTH}
+      aspectRatio="16 / 10"
+      className="rounded-xl border border-zinc-200"
     >
-      <div
-        className="pointer-events-none absolute left-0 top-0 origin-top-left select-none"
-        style={{ width: PREVIEW_WIDTH, transform: `scale(${scale})` }}
-      >
-        <DojangLanding content={content} preview />
-      </div>
-    </div>
+      <DojangLanding content={content} preview />
+    </ScaledFrame>
   );
 }
 
