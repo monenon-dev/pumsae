@@ -54,10 +54,8 @@ export async function updateTrialRequestStatus(
   );
 }
 
-export function getTrialRequestsWsUrl(token: string): string {
-  const url = new URL(
-    `${getApiUrl().replace(/^http/i, "ws")}/ws/dashboard/trial-requests`,
-  );
-  url.searchParams.set("token", token);
-  return url.toString();
+// 토큰은 주소에 넣지 않는다(서버·프록시 로그에 그대로 남는다). 연결한 뒤
+// 첫 메시지 { token }으로 보내면 서버가 그걸로 인증한다.
+export function getTrialRequestsWsUrl(): string {
+  return `${getApiUrl().replace(/^http/i, "ws")}/ws/dashboard/trial-requests`;
 }

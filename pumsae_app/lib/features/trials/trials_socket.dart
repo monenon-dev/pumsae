@@ -12,7 +12,8 @@ import 'trial_request.dart';
 ///
 /// Reconnects a fixed 3 seconds after any disconnect (error or clean close)
 /// for as long as the socket hasn't been [dispose]d, re-reading the current
-/// access token from [ApiClient] on every attempt.
+/// access token from [ApiClient] on every attempt and sending it as the
+/// first message (`{ "token": ... }`), never in the URL.
 class TrialsSocket {
   TrialsSocket(this._apiClient);
 
@@ -39,7 +40,13 @@ class TrialsSocket {
     final channel = WebSocketChannel.connect(_buildUri());
     _channel = channel;
 
-    channel.ready.catchError((Object _) {
+    // 토큰은 주소에 넣지 않고(서버 로그에 남는다) 연결된 뒤 첫 메시지로 보낸다.
+    final token = _apiClient.accessToken;
+    channel.ready.then((_) {
+      if (token != null && identical(_channel, channel)) {
+        channel.sink.add(jsonEncode({'token': token}));
+      }
+    }).catchError((Object _) {
       _scheduleReconnect();
     });
 
@@ -54,12 +61,7 @@ class TrialsSocket {
   Uri _buildUri() {
     final base = Uri.parse(ApiConfig.baseUrl);
     final scheme = base.scheme == 'https' ? 'wss' : 'ws';
-    final token = _apiClient.accessToken;
-    return base.replace(
-      scheme: scheme,
-      path: '/ws/dashboard/trial-requests',
-      queryParameters: token != null ? {'token': token} : null,
-    );
+    return base.replace(scheme: scheme, path: '/ws/dashboard/trial-requests');
   }
 
   void _handleMessage(dynamic raw) {

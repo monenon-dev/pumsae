@@ -100,8 +100,13 @@ export default function TrialsPage() {
         return;
       }
 
-      const ws = new WebSocket(getTrialRequestsWsUrl(token));
+      const ws = new WebSocket(getTrialRequestsWsUrl());
       socket = ws;
+      const accessToken = token;
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ token: accessToken }));
+      };
 
       ws.onmessage = (event) => {
         try {
