@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogoutButton } from "@/components/LogoutButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { PumsaeLogo } from "@/components/ui/Logo";
 import { Badge } from "@/components/ui/Badge";
 import { useDashboardStatus } from "@/components/dashboard/DashboardStatusProvider";
@@ -61,7 +61,7 @@ export function DashboardHeader() {
             })}
           </nav>
         </div>
-        <LogoutButton />
+        <ProfileMenu />
       </div>
     </header>
   );
