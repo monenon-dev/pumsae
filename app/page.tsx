@@ -67,20 +67,12 @@ function LandingHome() {
             {isLoggedIn ? (
               <ProfileMenu />
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-pumsae-ink hover:bg-pumsae-line"
-                >
-                  로그인
-                </Link>
-                <Link
-                  href="/register"
-                  className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
-                >
-                  무료로 시작하기
-                </Link>
-              </>
+              <Link
+                href="/login"
+                className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
+              >
+                로그인
+              </Link>
             )}
           </div>
         </div>
@@ -97,10 +89,10 @@ function LandingHome() {
           </p>
           <div className="mt-8">
             <Link
-              href={isLoggedIn ? "/dashboard" : "/register"}
+              href={isLoggedIn ? "/dashboard" : "/login"}
               className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
             >
-              {isLoggedIn ? "대시보드로 가기" : "무료로 시작하기"}
+              {isLoggedIn ? "대시보드로 가기" : "로그인하고 시작하기"}
             </Link>
           </div>
         </section>
@@ -135,10 +127,10 @@ function LandingHome() {
             </h2>
             <div className="mt-6">
               <Link
-                href={isLoggedIn ? "/dashboard" : "/register"}
+                href={isLoggedIn ? "/dashboard" : "/login"}
                 className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
               >
-                {isLoggedIn ? "대시보드로 가기" : "무료로 시작하기"}
+                {isLoggedIn ? "대시보드로 가기" : "로그인하고 시작하기"}
               </Link>
             </div>
           </div>
