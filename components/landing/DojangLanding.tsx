@@ -1,3 +1,8 @@
+"use client";
+
+// 템플릿들이 클라이언트 모듈(hero-layouts/shared, canvas-context)의 함수와 훅을
+// 직접 부르므로 이 트리 전체를 클라이언트 컴포넌트로 둔다. 서버 컴포넌트로
+// 렌더링하면 "g is not a function"으로 공개 페이지가 500이 난다.
 import { BadgeTemplate } from "@/components/landing/templates/BadgeTemplate";
 import { CanvasTemplate } from "@/components/landing/templates/CanvasTemplate";
 import { DynamicTemplate } from "@/components/landing/templates/DynamicTemplate";
