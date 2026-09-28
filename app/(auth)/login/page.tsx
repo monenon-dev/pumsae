@@ -1,20 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { GuestGuard } from "@/components/auth/AuthGuard";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError } from "@/lib/api/types";
 import { mapAuthError } from "@/lib/auth/errors";
-import { resolvePostLoginPath } from "@/lib/auth/post-login";
+import { POST_LOGIN_PATH } from "@/lib/auth/post-login";
 
 const inputClassName =
   "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none ring-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1";
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,8 +30,7 @@ function LoginForm() {
         email: email.trim(),
         password,
       });
-      const path = await resolvePostLoginPath(searchParams.get("next"));
-      router.replace(path);
+      router.replace(POST_LOGIN_PATH);
     } catch (submitError) {
       const message =
         submitError instanceof ApiError

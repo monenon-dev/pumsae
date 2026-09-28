@@ -1,6 +1,3 @@
-export async function resolvePostLoginPath(explicitNext: string | null): Promise<string> {
-  if (explicitNext && explicitNext.startsWith("/") && !explicitNext.startsWith("//")) {
-    return explicitNext;
-  }
-  return "/";
-}
+// 로그인·회원가입 직후에는 언제나 홈으로 보낸다. 이전에 보던 페이지(?next=)로
+// 돌려보내면 대시보드가 바로 떠서, 홈의 프로필 버튼을 먼저 보여주기로 했다.
+export const POST_LOGIN_PATH = "/";

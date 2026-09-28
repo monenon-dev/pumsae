@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { resolvePostLoginPath } from "@/lib/auth/post-login";
+import { POST_LOGIN_PATH } from "@/lib/auth/post-login";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -36,26 +36,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 export function GuestGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (loading || !user) {
       return;
     }
 
-    let cancelled = false;
-    const next = searchParams.get("next");
-
-    resolvePostLoginPath(next).then((target) => {
-      if (!cancelled) {
-        router.replace(target);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [loading, router, searchParams, user]);
+    router.replace(POST_LOGIN_PATH);
+  }, [loading, router, user]);
 
   if (loading) {
     return (
