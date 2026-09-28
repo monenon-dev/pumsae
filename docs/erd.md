@@ -1,6 +1,6 @@
 # 데이터 ERD
 
-2026-09-28 기준 실제 스키마입니다. DB는 **Neon Postgres**, 스키마는 **SQLAlchemy + Alembic**으로 관리합니다(마이그레이션 14건, 배포할 때마다 `alembic upgrade head` 자동 실행).  
+2026-09-28 기준 실제 스키마입니다. DB는 **Neon Postgres**, 스키마는 **SQLAlchemy + Alembic**으로 관리합니다(마이그레이션 15건, 배포할 때마다 `alembic upgrade head` 자동 실행).  
 RLS는 쓰지 않고, FastAPI에서 `current_user.dojang_id`로 권한을 막습니다.
 
 제품 맥락은 [프로젝트 개요](./프로젝트.md)와 [프로젝트 계획서](./PUMSAE_프로젝트_계획서.md), 초기 구현 순서는 [개발 가이드 v3](./PUMSAE_개발가이드_v3.md)를 보세요.
@@ -269,14 +269,12 @@ SQLAlchemy 모델은 `User`, `Dojang`, `DojangSlugAlias`, `PromoTemplate`, `Tria
 |---|---|
 | `users.role` | `OWNER`, `INSTRUCTOR` |
 | `dojangs.hero_layout` | `GRADIENT`, `SOLID`, `PHOTO_COVER`, `TRADITIONAL`, `DYNAMIC`, `KIDS`, `PREMIUM`, `OCEAN`, `MONO`, `SPOTLIGHT`, `BADGE`, `CANVAS` |
-| `dojangs.heading_font` | `PRETENDARD`, `SONG_MYUNG`, `BLACK_HAN_SANS`, `GOWUN_BATANG`, `GAEGU` |
+| `dojangs.heading_font` | `PRETENDARD`, `SONG_MYUNG`, `BLACK_HAN_SANS`, `GOWUN_BATANG`, `GAEGU`, `NANUM_MYEONGJO`, `DO_HYEON`, `JUA`, `SUNFLOWER`, `STYLISH` |
 | `promo_templates.type` | `AWARD`, `BELT_UP`, `RECRUIT`, `EVENT` |
 | `trial_requests.desired_class` | `KIDS`, `ELEMENTARY`, `MIDDLE_HIGH`, `ADULT` |
 | `trial_requests.status` | `PENDING`, `CONFIRMED`, `DECLINED` |
 
 `dojang_events.category`와 `dojangs.section_spacing`은 DB enum이 아니라 문자열이고, 허용 값은 API에서 검사합니다.
-
-> **알려진 불일치:** 웹 편집기(`types/dojang.ts`)는 제목 글꼴을 10개(`NANUM_MYEONGJO`, `DO_HYEON`, `JUA`, `SUNFLOWER`, `STYLISH` 추가) 보여주지만, DB·API enum은 위 5개뿐입니다. 추가된 5개를 고르면 저장이 거절됩니다.
 
 ---
 
