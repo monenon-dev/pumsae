@@ -125,25 +125,6 @@ function LandingHome() {
       <footer className="border-t border-pumsae-line">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-8 text-sm text-pumsae-muted sm:px-6">
           <PumsaeLogo />
-          <div className="flex items-center gap-4">
-            {isLoggedIn ? (
-              <Link href="/dashboard" className="hover:text-pumsae-ink hover:underline">
-                대시보드로 가기
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" className="hover:text-pumsae-ink hover:underline">
-                  로그인
-                </Link>
-                <Link
-                  href="/register"
-                  className="hover:text-pumsae-ink hover:underline"
-                >
-                  회원가입
-                </Link>
-              </>
-            )}
-          </div>
         </div>
       </footer>
     </div>
