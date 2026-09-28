@@ -1,13 +1,24 @@
 class DojangSummary {
-  const DojangSummary({required this.name, required this.slug});
+  const DojangSummary({
+    required this.name,
+    required this.slug,
+    required this.updatedAt,
+  });
 
   final String name;
   final String slug;
 
+  /// null until the owner saves the landing page for the first time.
+  final DateTime? updatedAt;
+
+  bool get published => updatedAt != null;
+
   factory DojangSummary.fromJson(Map<String, dynamic> json) {
+    final updatedAt = json['updatedAt'] as String?;
     return DojangSummary(
       name: json['name'] as String,
       slug: json['slug'] as String,
+      updatedAt: updatedAt == null ? null : DateTime.parse(updatedAt),
     );
   }
 }

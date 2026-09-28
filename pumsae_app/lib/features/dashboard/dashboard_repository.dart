@@ -20,13 +20,6 @@ class DashboardRepository {
     return DojangSummary.fromJson(response.data!);
   }
 
-  Future<int> fetchTemplateCount() async {
-    final response = await _apiClient.dio.get<List<dynamic>>(
-      '/dashboard/templates',
-    );
-    return (response.data ?? const []).length;
-  }
-
   Future<MeInfo> updateName(String name) async {
     final response = await _apiClient.dio.patch<Map<String, dynamic>>(
       '/dashboard/me',

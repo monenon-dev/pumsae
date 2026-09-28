@@ -4,19 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'trial_request.dart';
 import 'trials_provider.dart';
 
-const _statusLabels = {
-  'PENDING': '대기',
-  'CONFIRMED': '승인됨',
-  'DECLINED': '거절됨',
-};
-
-const _classLabels = {
-  'KIDS': '유아부',
-  'ELEMENTARY': '초등부',
-  'MIDDLE_HIGH': '중고등부',
-  'ADULT': '성인부',
-};
-
 String _formatDateTime(DateTime value) {
   final local = value.toLocal();
   String two(int n) => n.toString().padLeft(2, '0');
@@ -108,7 +95,7 @@ class _TrialCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final classLabel =
-        trial.desiredClass != null ? _classLabels[trial.desiredClass] ?? trial.desiredClass : null;
+        trial.desiredClass != null ? trialClassLabels[trial.desiredClass] ?? trial.desiredClass : null;
 
     return Card(
       child: Padding(
@@ -192,7 +179,7 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        _statusLabels[status] ?? status,
+        trialStatusLabels[status] ?? status,
         style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12),
       ),
     );

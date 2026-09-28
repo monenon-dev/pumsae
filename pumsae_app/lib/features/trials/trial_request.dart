@@ -1,3 +1,16 @@
+const trialStatusLabels = {
+  'PENDING': '대기',
+  'CONFIRMED': '승인됨',
+  'DECLINED': '거절됨',
+};
+
+const trialClassLabels = {
+  'KIDS': '유아부',
+  'ELEMENTARY': '초등부',
+  'MIDDLE_HIGH': '중고등부',
+  'ADULT': '성인부',
+};
+
 class TrialRequest {
   const TrialRequest({
     required this.id,

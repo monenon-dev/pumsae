@@ -17,7 +17,3 @@ final meProvider = FutureProvider.autoDispose<MeInfo>((ref) {
 final dojangProvider = FutureProvider.autoDispose<DojangSummary>((ref) {
   return ref.watch(dashboardRepositoryProvider).fetchDojang();
 });
-
-final templateCountProvider = FutureProvider.autoDispose<int>((ref) {
-  return ref.watch(dashboardRepositoryProvider).fetchTemplateCount();
-});
