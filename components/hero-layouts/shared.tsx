@@ -161,13 +161,15 @@ export function HeroCopy({
           onBreakpointChange={onBreakpointChange}
           defaultTextColor={textColor}
         />
-        {content.logoUrl ? (
-          <HeroLogo
-            src={content.logoUrl}
-            alt={`${content.name} 로고`}
-            borderColor={buttonBg}
-            position={content.logoPosition ?? DEFAULT_CANVAS_LOGO_POSITION}
-          />
+        {content.logoUrl && !content.logoPosition ? (
+          <div className={CANVAS_LOGO_SLOT_CLASS}>
+            <HeroLogo
+              src={content.logoUrl}
+              alt={`${content.name} 로고`}
+              borderColor={buttonBg}
+              position={null}
+            />
+          </div>
         ) : null}
       </>
     );
@@ -175,14 +177,6 @@ export function HeroCopy({
 
   return (
     <>
-      {content.logoUrl && content.logoPosition ? (
-        <HeroLogo
-          src={content.logoUrl}
-          alt={`${content.name} 로고`}
-          borderColor={buttonBg}
-          position={content.logoPosition}
-        />
-      ) : null}
       <div className="relative z-10 px-5 pt-5 sm:px-8">
         <p className="text-sm font-semibold tracking-wide" style={{ color: mutedColor }}>
           {content.name || "도장 이름"}
@@ -238,18 +232,17 @@ export function HeroCopy({
   );
 }
 
-// 캔버스 모드에는 로고가 들어갈 기본 자리가 없어서 왼쪽 위에 둔다.
-export const DEFAULT_CANVAS_LOGO_POSITION: LogoPosition = {
-  xPct: 6,
-  yPct: 8,
-  scale: 1,
-};
+// 캔버스 모드에는 로고가 들어갈 기본 자리가 없어서 히어로 왼쪽 위에 둔다.
+export const CANVAS_LOGO_SLOT_CLASS = "absolute left-[6%] top-[8%] z-30";
+
+// 로고를 옮기면 이 속성이 붙은 랜딩페이지 전체 영역(DojangLanding) 기준 %좌표로 저장된다.
+export const LANDING_ROOT_ATTR = "data-landing-root";
 
 const LOGO_SCALE_MIN = 0.5;
 const LOGO_SCALE_MAX = 3;
 
-// position이 null이면 디자인이 정한 자리(글 위)에 흐름대로 놓이고,
-// 값이 있으면 히어로(<header>) 기준 %좌표에 절대 위치로 놓인다.
+// position이 null이면 디자인이 정한 자리(히어로 글 위)에 흐름대로 놓이고,
+// 값이 있으면 랜딩페이지 전체 기준 %좌표에 절대 위치로 놓인다(DojangLanding이 그린다).
 // 편집 중에는 끌어서 옮기고 크기를 바꿀 수 있다. 처음 끄는 순간 지금 보이는
 // 자리를 %좌표로 바꿔 저장하므로 로고가 튀지 않는다.
 export function HeroLogo({
@@ -267,17 +260,17 @@ export function HeroLogo({
   const imgRef = useRef<HTMLImageElement>(null);
   const scale = position?.scale ?? 1;
 
-  // 흐름 배치(null) 상태일 때 지금 보이는 자리를 히어로 기준 %좌표로 바꾼다.
+  // 흐름 배치(null) 상태일 때 지금 보이는 자리를 페이지 전체 기준 %좌표로 바꾼다.
   function currentPosition(): LogoPosition | null {
     if (position) return position;
     const img = imgRef.current;
-    const hero = img?.closest("header");
-    if (!img || !hero) return null;
-    const heroRect = hero.getBoundingClientRect();
+    const page = img?.closest(`[${LANDING_ROOT_ATTR}]`);
+    if (!img || !page) return null;
+    const pageRect = page.getBoundingClientRect();
     const imgRect = img.getBoundingClientRect();
     return {
-      xPct: ((imgRect.left - heroRect.left) / heroRect.width) * 100,
-      yPct: ((imgRect.top - heroRect.top) / heroRect.height) * 100,
+      xPct: ((imgRect.left - pageRect.left) / pageRect.width) * 100,
+      yPct: ((imgRect.top - pageRect.top) / pageRect.height) * 100,
       scale,
     };
   }
@@ -287,19 +280,19 @@ export function HeroLogo({
     event.preventDefault();
     event.stopPropagation();
     const img = imgRef.current;
-    const hero = img?.closest("header");
+    const page = img?.closest(`[${LANDING_ROOT_ATTR}]`);
     const start = currentPosition();
-    if (!img || !hero || !start) return;
-    const heroRect = hero.getBoundingClientRect();
+    if (!img || !page || !start) return;
+    const pageRect = page.getBoundingClientRect();
     const imgRect = img.getBoundingClientRect();
-    const maxX = Math.max(100 - (imgRect.width / heroRect.width) * 100, 0);
-    const maxY = Math.max(100 - (imgRect.height / heroRect.height) * 100, 0);
+    const maxX = Math.max(100 - (imgRect.width / pageRect.width) * 100, 0);
+    const maxY = Math.max(100 - (imgRect.height / pageRect.height) * 100, 0);
     const startX = event.clientX;
     const startY = event.clientY;
 
     function onMove(moveEvent: PointerEvent) {
-      const dxPct = ((moveEvent.clientX - startX) / heroRect.width) * 100;
-      const dyPct = ((moveEvent.clientY - startY) / heroRect.height) * 100;
+      const dxPct = ((moveEvent.clientX - startX) / pageRect.width) * 100;
+      const dyPct = ((moveEvent.clientY - startY) / pageRect.height) * 100;
       onLogoPositionChange({
         ...start!,
         xPct: Math.min(Math.max(start!.xPct + dxPct, 0), maxX),
@@ -383,7 +376,7 @@ export function HeroLogo({
 
   return (
     <div
-      className="absolute z-30"
+      className="absolute z-40"
       style={{ left: `${position.xPct}%`, top: `${position.yPct}%` }}
     >
       {logo}

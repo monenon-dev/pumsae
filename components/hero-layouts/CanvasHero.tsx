@@ -10,7 +10,7 @@ import { heroMinHeightClass, normalizeHexColor } from "@/lib/dojang/brand";
 import { useCanvasEditor } from "@/lib/dojang/canvas-context";
 import { EditableCanvasLayer } from "./EditableCanvasLayer";
 import {
-  DEFAULT_CANVAS_LOGO_POSITION,
+  CANVAS_LOGO_SLOT_CLASS,
   HeroLogo,
   HeroPhoto,
   type HeroComponentProps,
@@ -77,13 +77,15 @@ export function CanvasHero({ content }: HeroComponentProps) {
         onBreakpointChange={onBreakpointChange}
         defaultTextColor={defaultTextColor}
       />
-      {content.logoUrl ? (
-        <HeroLogo
-          src={content.logoUrl}
-          alt={`${content.name} 로고`}
-          borderColor={defaultTextColor}
-          position={content.logoPosition ?? DEFAULT_CANVAS_LOGO_POSITION}
-        />
+      {content.logoUrl && !content.logoPosition ? (
+        <div className={CANVAS_LOGO_SLOT_CLASS}>
+          <HeroLogo
+            src={content.logoUrl}
+            alt={`${content.name} 로고`}
+            borderColor={defaultTextColor}
+            position={null}
+          />
+        </div>
       ) : null}
     </header>
   );
