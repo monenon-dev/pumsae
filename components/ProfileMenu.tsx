@@ -13,7 +13,7 @@ export function ProfileMenu() {
 
   return (
     <Link
-      href="/dashboard/profile"
+      href="/profile"
       aria-label="프로필 보기"
       className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-medium text-pumsae-ink transition-colors hover:bg-pumsae-line"
     >
