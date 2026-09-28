@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../albums/album.dart';
+import '../calendar/calendar_event.dart';
+import '../calendar/calendar_repository.dart';
 import '../albums/albums_provider.dart';
 import '../templates/promo_template.dart';
 import '../templates/templates_provider.dart';
@@ -73,6 +75,7 @@ class HomeScreen extends ConsumerWidget {
           ref.invalidate(dojangProvider);
           ref.invalidate(templatesProvider);
           ref.invalidate(albumsProvider);
+          ref.invalidate(upcomingEventsProvider);
           ref.invalidate(trialsProvider);
           try {
             await ref.read(dojangProvider.future);
@@ -98,6 +101,8 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             const _LandingSection(),
+            const SizedBox(height: 12),
+            const _CalendarSection(),
             const SizedBox(height: 12),
             const _TemplatesSection(),
             const SizedBox(height: 12),
@@ -241,6 +246,70 @@ class _TemplatesSection extends ConsumerWidget {
           );
         },
         () => ref.invalidate(templatesProvider),
+      ),
+    );
+  }
+}
+
+class _CalendarSection extends ConsumerWidget {
+  const _CalendarSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final upcoming = ref.watch(upcomingEventsProvider);
+
+    return _SectionCard(
+      icon: Icons.calendar_month_outlined,
+      title: '다가오는 일정',
+      onMore: () async {
+        await context.push('/calendar');
+        ref.invalidate(upcomingEventsProvider);
+      },
+      child: _asyncContent<List<CalendarEvent>>(
+        upcoming,
+        (events) {
+          if (events.isEmpty) {
+            return Text(
+              '앞으로 2주 동안 등록된 일정이 없어요.',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            );
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final event in events.take(4))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: event.category.color,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(event.title, overflow: TextOverflow.ellipsis),
+                      ),
+                      Text(
+                        '${formatDayTitle(event.date)} ${event.startTime ?? ''}'.trim(),
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+                      ),
+                    ],
+                  ),
+                ),
+              if (events.length > 4)
+                Text(
+                  '외 ${events.length - 4}개',
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+                ),
+            ],
+          );
+        },
+        () => ref.invalidate(upcomingEventsProvider),
       ),
     );
   }

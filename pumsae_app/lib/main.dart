@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_router.dart';
@@ -23,6 +24,10 @@ class PumsaeApp extends ConsumerWidget {
       title: 'PUMSAE',
       theme: AppTheme.light(),
       routerConfig: router,
+      // 날짜·시간 선택기와 기본 문구를 한국어로.
+      locale: const Locale('ko', 'KR'),
+      supportedLocales: const [Locale('ko', 'KR'), Locale('en')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
     );
   }
 }

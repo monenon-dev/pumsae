@@ -6,6 +6,7 @@ import 'core/auth_provider.dart';
 import 'features/albums/album_detail_screen.dart';
 import 'features/albums/albums_screen.dart';
 import 'features/auth/login_screen.dart';
+import 'features/calendar/calendar_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/dashboard/home_screen.dart';
 import 'features/profile/profile_screen.dart';
@@ -40,6 +41,7 @@ const _trialsPath = '/trials';
 const _templatesPath = '/templates';
 const _profilePath = '/profile';
 const _albumsPath = '/albums';
+const _calendarPath = '/calendar';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _AuthRefreshNotifier(ref);
@@ -102,6 +104,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: _albumsPath,
         builder: (context, state) => const AlbumsScreen(),
+      ),
+      GoRoute(
+        path: _calendarPath,
+        builder: (context, state) => const CalendarScreen(),
       ),
       GoRoute(
         path: '$_albumsPath/:id',
