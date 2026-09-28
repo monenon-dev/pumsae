@@ -73,10 +73,9 @@ function RegisterForm() {
 
   return (
     <>
-      <h1 className="text-xl font-semibold tracking-tight">체육관 등록</h1>
+      <h1 className="text-xl font-semibold tracking-tight">회원가입</h1>
       <p className="mt-2 text-sm leading-6 text-zinc-600">
-        우리 체육관을 새로 등록하고 홍보 페이지를 시작합니다. 기존 체육관 합류는
-        다음 단계에서 지원할 예정입니다.
+        계정을 만들면 우리 체육관 홍보 페이지를 바로 시작할 수 있어요.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -151,7 +150,7 @@ function RegisterForm() {
           disabled={loading}
           className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
         >
-          {loading ? "등록 중..." : "체육관 등록하기"}
+          {loading ? "가입 중..." : "회원가입"}
         </button>
       </form>
 

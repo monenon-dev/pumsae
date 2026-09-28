@@ -48,7 +48,7 @@ function LoginForm() {
     <>
       <h1 className="text-xl font-semibold tracking-tight">로그인</h1>
       <p className="mt-2 text-sm leading-6 text-zinc-600">
-        관장님 계정으로 대시보드에 들어갑니다.
+        관장님 계정으로 로그인하세요.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
