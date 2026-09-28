@@ -5,7 +5,9 @@ import {
   type CanvasTextElement,
   type DojangLandingContent,
   type HeadingFont,
+  type HeroImagePosition,
   type HeroLayout,
+  type LogoPosition,
   type SectionSpacing,
   withNormalizedHeroLayout,
 } from "@/types/dojang";
@@ -23,6 +25,8 @@ export async function updateMyDojang(
     description: string | null;
     logoUrl: string | null;
     heroImageUrl: string | null;
+    heroImagePosition: HeroImagePosition;
+    logoPosition: LogoPosition | null;
     brandColor: string | null;
     customBgColor: string | null;
     customTextColor: string | null;

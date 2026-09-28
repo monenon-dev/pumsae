@@ -17,6 +17,7 @@ import {
   DEFAULT_BRAND_COLOR,
   DEFAULT_CUSTOM_BG_COLOR,
   DEFAULT_CUSTOM_TEXT_COLOR,
+  DEFAULT_HERO_IMAGE_POSITION,
   HEADING_FONTS,
   HEADING_FONT_LABELS,
   HEADING_FONT_VARS,
@@ -31,6 +32,7 @@ import {
   type DojangLandingContent,
   type HeroImagePosition,
   type HeroLayout,
+  type LogoPosition,
   withNormalizedHeroLayout,
 } from "@/types/dojang";
 
@@ -456,6 +458,10 @@ export function LandingEditor({ initial }: LandingEditorProps) {
     updateField("heroImagePosition", position);
   }
 
+  function updateLogoPosition(position: LogoPosition | null) {
+    updateField("logoPosition", position);
+  }
+
   function beginInlineEdit(target: HTMLElement, field: string) {
     beginInlineTextEdit(target, {
       multiline: field === "description",
@@ -509,6 +515,8 @@ export function LandingEditor({ initial }: LandingEditorProps) {
         description: content.description?.trim() || null,
         logoUrl: content.logoUrl,
         heroImageUrl: content.heroImageUrl,
+        heroImagePosition: content.heroImagePosition,
+        logoPosition: content.logoPosition,
         brandColor: normalizeHexColor(
           content.brandColor,
           DEFAULT_BRAND_COLOR,
@@ -622,6 +630,38 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                 onChange={(next) => updateField("logoUrl", next)}
               />
             </div>
+            {content.heroImageUrl || content.logoUrl ? (
+              <div className="mt-3 rounded-lg bg-zinc-50 px-3 py-2.5 text-xs leading-5 text-zinc-600">
+                <p>
+                  오른쪽 미리보기에서 사진과 로고를 끌어서 위치를 옮길 수 있어요.
+                  사진은 확대, 로고는 크기 버튼으로 조절하세요.
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {content.heroImageUrl ? (
+                    <button
+                      type="button"
+                      disabled={!canEdit}
+                      onClick={() =>
+                        updateHeroImagePosition(DEFAULT_HERO_IMAGE_POSITION)
+                      }
+                      className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+                    >
+                      사진 위치 초기화
+                    </button>
+                  ) : null}
+                  {content.logoUrl ? (
+                    <button
+                      type="button"
+                      disabled={!canEdit}
+                      onClick={() => updateLogoPosition(null)}
+                      className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+                    >
+                      로고 위치 초기화
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
           </SectionCard>
 
           <SectionCard icon={<PaletteIcon />} title="디자인">
@@ -1036,6 +1076,7 @@ export function LandingEditor({ initial }: LandingEditorProps) {
                 onBreakpointChange: setCanvasBreakpoint,
                 onChange: updateCanvasElements,
                 onImagePositionChange: updateHeroImagePosition,
+                onLogoPositionChange: updateLogoPosition,
               }}
             >
               <DojangLanding content={content} preview />

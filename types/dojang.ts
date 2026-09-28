@@ -286,6 +286,13 @@ export type HeroImagePosition = {
   zoom: number;
 };
 
+// 히어로 영역 기준 로고 왼쪽 위 좌표(%)와 크기 배율. null이면 디자인 기본 자리.
+export type LogoPosition = {
+  xPct: number;
+  yPct: number;
+  scale: number;
+};
+
 export const DEFAULT_HERO_IMAGE_POSITION: HeroImagePosition = {
   xPct: 50,
   yPct: 50,
@@ -300,6 +307,7 @@ export type DojangLandingContent = {
   logoUrl: string | null;
   heroImageUrl: string | null;
   heroImagePosition: HeroImagePosition;
+  logoPosition: LogoPosition | null;
   brandColor: string | null;
   customBgColor: string | null;
   customTextColor: string | null;
@@ -323,6 +331,7 @@ export function withNormalizedHeroLayout(
     | "sectionText"
     | "canvasElements"
     | "heroImagePosition"
+    | "logoPosition"
   > & {
     heroLayout?: string | null;
     headingFont?: string | null;
@@ -330,6 +339,7 @@ export function withNormalizedHeroLayout(
     sectionText?: Record<string, string> | null;
     canvasElements?: CanvasTextElement[] | null;
     heroImagePosition?: Partial<HeroImagePosition> | null;
+    logoPosition?: LogoPosition | null;
   },
 ): DojangLandingContent {
   return {
@@ -343,6 +353,7 @@ export function withNormalizedHeroLayout(
       ...DEFAULT_HERO_IMAGE_POSITION,
       ...content.heroImagePosition,
     },
+    logoPosition: content.logoPosition ?? null,
   };
 }
 

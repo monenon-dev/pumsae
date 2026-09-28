@@ -29,6 +29,12 @@ class HeroImagePosition(BaseModel):
     zoom: float = 1
 
 
+class LogoPosition(BaseModel):
+    xPct: float
+    yPct: float
+    scale: float = 1
+
+
 class CanvasElement(BaseModel):
     id: str
     text: str
@@ -51,6 +57,7 @@ class DojangOut(BaseModel):
     logoUrl: str | None
     heroImageUrl: str | None
     heroImagePosition: HeroImagePosition | None
+    logoPosition: LogoPosition | None
     brandColor: str | None
     customBgColor: str | None
     customTextColor: str | None
@@ -74,6 +81,7 @@ class DojangOut(BaseModel):
             logoUrl=dojang.logo_url,
             heroImageUrl=dojang.hero_image_url,
             heroImagePosition=dojang.hero_image_position,
+            logoPosition=dojang.logo_position,
             brandColor=dojang.brand_color,
             customBgColor=dojang.custom_bg_color,
             customTextColor=dojang.custom_text_color,
@@ -95,6 +103,7 @@ class DojangPatch(BaseModel):
     logoUrl: str | None = None
     heroImageUrl: str | None = None
     heroImagePosition: HeroImagePosition | None = None
+    logoPosition: LogoPosition | None = None
     brandColor: str | None = None
     customBgColor: str | None = None
     customTextColor: str | None = None

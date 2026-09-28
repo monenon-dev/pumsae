@@ -9,6 +9,7 @@ import {
   type DojangLandingContent,
   type HeadingFont,
   type HeroImagePosition,
+  type LogoPosition,
 } from "@/types/dojang";
 import { getCopy } from "@/lib/dojang/copy";
 import { heroContentPaddingClass } from "@/lib/dojang/brand";
@@ -151,19 +152,37 @@ export function HeroCopy({
         : defaultCanvasElementsForHero(content, layoutId, textColor, trialLabel);
 
     return (
-      <EditableCanvasLayer
-        elements={elements}
-        onChange={onChange}
-        editable={editable}
-        breakpoint={breakpoint}
-        onBreakpointChange={onBreakpointChange}
-        defaultTextColor={textColor}
-      />
+      <>
+        <EditableCanvasLayer
+          elements={elements}
+          onChange={onChange}
+          editable={editable}
+          breakpoint={breakpoint}
+          onBreakpointChange={onBreakpointChange}
+          defaultTextColor={textColor}
+        />
+        {content.logoUrl ? (
+          <HeroLogo
+            src={content.logoUrl}
+            alt={`${content.name} 로고`}
+            borderColor={buttonBg}
+            position={content.logoPosition ?? DEFAULT_CANVAS_LOGO_POSITION}
+          />
+        ) : null}
+      </>
     );
   }
 
   return (
     <>
+      {content.logoUrl && content.logoPosition ? (
+        <HeroLogo
+          src={content.logoUrl}
+          alt={`${content.name} 로고`}
+          borderColor={buttonBg}
+          position={content.logoPosition}
+        />
+      ) : null}
       <div className="relative z-10 px-5 pt-5 sm:px-8">
         <p className="text-sm font-semibold tracking-wide" style={{ color: mutedColor }}>
           {content.name || "도장 이름"}
@@ -171,14 +190,12 @@ export function HeroCopy({
       </div>
 
       <div className={`relative z-10 ${heroContentPaddingClass(content.sectionSpacing)}`}>
-        {content.logoUrl ? (
-          // User-provided URLs can be any host, so native img is used on purpose.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+        {content.logoUrl && !content.logoPosition ? (
+          <HeroLogo
             src={content.logoUrl}
             alt={`${content.name} 로고`}
-            className="mb-5 h-16 w-16 rounded-full border-2 bg-white object-cover shadow-sm sm:h-[4.5rem] sm:w-[4.5rem]"
-            style={{ borderColor: buttonBg }}
+            borderColor={buttonBg}
+            position={null}
           />
         ) : null}
         {location ? (
@@ -218,6 +235,160 @@ export function HeroCopy({
         </div>
       </div>
     </>
+  );
+}
+
+// 캔버스 모드에는 로고가 들어갈 기본 자리가 없어서 왼쪽 위에 둔다.
+export const DEFAULT_CANVAS_LOGO_POSITION: LogoPosition = {
+  xPct: 6,
+  yPct: 8,
+  scale: 1,
+};
+
+const LOGO_SCALE_MIN = 0.5;
+const LOGO_SCALE_MAX = 3;
+
+// position이 null이면 디자인이 정한 자리(글 위)에 흐름대로 놓이고,
+// 값이 있으면 히어로(<header>) 기준 %좌표에 절대 위치로 놓인다.
+// 편집 중에는 끌어서 옮기고 크기를 바꿀 수 있다. 처음 끄는 순간 지금 보이는
+// 자리를 %좌표로 바꿔 저장하므로 로고가 튀지 않는다.
+export function HeroLogo({
+  src,
+  alt,
+  borderColor,
+  position,
+}: {
+  src: string;
+  alt: string;
+  borderColor: string;
+  position: LogoPosition | null;
+}) {
+  const { editable, onLogoPositionChange } = useCanvasEditor();
+  const imgRef = useRef<HTMLImageElement>(null);
+  const scale = position?.scale ?? 1;
+
+  // 흐름 배치(null) 상태일 때 지금 보이는 자리를 히어로 기준 %좌표로 바꾼다.
+  function currentPosition(): LogoPosition | null {
+    if (position) return position;
+    const img = imgRef.current;
+    const hero = img?.closest("header");
+    if (!img || !hero) return null;
+    const heroRect = hero.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+    return {
+      xPct: ((imgRect.left - heroRect.left) / heroRect.width) * 100,
+      yPct: ((imgRect.top - heroRect.top) / heroRect.height) * 100,
+      scale,
+    };
+  }
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLImageElement>) {
+    if (!editable) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const img = imgRef.current;
+    const hero = img?.closest("header");
+    const start = currentPosition();
+    if (!img || !hero || !start) return;
+    const heroRect = hero.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+    const maxX = Math.max(100 - (imgRect.width / heroRect.width) * 100, 0);
+    const maxY = Math.max(100 - (imgRect.height / heroRect.height) * 100, 0);
+    const startX = event.clientX;
+    const startY = event.clientY;
+
+    function onMove(moveEvent: PointerEvent) {
+      const dxPct = ((moveEvent.clientX - startX) / heroRect.width) * 100;
+      const dyPct = ((moveEvent.clientY - startY) / heroRect.height) * 100;
+      onLogoPositionChange({
+        ...start!,
+        xPct: Math.min(Math.max(start!.xPct + dxPct, 0), maxX),
+        yPct: Math.min(Math.max(start!.yPct + dyPct, 0), maxY),
+      });
+    }
+    function onUp() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  function adjustScale(delta: number) {
+    const base = currentPosition();
+    if (!base) return;
+    const nextScale = Math.round((base.scale + delta) * 10) / 10;
+    onLogoPositionChange({
+      ...base,
+      scale: Math.min(Math.max(nextScale, LOGO_SCALE_MIN), LOGO_SCALE_MAX),
+    });
+  }
+
+  const logo = (
+    // User-provided URLs can be any host, so native img is used on purpose.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      draggable={false}
+      onPointerDown={handlePointerDown}
+      className={`h-[calc(4rem*var(--logo-scale))] w-[calc(4rem*var(--logo-scale))] rounded-full border-2 bg-white object-cover shadow-sm sm:h-[calc(4.5rem*var(--logo-scale))] sm:w-[calc(4.5rem*var(--logo-scale))]${
+        editable ? " cursor-move touch-none hover:ring-2 hover:ring-white/80 hover:ring-offset-2" : ""
+      }`}
+      style={{ borderColor, ["--logo-scale" as string]: scale }}
+    />
+  );
+
+  const controls = editable ? (
+    <div
+      className="mt-2 flex w-max items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-zinc-900 shadow-lg"
+      onPointerDown={(event) => event.stopPropagation()}
+    >
+      <button
+        type="button"
+        onClick={() => adjustScale(-0.1)}
+        className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold hover:bg-zinc-100"
+      >
+        -
+      </button>
+      <span className="px-1 text-xs font-semibold text-zinc-600">로고 크기</span>
+      <button
+        type="button"
+        onClick={() => adjustScale(0.1)}
+        className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold hover:bg-zinc-100"
+      >
+        +
+      </button>
+      {position ? (
+        <button
+          type="button"
+          onClick={() => onLogoPositionChange(null)}
+          className="ml-1 rounded-full px-2 text-xs font-semibold text-zinc-600 hover:bg-zinc-100"
+        >
+          원위치
+        </button>
+      ) : null}
+    </div>
+  ) : null;
+
+  if (!position) {
+    return (
+      <div className="mb-5">
+        {logo}
+        {controls}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="absolute z-30"
+      style={{ left: `${position.xPct}%`, top: `${position.yPct}%` }}
+    >
+      {logo}
+      {controls}
+    </div>
   );
 }
 

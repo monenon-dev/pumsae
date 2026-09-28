@@ -226,6 +226,18 @@ def update_my_dojang(
                 "zoom": min(max(zoom, 1), 2.5),
             }
 
+    if "logoPosition" in updates:
+        raw_logo = updates["logoPosition"]
+        if raw_logo is None:
+            # None이면 디자인이 정한 기본 자리로 돌아간다.
+            dojang.logo_position = None
+        else:
+            dojang.logo_position = {
+                "xPct": min(max(float(raw_logo["xPct"]), 0), 100),
+                "yPct": min(max(float(raw_logo["yPct"]), 0), 100),
+                "scale": min(max(float(raw_logo.get("scale", 1)), 0.5), 3),
+            }
+
     if "brandColor" in updates:
         color = (updates["brandColor"] or "").strip()
         if not _HEX.match(color):

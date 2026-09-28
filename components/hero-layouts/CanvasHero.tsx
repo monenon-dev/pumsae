@@ -9,7 +9,12 @@ import {
 import { heroMinHeightClass, normalizeHexColor } from "@/lib/dojang/brand";
 import { useCanvasEditor } from "@/lib/dojang/canvas-context";
 import { EditableCanvasLayer } from "./EditableCanvasLayer";
-import { HeroPhoto, type HeroComponentProps } from "./shared";
+import {
+  DEFAULT_CANVAS_LOGO_POSITION,
+  HeroLogo,
+  HeroPhoto,
+  type HeroComponentProps,
+} from "./shared";
 
 function defaultElements(
   content: HeroComponentProps["content"],
@@ -72,6 +77,14 @@ export function CanvasHero({ content }: HeroComponentProps) {
         onBreakpointChange={onBreakpointChange}
         defaultTextColor={defaultTextColor}
       />
+      {content.logoUrl ? (
+        <HeroLogo
+          src={content.logoUrl}
+          alt={`${content.name} 로고`}
+          borderColor={defaultTextColor}
+          position={content.logoPosition ?? DEFAULT_CANVAS_LOGO_POSITION}
+        />
+      ) : null}
     </header>
   );
 }
