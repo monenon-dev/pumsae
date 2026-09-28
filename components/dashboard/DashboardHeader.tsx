@@ -38,18 +38,23 @@ export function DashboardHeader() {
   const { loading, landingSaved, pendingTrialsCount } = useDashboardStatus();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // 메뉴에서 페이지를 고르면 닫는다.
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
+  // 메뉴 항목을 누르면 그 onClick에서 닫는다. pathname이 바뀔 때 닫으면, 느린
+  // 휴대폰에서 이동이 끝나기 전에 ☰를 다시 눌러 연 메뉴가 이동 완료와 함께
+  // 저절로 닫혀 버린다. 뒤로/앞으로 가기만 따로 닫는다.
   useEffect(() => {
     if (!menuOpen) return;
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setMenuOpen(false);
     }
+    function handlePopState() {
+      setMenuOpen(false);
+    }
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, [menuOpen]);
 
   function badgesFor(href: string) {
