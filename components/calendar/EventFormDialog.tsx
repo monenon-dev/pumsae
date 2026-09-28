@@ -127,6 +127,12 @@ export function EventFormDialog({
                 </button>
               ))}
             </div>
+            {category === "NOTICE" ? (
+              <p className="mt-2 text-xs font-normal leading-5 text-emerald-700">
+                학부모에게 공개하면 홈페이지 캘린더 위 &quot;이번 달 안내&quot;에 메모까지
+                바로 보여요. 날짜가 딱히 없는 안내는 적용 시작일에 넣어 주세요.
+              </p>
+            ) : null}
           </div>
 
           <label className="block text-sm font-medium">

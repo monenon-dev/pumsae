@@ -6,7 +6,7 @@ import { MonthCalendar, MonthCalendarHeader } from "@/components/calendar/MonthC
 import { fetchPublicEvents } from "@/lib/api/events";
 import { sectionPaddingClass } from "@/lib/dojang/brand";
 import { getCopy } from "@/lib/dojang/copy";
-import { gridRange, startOfMonth, toDateKey } from "@/lib/calendar";
+import { formatDayTitle, gridRange, startOfMonth, toDateKey } from "@/lib/calendar";
 import type { CalendarEvent } from "@/types/calendar";
 import { HEADING_FONT_VARS, type DojangLandingContent } from "@/types/dojang";
 
@@ -49,6 +49,12 @@ export function DojangCalendarSection({
     return null;
   }
 
+  // "공지"로 등록한 일정은 날짜를 누르지 않아도 보이도록 달력 위에 메모까지 펼친다.
+  const monthPrefix = toDateKey(month).slice(0, 7);
+  const notices = events.filter(
+    (event) => event.category === "NOTICE" && event.date.startsWith(monthPrefix),
+  );
+
   function changeMonth(next: Date) {
     setMonth(startOfMonth(next));
     const today = new Date();
@@ -81,6 +87,34 @@ export function DojangCalendarSection({
         {/* 디자인 배경색과 상관없이 읽기 쉽도록 달력은 흰 판 위에 그린다. */}
         <div className="mt-7 rounded-2xl bg-white p-4 text-zinc-900 shadow-sm sm:p-5">
           <MonthCalendarHeader month={month} onMonthChange={changeMonth} />
+          {notices.length > 0 ? (
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
+              <h3 className="text-sm font-semibold text-emerald-900">
+                {month.getMonth() + 1}월 안내
+              </h3>
+              <ul className="mt-2 divide-y divide-emerald-100">
+                {notices.map((notice) => (
+                  <li key={notice.id} className="py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDate(notice.date)}
+                      className="w-full text-left"
+                    >
+                      <p className="text-xs font-medium text-emerald-700">
+                        {formatDayTitle(notice.date)}
+                      </p>
+                      <p className="mt-0.5 font-semibold text-zinc-900">{notice.title}</p>
+                      {notice.memo ? (
+                        <p className="mt-1 whitespace-pre-line text-sm leading-6 text-zinc-700">
+                          {notice.memo}
+                        </p>
+                      ) : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="mt-4">
             <MonthCalendar
               month={month}

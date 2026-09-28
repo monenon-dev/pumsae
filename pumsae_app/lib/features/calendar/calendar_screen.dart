@@ -573,6 +573,15 @@ class _EventFormState extends ConsumerState<_EventForm> {
                   ),
               ],
             ),
+            if (_category == EventCategory.notice)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  '학부모에게 공개하면 홈페이지 캘린더 위 "이번 달 안내"에 메모까지 바로 보여요. '
+                  '날짜가 딱히 없는 안내는 적용 시작일에 넣어 주세요.',
+                  style: TextStyle(fontSize: 12, color: EventCategory.notice.color),
+                ),
+              ),
             const SizedBox(height: 8),
             ListTile(
               contentPadding: EdgeInsets.zero,
