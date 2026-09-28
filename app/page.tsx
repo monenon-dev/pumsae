@@ -120,21 +120,6 @@ function LandingHome() {
           </div>
         </section>
 
-        <section className="border-t border-pumsae-line">
-          <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-            <h2 className="text-xl font-semibold tracking-tight">
-              지금 바로 우리 체육관 홍보를 시작해 보세요
-            </h2>
-            <div className="mt-6">
-              <Link
-                href={isLoggedIn ? "/dashboard" : "/login"}
-                className="inline-flex items-center justify-center rounded-lg bg-pumsae-accent px-6 py-3 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
-              >
-                {isLoggedIn ? "대시보드로 가기" : "로그인하고 시작하기"}
-              </Link>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="border-t border-pumsae-line">
