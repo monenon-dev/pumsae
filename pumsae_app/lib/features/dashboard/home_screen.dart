@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../albums/album.dart';
+import '../albums/albums_provider.dart';
 import '../templates/promo_template.dart';
 import '../templates/templates_provider.dart';
 import '../trials/trial_request.dart';
@@ -70,6 +72,7 @@ class HomeScreen extends ConsumerWidget {
           ref.invalidate(meProvider);
           ref.invalidate(dojangProvider);
           ref.invalidate(templatesProvider);
+          ref.invalidate(albumsProvider);
           ref.invalidate(trialsProvider);
           try {
             await ref.read(dojangProvider.future);
@@ -97,6 +100,8 @@ class HomeScreen extends ConsumerWidget {
             const _LandingSection(),
             const SizedBox(height: 12),
             const _TemplatesSection(),
+            const SizedBox(height: 12),
+            const _AlbumsSection(),
             const SizedBox(height: 12),
             const _TrialsSection(),
           ],
@@ -236,6 +241,73 @@ class _TemplatesSection extends ConsumerWidget {
           );
         },
         () => ref.invalidate(templatesProvider),
+      ),
+    );
+  }
+}
+
+class _AlbumsSection extends ConsumerWidget {
+  const _AlbumsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final albums = ref.watch(albumsProvider);
+
+    return _SectionCard(
+      icon: Icons.photo_library_outlined,
+      title: '사진첩',
+      onMore: () async {
+        await context.push('/albums');
+        ref.invalidate(albumsProvider);
+      },
+      child: _asyncContent<List<AlbumSummary>>(
+        albums,
+        (rows) {
+          if (rows.isEmpty) {
+            return Text(
+              '아직 만든 앨범이 없어요. 수업·행사 사진을 모아 보세요.',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            );
+          }
+          final photos = rows.fold<int>(0, (sum, album) => sum + album.photoCount);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('앨범 ${rows.length}개 · 사진 $photos장'),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 84,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: rows.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final album = rows[index];
+                    return GestureDetector(
+                      onTap: () async {
+                        await context.push('/albums/${album.id}');
+                        ref.invalidate(albumsProvider);
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: 84,
+                          child: album.coverUrl == null
+                              ? ColoredBox(
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  child: const Icon(Icons.photo_library_outlined),
+                                )
+                              : Image.network(album.coverUrl!, fit: BoxFit.cover),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+        () => ref.invalidate(albumsProvider),
       ),
     );
   }
