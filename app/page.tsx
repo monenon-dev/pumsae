@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PumsaeLogo } from "@/components/ui/Logo";
+import { ProfileMenu } from "@/components/ProfileMenu";
 
 const FEATURES = [
   {
@@ -64,12 +65,7 @@ function LandingHome() {
           <PumsaeLogo />
           <div className="flex items-center gap-2">
             {isLoggedIn ? (
-              <Link
-                href="/dashboard/landing"
-                className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
-              >
-                대시보드로 가기
-              </Link>
+              <ProfileMenu />
             ) : (
               <>
                 <Link
