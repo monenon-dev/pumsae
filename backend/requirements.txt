@@ -10,3 +10,4 @@ Pillow
 python-multipart
 playwright
 python-dotenv
+firebase-admin

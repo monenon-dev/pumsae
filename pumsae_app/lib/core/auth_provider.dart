@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import 'api_client.dart';
 import 'auth_repository.dart';
+import 'push_service.dart';
 
 enum AuthStatus { loading, authenticated, unauthenticated }
 
@@ -25,7 +26,7 @@ class AuthState {
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._repository) : super(AuthState.loading) {
+  AuthNotifier(this._repository, this._push) : super(AuthState.loading) {
     _sessionExpiredSub = _repository.onSessionExpired.listen((_) {
       state = AuthState.unauthenticated;
     });
@@ -33,6 +34,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   final AuthRepository _repository;
+  final PushService _push;
   late final StreamSubscription<void> _sessionExpiredSub;
 
   Future<void> _restore() async {
@@ -68,6 +70,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    // 로그아웃한 폰으로 체험 신청 알림이 계속 가지 않게, 세션이 살아 있을 때 먼저 해제한다.
+    await _push.unregister();
     await _repository.logout();
     state = AuthState.unauthenticated;
   }
@@ -89,6 +93,13 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(ref.watch(apiClientProvider));
 });
 
+final pushServiceProvider = Provider<PushService>((ref) {
+  return PushService(ref.watch(apiClientProvider));
+});
+
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.watch(authRepositoryProvider));
+  return AuthNotifier(
+    ref.watch(authRepositoryProvider),
+    ref.watch(pushServiceProvider),
+  );
 });

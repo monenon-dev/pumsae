@@ -35,6 +35,7 @@ class Settings:
     r2_bucket_name: str | None
     r2_public_url: str | None
     cors_origins: list[str]
+    firebase_credentials_json: str | None
 
     def __init__(self) -> None:
         self.database_url = _normalize_database_url(os.getenv("DATABASE_URL"))
@@ -58,6 +59,8 @@ class Settings:
             "CORS_ORIGINS",
             "http://localhost:3000,http://127.0.0.1:3000",
         )
+        # Firebase 서비스 계정 키 JSON 내용 전체. 없으면 푸시 알림만 꺼진다.
+        self.firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON") or None
 
 
 settings = Settings()

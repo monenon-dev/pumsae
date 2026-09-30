@@ -6,6 +6,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// 푸시 알림(FCM) 설정 파일. git에 올리지 않아서, 없는 PC에서는 푸시만 빠진 채로 빌드된다.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // 스토어 업로드 키. android/key.properties는 git에 올리지 않는다(android/.gitignore).
 // 없으면 릴리스 빌드도 디버그 키로 서명되는데, 그 파일은 Play 스토어가 받지 않는다.
 val keystoreProperties = Properties().apply {
