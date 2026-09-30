@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.dojangs import _find_dojang
-from app.api.uploads import _content_type, _read_limited, open_image, resized_webp
+from app.api.uploads import _content_type, _read_limited, open_image, resized_jpeg
 from app.core.deps import get_staff_user
 from app.core.r2 import delete_public_urls, put_object
 from app.db.session import get_db
@@ -256,12 +256,12 @@ async def upload_photo(
 
     _content_type(file)
     image = open_image(await _read_limited(file))
-    full, width, height = resized_webp(image, FULL_MAX_SIDE)
-    thumb, _, _ = resized_webp(image, THUMB_MAX_SIDE, quality=72)
+    full, width, height = resized_jpeg(image, FULL_MAX_SIDE)
+    thumb, _, _ = resized_jpeg(image, THUMB_MAX_SIDE, quality=75)
 
     key = f"albums/{album.dojang_id}/{album.id}/{uuid.uuid4()}"
-    url = put_object(f"{key}.webp", full, "image/webp")
-    thumb_url = put_object(f"{key}-thumb.webp", thumb, "image/webp")
+    url = put_object(f"{key}.jpg", full, "image/jpeg")
+    thumb_url = put_object(f"{key}-thumb.jpg", thumb, "image/jpeg")
 
     last = db.scalar(select(func.max(AlbumPhoto.sort_order)).where(AlbumPhoto.album_id == album.id))
     photo = AlbumPhoto(

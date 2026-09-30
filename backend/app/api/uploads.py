@@ -102,12 +102,15 @@ def open_image(data: bytes) -> Image.Image:
     return ImageOps.exif_transpose(image)
 
 
-def resized_webp(image: Image.Image, max_side: int, quality: int = 80) -> tuple[bytes, int, int]:
-    """긴 변이 max_side를 넘지 않게 줄여 webp로. (바이트, 너비, 높이)"""
+def resized_jpeg(image: Image.Image, max_side: int, quality: int = 85) -> tuple[bytes, int, int]:
+    """긴 변이 max_side를 넘지 않게 줄여 jpg로. (바이트, 너비, 높이)
+
+    사진첩 사진은 학부모가 내려받아 카톡 등으로 보내기도 해서, 어디서나 열리는 jpg로 둔다.
+    """
     copy = _to_rgb(image.copy())
     copy.thumbnail((max_side, max_side), Image.LANCZOS)
     buffer = BytesIO()
-    copy.save(buffer, format="WEBP", quality=quality)
+    copy.save(buffer, format="JPEG", quality=quality, optimize=True, progressive=True)
     return buffer.getvalue(), copy.width, copy.height
 
 

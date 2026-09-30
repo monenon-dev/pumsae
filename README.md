@@ -55,7 +55,7 @@
 | 모바일 앱 | Flutter, Riverpod, go_router, Dio |
 | API 서버 | FastAPI, Pydantic · Railway (Docker) |
 | 데이터베이스 | Neon Postgres, SQLAlchemy 2, Alembic (배포 시 자동 마이그레이션) |
-| 파일 | Cloudflare R2 (Pillow로 회전 보정·리사이즈 후 webp 저장) |
+| 파일 | Cloudflare R2 (Pillow로 회전 보정·리사이즈 후 저장. 사진첩은 jpg, 대표 사진·로고는 webp) |
 | 실시간 | WebSocket |
 | 이미지 생성 | Playwright (카드뉴스 고화질 PNG) |
 | 인증 | 자체 JWT — access token은 메모리, refresh token은 httpOnly 쿠키 |
@@ -91,7 +91,7 @@ flowchart LR
 
 **3. 휴대폰 사진이 옆으로 누워 보이고 페이지가 무거움**
 - 원인: 휴대폰 사진은 회전 정보를 EXIF에 따로 담고, 원본이 4000px 이상입니다.
-- 해결: 업로드 시 서버에서 EXIF 회전을 적용한 뒤 긴 변 2048px(보기용)·480px(목록용) 두 벌의 webp로 저장합니다. 앱은 기기에서 한 번 더 줄여 전송량을 줄입니다.
+- 해결: 업로드 시 서버에서 EXIF 회전을 적용한 뒤 긴 변 2048px(보기용)·480px(목록용) 두 벌의 jpg로 저장합니다. 학부모가 내려받아 메신저로 보내도 어디서나 열리도록 webp 대신 jpg를 씁니다. 앱은 기기에서 한 번 더 줄여 전송량을 줄입니다.
 
 **4. 주소를 바꾸면 이미 공유한 링크가 끊김**
 - 해결: 이전 주소를 별도 테이블에 남기고, 공개 조회가 예전 주소도 찾아 현재 주소로 영구 이동(308)시킵니다. 새로 가입하는 도장에는 다른 도장의 예전 주소가 배정되지 않게 했습니다.

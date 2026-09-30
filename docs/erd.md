@@ -246,7 +246,7 @@ SQLAlchemy 모델은 `User`, `Dojang`, `DojangSlugAlias`, `PromoTemplate`, `Tria
 
 ### `album_photos` — 앨범 사진 (`AlbumPhoto`)
 
-업로드할 때 백엔드가 EXIF 회전을 바로잡고 두 크기의 webp로 R2에 저장합니다. 경로는 `albums/{dojang_id}/{album_id}/{uuid}.webp`(+ `-thumb.webp`)입니다.
+업로드할 때 백엔드가 EXIF 회전을 바로잡고 두 크기의 jpg로 R2에 저장합니다. 경로는 `albums/{dojang_id}/{album_id}/{uuid}.jpg`(+ `-thumb.jpg`)입니다. 2026-09-30 이전에 올린 사진은 `.webp`로 남아 있습니다.
 
 | 컬럼 | 타입 | 제약 | 설명 |
 |---|---|---|---|
