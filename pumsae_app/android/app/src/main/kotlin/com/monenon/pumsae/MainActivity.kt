@@ -1,4 +1,4 @@
-package com.example.pumsae_app
+package com.monenon.pumsae
 
 import io.flutter.embedding.android.FlutterActivity
 
