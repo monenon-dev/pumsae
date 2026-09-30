@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../albums/album.dart';
+import '../albums/albums_provider.dart';
 import '../calendar/calendar_event.dart';
 import '../calendar/calendar_repository.dart';
-import '../albums/albums_provider.dart';
+import '../../theme/app_theme.dart';
 import '../templates/promo_template.dart';
 import '../templates/templates_provider.dart';
 import '../trials/trial_request.dart';
@@ -20,8 +21,7 @@ import 'dojang_summary.dart';
 // for both the on-screen label and the actual link for now.
 const _publicWebHost = 'pumsae.vercel.app';
 
-const _recentTemplates = 4;
-const _recentTrials = 5;
+const _recentTrials = 3;
 
 String _roleLabel(String role) {
   switch (role) {
@@ -39,7 +39,7 @@ String _formatShortDate(DateTime value) {
   return '${local.month}월 ${local.day}일';
 }
 
-Future<void> _openWeb(BuildContext context, String path) async {
+Future<void> openWeb(BuildContext context, String path) async {
   final uri = Uri.https(_publicWebHost, path);
   final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
   if (!launched && context.mounted) {
@@ -49,8 +49,7 @@ Future<void> _openWeb(BuildContext context, String path) async {
   }
 }
 
-/// 앱의 첫 화면. 웹 대시보드의 "내 작업물"과 같이 홈페이지·카드뉴스·체험 신청을
-/// 한눈에 보여준다.
+/// 홈 탭. 할 일을 숫자 타일로 한눈에 보여주고, 자세한 건 각 탭에서 본다.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -59,16 +58,7 @@ class HomeScreen extends ConsumerWidget {
     final me = ref.watch(meProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('내 작업물'),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/profile'),
-            icon: const Icon(Icons.person_outline),
-            tooltip: '프로필',
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('홈')),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(meProvider);
@@ -80,35 +70,19 @@ class HomeScreen extends ConsumerWidget {
           try {
             await ref.read(dojangProvider.future);
           } catch (_) {
-            // 실패는 각 카드가 "불러오지 못했어요 · 재시도"로 보여준다.
+            // 실패는 각 타일·카드가 따로 보여준다.
           }
         },
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            _asyncContent<MeInfo>(
-              me,
-              (info) => Text(
-                '안녕하세요, ${info.name}님 (${_roleLabel(info.role)})',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              () => ref.invalidate(meProvider),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '지금까지 만든 홈페이지와 카드뉴스, 들어온 체험 신청이에요.',
-              style: TextStyle(color: Theme.of(context).hintColor),
-            ),
+            _GreetingCard(me: me, onRetry: () => ref.invalidate(meProvider)),
+            const SizedBox(height: 16),
+            const _StatGrid(),
+            const SizedBox(height: 16),
+            const _LandingCard(),
             const SizedBox(height: 20),
-            const _LandingSection(),
-            const SizedBox(height: 12),
-            const _CalendarSection(),
-            const SizedBox(height: 12),
-            const _TemplatesSection(),
-            const SizedBox(height: 12),
-            const _AlbumsSection(),
-            const SizedBox(height: 12),
-            const _TrialsSection(),
+            const _RecentTrials(),
           ],
         ),
       ),
@@ -116,332 +90,411 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _LandingSection extends ConsumerWidget {
-  const _LandingSection();
+/// 홈 맨 위의 차콜 카드. 아래 타일의 기능 색과 빨강 포인트가 또렷하게 대비된다.
+class _GreetingCard extends StatelessWidget {
+  const _GreetingCard({required this.me, required this.onRetry});
+
+  final AsyncValue<MeInfo> me;
+  final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final dojang = ref.watch(dojangProvider);
+  Widget build(BuildContext context) {
+    const faded = Color(0xCCFFFFFF);
+    final today = formatDayTitle(dateKey(DateTime.now()));
 
-    return _SectionCard(
-      icon: Icons.public,
-      title: '내 홈페이지',
-      trailing: dojang.value?.published == false ? const _Pill('미완성') : null,
-      child: _asyncContent<DojangSummary>(
-        dojang,
-        (summary) {
-          final address = '$_publicWebHost/${summary.slug}';
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                summary.published
-                    ? '학부모님께 이 주소를 공유하세요.'
-                    : '아직 저장하지 않았어요. 웹에서 편집하고 저장하면 공개돼요.',
-                style: TextStyle(color: Theme.of(context).hintColor),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+      decoration: BoxDecoration(
+        color: AppColors.ink,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: me.when(
+        data: (info) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(today, style: const TextStyle(color: faded, fontSize: 13)),
+            const SizedBox(height: 6),
+            Text(
+              '안녕하세요, ${info.name}님',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  address,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      await Clipboard.setData(ClipboardData(text: 'https://$address'));
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('주소를 복사했어요.')),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.copy, size: 18),
-                    label: const Text('주소 복사'),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => _openWeb(context, '/${summary.slug}'),
-                    icon: const Icon(Icons.open_in_new, size: 18),
-                    label: const Text('공개 페이지 보기'),
-                  ),
-                  FilledButton.icon(
-                    // 랜딩페이지 편집기는 웹에만 있어서 브라우저로 연다.
-                    onPressed: () => _openWeb(context, '/dashboard/landing'),
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    label: const Text('웹에서 편집'),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-        () => ref.invalidate(dojangProvider),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              [
+                if (info.dojangName != null) info.dojangName!,
+                _roleLabel(info.role),
+              ].join(' · '),
+              style: const TextStyle(color: faded, fontSize: 14),
+            ),
+          ],
+        ),
+        loading: () => const SizedBox(
+          height: 70,
+          child: Center(
+            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+          ),
+        ),
+        error: (error, stackTrace) => Row(
+          children: [
+            const Text('불러오지 못했어요', style: TextStyle(color: Colors.white)),
+            TextButton(
+              onPressed: onRetry,
+              child: const Text('재시도', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _TemplatesSection extends ConsumerWidget {
-  const _TemplatesSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final templates = ref.watch(templatesProvider);
-
-    return _SectionCard(
-      icon: Icons.image_outlined,
-      title: '카드뉴스',
-      onMore: () => context.push('/templates'),
-      child: _asyncContent<List<PromoTemplate>>(
-        templates,
-        (rows) {
-          if (rows.isEmpty) {
-            return Text(
-              '아직 만든 카드뉴스가 없어요.',
-              style: TextStyle(color: Theme.of(context).hintColor),
-            );
-          }
-          final recent = [...rows]
-            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('지금까지 ${rows.length}개 만들었어요.'),
-              const SizedBox(height: 4),
-              for (final template in recent.take(_recentTemplates))
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  leading: template.thumbnailUrl == null
-                      ? const Icon(Icons.crop_square)
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: Image.network(
-                            template.thumbnailUrl!,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.crop_square),
-                          ),
-                        ),
-                  title: Text(template.title, overflow: TextOverflow.ellipsis),
-                  subtitle: Text(
-                    '${template.typeLabel} · ${_formatShortDate(template.createdAt)}',
-                  ),
-                  onTap: () => context.push('/templates'),
-                ),
-            ],
-          );
-        },
-        () => ref.invalidate(templatesProvider),
-      ),
-    );
-  }
-}
-
-class _CalendarSection extends ConsumerWidget {
-  const _CalendarSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final upcoming = ref.watch(upcomingEventsProvider);
-
-    return _SectionCard(
-      icon: Icons.calendar_month_outlined,
-      title: '다가오는 일정',
-      onMore: () async {
-        await context.push('/calendar');
-        ref.invalidate(upcomingEventsProvider);
-      },
-      child: _asyncContent<List<CalendarEvent>>(
-        upcoming,
-        (events) {
-          if (events.isEmpty) {
-            return Text(
-              '앞으로 2주 동안 등록된 일정이 없어요.',
-              style: TextStyle(color: Theme.of(context).hintColor),
-            );
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final event in events.take(4))
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: event.category.color,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(event.title, overflow: TextOverflow.ellipsis),
-                      ),
-                      Text(
-                        '${formatDayTitle(event.date)} ${event.startTime ?? ''}'.trim(),
-                        style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
-                      ),
-                    ],
-                  ),
-                ),
-              if (events.length > 4)
-                Text(
-                  '외 ${events.length - 4}개',
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
-                ),
-            ],
-          );
-        },
-        () => ref.invalidate(upcomingEventsProvider),
-      ),
-    );
-  }
-}
-
-class _AlbumsSection extends ConsumerWidget {
-  const _AlbumsSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final albums = ref.watch(albumsProvider);
-
-    return _SectionCard(
-      icon: Icons.photo_library_outlined,
-      title: '사진첩',
-      onMore: () async {
-        await context.push('/albums');
-        ref.invalidate(albumsProvider);
-      },
-      child: _asyncContent<List<AlbumSummary>>(
-        albums,
-        (rows) {
-          if (rows.isEmpty) {
-            return Text(
-              '아직 만든 앨범이 없어요. 수업·행사 사진을 모아 보세요.',
-              style: TextStyle(color: Theme.of(context).hintColor),
-            );
-          }
-          final photos = rows.fold<int>(0, (sum, album) => sum + album.photoCount);
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('앨범 ${rows.length}개 · 사진 $photos장'),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 84,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: rows.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final album = rows[index];
-                    return GestureDetector(
-                      onTap: () async {
-                        await context.push('/albums/${album.id}');
-                        ref.invalidate(albumsProvider);
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: SizedBox(
-                          width: 84,
-                          child: album.coverUrl == null
-                              ? ColoredBox(
-                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                  child: const Icon(Icons.photo_library_outlined),
-                                )
-                              : Image.network(album.coverUrl!, fit: BoxFit.cover),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-        () => ref.invalidate(albumsProvider),
-      ),
-    );
-  }
-}
-
-class _TrialsSection extends ConsumerWidget {
-  const _TrialsSection();
+class _StatGrid extends ConsumerWidget {
+  const _StatGrid();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trials = ref.watch(trialsProvider);
     final pending = ref.watch(pendingTrialsCountProvider);
+    final events = ref.watch(upcomingEventsProvider);
+    final albums = ref.watch(albumsProvider);
+    final templates = ref.watch(templatesProvider);
 
-    return _SectionCard(
-      icon: Icons.event_available_outlined,
-      title: '체험 신청',
-      trailing: pending > 0 ? _Pill('대기 $pending') : null,
-      onMore: () => context.push('/trials'),
-      child: _asyncContent<List<TrialRequest>>(
-        trials,
-        (rows) {
-          if (rows.isEmpty) {
-            return Text(
-              '아직 들어온 체험 신청이 없어요. 홈페이지 주소를 공유해 보세요.',
-              style: TextStyle(color: Theme.of(context).hintColor),
-            );
-          }
-          final recent = [...rows]
-            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          return Column(
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 1.45,
+      children: [
+        _StatTile.fromAsync<List<TrialRequest>>(
+          value: trials,
+          icon: Icons.event_available_outlined,
+          label: '체험 대기',
+          tint: AppColors.trials,
+          highlight: pending > 0,
+          number: (_) => '$pending건',
+          caption: (rows) => '지금까지 ${rows.length}건 받음',
+          onTap: () => context.go('/trials'),
+        ),
+        _StatTile.fromAsync<List<CalendarEvent>>(
+          value: events,
+          icon: Icons.calendar_month_outlined,
+          label: '2주 내 일정',
+          tint: AppColors.calendar,
+          number: (rows) => '${rows.length}개',
+          caption: (rows) => rows.isEmpty
+              ? '등록된 일정 없음'
+              : '${formatDayTitle(rows.first.date)} ${rows.first.title}',
+          onTap: () => context.go('/calendar'),
+        ),
+        _StatTile.fromAsync<List<AlbumSummary>>(
+          value: albums,
+          icon: Icons.photo_library_outlined,
+          label: '사진첩',
+          tint: AppColors.albums,
+          number: (rows) => '앨범 ${rows.length}개',
+          caption: (rows) =>
+              '사진 ${rows.fold<int>(0, (sum, album) => sum + album.photoCount)}장',
+          onTap: () => context.go('/albums'),
+        ),
+        _StatTile.fromAsync<List<PromoTemplate>>(
+          value: templates,
+          icon: Icons.image_outlined,
+          label: '카드뉴스',
+          tint: AppColors.templates,
+          number: (rows) => '${rows.length}개',
+          caption: (_) => '보기 · 갤러리 저장',
+          onTap: () => context.push('/templates'),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({
+    required this.icon,
+    required this.label,
+    required this.number,
+    required this.caption,
+    required this.onTap,
+    required this.tint,
+    this.highlight = false,
+  });
+
+  /// [value]가 불러오는 중이면 '–', 실패하면 '!'를 숫자 자리에 보여준다.
+  static _StatTile fromAsync<T>({
+    required AsyncValue<T> value,
+    required IconData icon,
+    required String label,
+    required String Function(T data) number,
+    required String Function(T data) caption,
+    required VoidCallback onTap,
+    required Color tint,
+    bool highlight = false,
+  }) {
+    return value.when(
+      data: (data) => _StatTile(
+        icon: icon,
+        label: label,
+        number: number(data),
+        caption: caption(data),
+        onTap: onTap,
+        tint: tint,
+        highlight: highlight,
+      ),
+      loading: () => _StatTile(
+        icon: icon,
+        label: label,
+        number: '–',
+        caption: '불러오는 중',
+        onTap: onTap,
+        tint: tint,
+      ),
+      error: (error, stackTrace) => _StatTile(
+        icon: icon,
+        label: label,
+        number: '!',
+        caption: '당겨서 새로고침',
+        onTap: onTap,
+        tint: tint,
+      ),
+    );
+  }
+
+  final IconData icon;
+  final String label;
+  final String number;
+  final String caption;
+  final VoidCallback onTap;
+
+  /// 기능 구분 색. 아이콘과 그 뒤 옅은 원에만 쓴다.
+  final Color tint;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final muted = colorScheme.onSurfaceVariant;
+
+    return Material(
+      color: colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                pending > 0
-                    ? '확인하지 않은 신청이 $pending건 있어요.'
-                    : '지금까지 ${rows.length}건 받았어요.',
-              ),
-              const SizedBox(height: 4),
-              for (final trial in recent.take(_recentTrials))
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  title: Text(
-                    trial.desiredClass == null
-                        ? trial.studentName
-                        : '${trial.studentName} · ${trialClassLabels[trial.desiredClass] ?? trial.desiredClass}',
-                    overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: tint.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, size: 17, color: tint),
                   ),
-                  subtitle: Text(_formatShortDate(trial.createdAt)),
-                  trailing: Text(
-                    trialStatusLabels[trial.status] ?? trial.status,
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
                     style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: trial.status == 'PENDING'
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).hintColor,
                     ),
                   ),
-                  onTap: () => context.push('/trials'),
+                  const Spacer(),
+                  // 처리할 게 있을 때만 빨간 점으로 눈에 띄게.
+                  if (highlight)
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                number,
+                style: TextStyle(
+                  color: highlight ? colorScheme.primary : colorScheme.onSurface,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              Text(
+                caption,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: muted, fontSize: 12),
+              ),
             ],
-          );
-        },
-        () => ref.invalidate(trialsProvider),
+          ),
+        ),
       ),
+    );
+  }
+}
+
+class _LandingCard extends ConsumerWidget {
+  const _LandingCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dojang = ref.watch(dojangProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
+        child: _asyncContent<DojangSummary>(
+          dojang,
+          (summary) {
+            final address = '$_publicWebHost/${summary.slug}';
+            return Row(
+              children: [
+                Icon(Icons.public, size: 20, color: colorScheme.onSurfaceVariant),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            '내 홈페이지',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                          if (!summary.published) ...[
+                            const SizedBox(width: 6),
+                            const _Pill('미완성'),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        summary.published ? address : '웹에서 편집하고 저장하면 공개돼요',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: '주소 복사',
+                  icon: const Icon(Icons.copy, size: 20),
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: 'https://$address'));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('주소를 복사했어요.')),
+                      );
+                    }
+                  },
+                ),
+                IconButton(
+                  tooltip: '공개 페이지 보기',
+                  icon: const Icon(Icons.open_in_new, size: 20),
+                  onPressed: () => openWeb(context, '/${summary.slug}'),
+                ),
+              ],
+            );
+          },
+          () => ref.invalidate(dojangProvider),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecentTrials extends ConsumerWidget {
+  const _RecentTrials();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trials = ref.watch(trialsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              '최근 체험 신청',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const Spacer(),
+            TextButton(
+              onPressed: () => context.go('/trials'),
+              child: const Text('전체 보기'),
+            ),
+          ],
+        ),
+        _asyncContent<List<TrialRequest>>(
+          trials,
+          (rows) {
+            if (rows.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  '아직 들어온 신청이 없어요. 홈페이지 주소를 공유해 보세요.',
+                  style: TextStyle(color: Theme.of(context).hintColor),
+                ),
+              );
+            }
+            final recent = [...rows]
+              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            return Column(
+              children: [
+                for (final trial in recent.take(_recentTrials))
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    title: Text(
+                      trial.desiredClass == null
+                          ? trial.studentName
+                          : '${trial.studentName} · ${trialClassLabels[trial.desiredClass] ?? trial.desiredClass}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(_formatShortDate(trial.createdAt)),
+                    trailing: Text(
+                      trialStatusLabels[trial.status] ?? trial.status,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: trial.status == 'PENDING'
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).hintColor,
+                      ),
+                    ),
+                    onTap: () => context.go('/trials'),
+                  ),
+              ],
+            );
+          },
+          () => ref.invalidate(trialsProvider),
+        ),
+      ],
     );
   }
 }
@@ -490,62 +543,6 @@ class _Pill extends StatelessWidget {
           color: colorScheme.onPrimary,
           fontSize: 11,
           fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.icon,
-    required this.title,
-    required this.child,
-    this.trailing,
-    this.onMore,
-  });
-
-  final IconData icon;
-  final String title;
-  final Widget child;
-  final Widget? trailing;
-  final VoidCallback? onMore;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 18,
-                  backgroundColor: colorScheme.primaryContainer,
-                  foregroundColor: colorScheme.onPrimaryContainer,
-                  child: Icon(icon, size: 20),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                if (trailing != null) ...[
-                  const SizedBox(width: 8),
-                  trailing!,
-                ],
-                const Spacer(),
-                if (onMore != null)
-                  TextButton(onPressed: onMore, child: const Text('전체 보기')),
-              ],
-            ),
-            const SizedBox(height: 10),
-            child,
-          ],
         ),
       ),
     );

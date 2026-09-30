@@ -9,6 +9,8 @@ import 'features/auth/login_screen.dart';
 import 'features/calendar/calendar_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/dashboard/home_screen.dart';
+import 'features/shell/main_shell.dart';
+import 'features/shell/more_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/templates/templates_screen.dart';
 import 'features/trials/trials_screen.dart';
@@ -42,6 +44,7 @@ const _templatesPath = '/templates';
 const _profilePath = '/profile';
 const _albumsPath = '/albums';
 const _calendarPath = '/calendar';
+const _morePath = '/more';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _AuthRefreshNotifier(ref);
@@ -85,14 +88,52 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: _registerPath,
         builder: (context, state) => const RegisterScreen(),
       ),
-      GoRoute(
-        path: _homePath,
-        builder: (context, state) => const HomeScreen(),
+      // 하단 탭 5개. 탭마다 자기 내비게이터를 가져서, 탭을 옮겨 다녀도 각 탭의
+      // 스크롤 위치·열어 둔 앨범 같은 상태가 그대로 남는다.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: _homePath,
+              builder: (context, state) => const HomeScreen(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: _calendarPath,
+              builder: (context, state) => const CalendarScreen(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: _albumsPath,
+              builder: (context, state) => const AlbumsScreen(),
+              routes: [
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) =>
+                      AlbumDetailScreen(albumId: state.pathParameters['id']!),
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: _trialsPath,
+              builder: (context, state) => const TrialsScreen(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: _morePath,
+              builder: (context, state) => const MoreScreen(),
+            ),
+          ]),
+        ],
       ),
-      GoRoute(
-        path: _trialsPath,
-        builder: (context, state) => const TrialsScreen(),
-      ),
+      // 탭 밖 화면: 탭바 없이 전체 화면으로 위에 쌓인다.
       GoRoute(
         path: _templatesPath,
         builder: (context, state) => const TemplatesScreen(),
@@ -100,19 +141,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: _profilePath,
         builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: _albumsPath,
-        builder: (context, state) => const AlbumsScreen(),
-      ),
-      GoRoute(
-        path: _calendarPath,
-        builder: (context, state) => const CalendarScreen(),
-      ),
-      GoRoute(
-        path: '$_albumsPath/:id',
-        builder: (context, state) =>
-            AlbumDetailScreen(albumId: state.pathParameters['id']!),
       ),
     ],
   );
