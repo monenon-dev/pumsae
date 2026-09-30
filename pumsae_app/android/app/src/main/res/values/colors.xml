@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 웹과 같은 브랜드 빨강(tailwind.config.ts의 pumsae.accent) -->
+    <color name="pumsae_accent">#B4222E</color>
+    <color name="pumsae_icon_background">#FFFFFF</color>
+</resources>
