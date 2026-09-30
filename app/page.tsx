@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ExampleShowcase } from "@/components/home/ExampleShowcase";
+import { MobileAppSection } from "@/components/home/MobileAppSection";
 import { PumsaeLogo } from "@/components/ui/Logo";
 import { ProfileMenu } from "@/components/ProfileMenu";
 
@@ -120,6 +121,8 @@ function LandingHome() {
             </div>
           </div>
         </section>
+
+        <MobileAppSection />
 
         <ExampleShowcase />
       </main>
