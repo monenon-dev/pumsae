@@ -6,7 +6,7 @@
 
 - 개인 프로젝트 · 2026.09 ~ 진행 중 (기획, 웹·앱·서버 개발, 배포)
 - 서비스: https://pumsae.vercel.app
-- 문서: [프로젝트 계획서](./docs/PUMSAE_프로젝트_계획서.md) · [데이터 ERD](./docs/erd.md) · [배포 가이드](./docs/배포.md)
+- 문서: [포트폴리오 요약 (PDF)](./docs/PUMSAE_포트폴리오_요약.pdf) · [프로젝트 계획서](./docs/PUMSAE_프로젝트_계획서.md) · [데이터 ERD](./docs/erd.md) · [배포 가이드](./docs/배포.md)
 
 ![서비스 홈의 "이렇게 만들어져요" 섹션. 예시 태권도장의 홈페이지가 브라우저 창 안에 보이고, 왼쪽에 만드는 3단계가 적혀 있다](./docs/images/home-example.png)
 
@@ -129,7 +129,7 @@ pumsae/
 ├── types/
 ├── backend/        # FastAPI (api, models, core, promo) + Alembic
 ├── pumsae_app/     # Flutter 앱
-└── docs/           # 계획서, ERD, 배포 가이드, 화면 캡처
+└── docs/           # 포트폴리오 요약, 계획서, ERD, 배포 가이드, 화면 캡처
 ```
 
 ---
