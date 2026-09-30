@@ -152,6 +152,12 @@ function RegisterForm() {
         >
           {loading ? "가입 중..." : "회원가입"}
         </button>
+        <p className="text-center text-xs leading-5 text-zinc-500">
+          가입하면 이메일·이름을 회원 관리에 쓰는 것에 동의하게 됩니다.{" "}
+          <Link href="/privacy" target="_blank" className="underline">
+            개인정보처리방침
+          </Link>
+        </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-zinc-600">

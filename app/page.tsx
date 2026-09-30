@@ -127,6 +127,9 @@ function LandingHome() {
       <footer className="border-t border-pumsae-line">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-8 text-sm text-pumsae-muted sm:px-6">
           <PumsaeLogo />
+          <Link href="/privacy" className="text-xs hover:text-pumsae-ink hover:underline">
+            개인정보처리방침
+          </Link>
         </div>
       </footer>
     </div>

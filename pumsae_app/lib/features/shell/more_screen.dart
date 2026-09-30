@@ -47,6 +47,13 @@ class MoreScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/profile'),
           ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('개인정보처리방침'),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () => openWeb(context, '/privacy'),
+          ),
         ],
       ),
     );

@@ -32,6 +32,8 @@ RESERVED_SLUGS = frozenset(
         "www",
         "help",
         "support",
+        "privacy",
+        "terms",
     }
 )
 

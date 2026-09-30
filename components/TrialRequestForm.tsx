@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { ApiError } from "@/lib/api/types";
 import { createTrialRequest } from "@/lib/api/trials";
@@ -26,6 +27,7 @@ export function TrialRequestForm({
   const [parentPhone, setParentPhone] = useState("");
   const [desiredClass, setDesiredClass] = useState<DesiredClass | "">("");
   const [memo, setMemo] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -33,6 +35,10 @@ export function TrialRequestForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (disabled || submitting) {
+      return;
+    }
+    if (!agreed) {
+      setError("개인정보 수집·이용에 동의해 주세요.");
       return;
     }
 
@@ -54,6 +60,7 @@ export function TrialRequestForm({
       setParentPhone("");
       setDesiredClass("");
       setMemo("");
+      setAgreed(false);
     } catch (submitError) {
       setError(
         submitError instanceof ApiError
@@ -167,6 +174,34 @@ export function TrialRequestForm({
             className={inputClassName}
             placeholder="희망 요일, 체험 인원 등"
           />
+        </label>
+      </div>
+
+      <div className="mt-5 rounded-lg bg-zinc-50 p-4 text-xs leading-5 text-zinc-600">
+        <p className="font-semibold text-zinc-800">개인정보 수집·이용 안내</p>
+        <ul className="mt-1.5 list-disc space-y-0.5 pl-4">
+          <li>수집 항목: 학생 이름, 보호자 이름, 연락처 (선택: 희망 반, 메모)</li>
+          <li>이용 목적: 체험 수업 일정 안내와 연락</li>
+          <li>보관 기간: 신청일로부터 1년 뒤 자동 삭제</li>
+        </ul>
+        <p className="mt-1.5">
+          동의하지 않으면 신청할 수 없습니다. 자세한 내용은{" "}
+          <Link href="/privacy" target="_blank" className="underline">
+            개인정보처리방침
+          </Link>
+          을 확인해 주세요.
+        </p>
+        <label className="mt-3 flex items-center gap-2 text-sm font-medium text-zinc-900">
+          <input
+            type="checkbox"
+            name="privacyAgreed"
+            required
+            disabled={disabled}
+            checked={agreed}
+            onChange={(event) => setAgreed(event.target.checked)}
+            className="h-4 w-4 accent-zinc-900"
+          />
+          개인정보 수집·이용에 동의합니다 (필수)
         </label>
       </div>
 
