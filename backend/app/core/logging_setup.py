@@ -41,7 +41,21 @@ class _LevelSplitStreamHandler(logging.StreamHandler):
 _REDACT = RedactTokenFilter()
 
 
+def _configure_app_logger() -> None:
+    # 우리 코드(app.*)의 로그는 핸들러가 없어서 INFO가 버려진다. 푸시 전송 결과처럼
+    # 운영에서 봐야 하는 기록이 Railway에 남도록 uvicorn과 같은 방식으로 내보낸다.
+    app_logger = logging.getLogger("app")
+    if app_logger.handlers:
+        return
+    handler = _LevelSplitStreamHandler()
+    handler.setFormatter(logging.Formatter("%(levelname)s:     %(name)s - %(message)s"))
+    app_logger.addHandler(handler)
+    app_logger.setLevel(logging.INFO)
+    app_logger.propagate = False
+
+
 def configure_logging() -> None:
+    _configure_app_logger()
     redact = _REDACT
     for name in _UVICORN_LOGGERS:
         logger = logging.getLogger(name)

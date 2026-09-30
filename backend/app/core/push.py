@@ -65,6 +65,7 @@ def notify_dojang_staff(
             )
         )
         if not tokens:
+            logger.info("FCM: no registered devices for dojang %s", dojang_id)
             return
 
         message = messaging.MulticastMessage(
@@ -89,10 +90,17 @@ def notify_dojang_staff(
             db.commit()
         if result.failure_count:
             logger.warning(
-                "FCM: %d of %d failed (%d dead tokens removed)",
+                "FCM: %d of %d failed (%d dead tokens removed): %s",
                 result.failure_count,
                 len(tokens),
                 len(dead),
+                "; ".join(
+                    repr(response.exception)
+                    for response in result.responses
+                    if not response.success
+                ),
             )
+        else:
+            logger.info("FCM: sent to %d device(s)", len(tokens))
     finally:
         db.close()
