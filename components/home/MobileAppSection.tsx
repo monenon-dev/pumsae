@@ -17,7 +17,7 @@ const APP_FEATURES = [
 export function MobileAppSection() {
   return (
     <section className="border-t border-pumsae-line">
-      <div className="mx-auto grid max-w-5xl items-center gap-12 px-4 py-16 sm:px-6 md:grid-cols-[1fr_320px]">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 md:grid-cols-[1fr_320px]">
         <div>
           <span className="inline-flex rounded-full border border-pumsae-line bg-white px-3 py-1 text-xs font-medium text-pumsae-muted">
             Android 앱 · Google Play 출시 준비 중
