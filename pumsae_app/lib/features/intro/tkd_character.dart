@@ -5,7 +5,7 @@ import '../../theme/app_theme.dart';
 
 /// PUMSAE 캐릭터: [AppColors.brandRed] 12% 원 위에 도복(Noto Emoji 🥋 SVG)을 올린 것.
 ///
-/// 인트로·로딩 표시는 모두 이 위젯만 쓴다. 캐릭터를 다른 그림이나 Lottie로 바꿀 때는
+/// 로딩 표시는 이 위젯을 쓴다. 캐릭터를 다른 그림이나 Lottie로 바꿀 때는
 /// [_figure]만 고치면 된다. 원은 흰 도복이 흰 배경에 묻히지 않게 깔아 둔다.
 class TkdCharacter extends StatelessWidget {
   const TkdCharacter({super.key, this.size = 96, this.figureBuilder});
@@ -37,7 +37,7 @@ class TkdCharacter extends StatelessWidget {
   }
 }
 
-/// 마크 아래에 붙는 "PUMSAE" 글자. 인트로와 로딩 표시가 같이 쓴다.
+/// 캐릭터 아래에 붙는 "PUMSAE" 글자. 시작 화면과 로딩 표시가 같이 쓴다.
 /// 어두운 배경 위에서는 [onDark]를 켜서 흰 글자로 쓴다.
 class IntroWordmark extends StatelessWidget {
   const IntroWordmark({super.key, this.fontSize = 28, this.onDark = false});

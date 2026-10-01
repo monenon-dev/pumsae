@@ -19,9 +19,13 @@ class PushService {
   StreamSubscription<String>? _tokenRefreshSub;
 
   static bool _ready = false;
+  static Future<void>? _initializing;
 
-  /// main()에서 runApp 전에 한 번 부른다.
-  static Future<void> initialize() async {
+  /// main()에서 시작만 해 두고 기다리지 않는다(Firebase 초기화로 첫 화면이 늦어지지 않게).
+  /// 푸시를 쓰는 아래 메서드들이 각자 이 초기화가 끝나기를 기다린다.
+  static Future<void> initialize() => _initializing ??= _initialize();
+
+  static Future<void> _initialize() async {
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
     try {
       await Firebase.initializeApp();
@@ -32,14 +36,18 @@ class PushService {
   }
 
   /// 알림을 눌러 앱이 열렸을 때(꺼져 있던 앱이 켜진 경우 포함) 그 메시지.
-  static Stream<RemoteMessage> get onOpened =>
-      _ready ? FirebaseMessaging.onMessageOpenedApp : const Stream.empty();
+  static Stream<RemoteMessage> get onOpened => Stream.fromFuture(initialize()).asyncExpand(
+        (_) => _ready ? FirebaseMessaging.onMessageOpenedApp : const Stream<RemoteMessage>.empty(),
+      );
 
-  static Future<RemoteMessage?> initialMessage() async =>
-      _ready ? FirebaseMessaging.instance.getInitialMessage() : null;
+  static Future<RemoteMessage?> initialMessage() async {
+    await initialize();
+    return _ready ? FirebaseMessaging.instance.getInitialMessage() : null;
+  }
 
   /// 알림 권한을 묻고(Android 13+, iOS) 토큰을 서버에 등록한다.
   Future<void> register() async {
+    await initialize();
     if (!_ready) return;
     try {
       final messaging = FirebaseMessaging.instance;
@@ -60,6 +68,7 @@ class PushService {
 
   /// 로그아웃 전에 부른다(액세스 토큰이 아직 살아 있어야 서버에 요청할 수 있다).
   Future<void> unregister() async {
+    await initialize();
     if (!_ready) return;
     await _tokenRefreshSub?.cancel();
     _tokenRefreshSub = null;

@@ -10,7 +10,6 @@ import 'features/calendar/calendar_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/auth/welcome_screen.dart';
 import 'features/dashboard/home_screen.dart';
-import 'features/intro/pumsae_loader.dart';
 import 'features/shell/main_shell.dart';
 import 'features/shell/more_screen.dart';
 import 'features/profile/profile_screen.dart';
@@ -165,6 +164,8 @@ class _SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: PumsaeLoader.overlay());
+    // 앱을 켜고 로그인 여부를 확인하는 동안 잠깐 보이는 빈 바탕. 바로 뒤에 나오는
+    // 시작 화면(캐릭터·PUMSAE)과 겹쳐 보이지 않게 로더나 로고를 두지 않는다.
+    return const Scaffold(body: SizedBox.expand());
   }
 }

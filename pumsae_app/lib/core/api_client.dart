@@ -80,7 +80,7 @@ class ApiClient {
       : _cookieJar = PersistCookieJar(
           storage: _SecureCookieStorage(const FlutterSecureStorage()),
         ) {
-    _dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl))
+    _dio = Dio(_options)
       ..interceptors.add(CookieManager(_cookieJar))
       ..interceptors.add(_AuthInterceptor(this));
 
@@ -94,9 +94,20 @@ class ApiClient {
     // waiting for it — a self-deadlock. This only surfaces once a retried
     // request fails again (e.g. a business-logic 401 like a wrong current
     // password), since a retry that succeeds never re-enters onError.
-    _rawDio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl))
-      ..interceptors.add(CookieManager(_cookieJar));
+    _rawDio = Dio(_options)
+      ..interceptors.add(CookieManager(_cookieJar))
+      // 두 Dio가 같은 연결 풀을 쓰게 해서, 앱 시작 때 세션 복원(/auth/refresh)으로
+      // 열어 둔 연결을 바로 뒤 홈 화면 요청들이 이어 쓴다(TLS 연결을 새로 맺지 않음).
+      ..httpClientAdapter = _dio.httpClientAdapter;
   }
+
+  /// 연결이 안 되거나 서버가 응답하지 않을 때 끝없이 기다리지 않게 한다.
+  /// 보내는 시간(sendTimeout)은 사진 업로드 때문에 따로 제한하지 않는다.
+  static final BaseOptions _options = BaseOptions(
+    baseUrl: ApiConfig.baseUrl,
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 30),
+  );
 
   late final Dio _dio;
   late final Dio _rawDio;
