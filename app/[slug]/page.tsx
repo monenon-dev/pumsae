@@ -58,5 +58,10 @@ export default async function PublicLandingPage({
 
   const news = await getDojangNews(dojang.slug, dojang.name);
 
-  return <DojangLanding content={dojang} news={news} />;
+  // 도장 공개 페이지는 웹 다크 모드와 상관없이 늘 밝은 바탕으로 보인다.
+  return (
+    <div className="theme-light min-h-screen bg-pumsae-bg">
+      <DojangLanding content={dojang} news={news} />
+    </div>
+  );
 }

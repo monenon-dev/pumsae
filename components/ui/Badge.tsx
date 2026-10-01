@@ -3,7 +3,7 @@ type BadgeVariant = "muted" | "warning" | "accent";
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   muted: "bg-pumsae-line text-pumsae-muted",
   warning: "bg-pumsae-accent/10 text-pumsae-accent",
-  accent: "bg-pumsae-accent text-white",
+  accent: "bg-pumsae-accent text-pure-white",
 };
 
 export function Badge({

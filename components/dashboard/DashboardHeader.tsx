@@ -7,6 +7,7 @@ import { ProfileMenu } from "@/components/ProfileMenu";
 import { PumsaeLogo } from "@/components/ui/Logo";
 import { Badge } from "@/components/ui/Badge";
 import { useDashboardStatus } from "@/components/dashboard/DashboardStatusProvider";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const links = [
   { href: "/dashboard", label: "내 작업물" },
@@ -99,6 +100,7 @@ export function DashboardHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <ProfileMenu />
           {/* 좁은 화면: 햄버거 버튼 */}
           <button

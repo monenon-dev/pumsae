@@ -190,7 +190,7 @@ export default function AlbumsPage() {
                   )}
                   <span
                     className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                      album.isPublic ? "bg-pumsae-accent text-white" : "bg-white/90 text-zinc-700"
+                      album.isPublic ? "bg-pumsae-accent text-pure-white" : "bg-white/90 text-zinc-700"
                     }`}
                   >
                     {album.isPublic ? "공개" : "비공개"}

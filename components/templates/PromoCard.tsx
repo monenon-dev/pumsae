@@ -1068,6 +1068,8 @@ export const PromoCard = forwardRef<HTMLDivElement, PromoCardProps>(
     return (
       <div
         ref={ref}
+        // 카드뉴스 이미지는 웹 다크 모드와 상관없이 늘 같은 색으로 그린다.
+        className="theme-light"
         style={{ width: PROMO_CARD_SIZE, height: PROMO_CARD_SIZE }}
       >
         <View content={content} accent={preset?.accentColor ?? "#d4af37"} />

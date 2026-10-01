@@ -5,6 +5,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ProfileSettings } from "@/components/profile/ProfileSettings";
 import { PumsaeLogo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function ProfilePage() {
   return (
@@ -15,7 +16,10 @@ export default function ProfilePage() {
             <Link href="/" className="shrink-0">
               <PumsaeLogo />
             </Link>
-            <LogoutButton />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <LogoutButton />
+            </div>
           </div>
         </header>
         <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8">

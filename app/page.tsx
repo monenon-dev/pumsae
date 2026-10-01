@@ -7,6 +7,7 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { MobileAppSection } from "@/components/home/MobileAppSection";
 import { PumsaeLogo } from "@/components/ui/Logo";
 import { ProfileMenu } from "@/components/ProfileMenu";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 function LandingHome() {
   const { user, loading } = useAuth();
@@ -18,12 +19,13 @@ function LandingHome() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <PumsaeLogo />
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {isLoggedIn ? (
               <ProfileMenu />
             ) : (
               <Link
                 href="/login"
-                className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-white hover:bg-pumsae-accent-dark"
+                className="rounded-lg bg-pumsae-accent px-3.5 py-2 text-sm font-semibold text-pure-white hover:bg-pumsae-accent-dark"
               >
                 로그인
               </Link>

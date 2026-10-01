@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PumsaeLogo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침 | PUMSAE",
@@ -60,10 +61,11 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-pumsae-bg">
       <header className="border-b border-pumsae-line bg-white">
-        <div className="mx-auto flex max-w-3xl items-center px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" aria-label="PUMSAE 홈">
             <PumsaeLogo />
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

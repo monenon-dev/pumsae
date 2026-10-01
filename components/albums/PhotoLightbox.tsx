@@ -49,7 +49,7 @@ export function PhotoLightbox({
       role="dialog"
       aria-modal="true"
       aria-label={title ?? "사진 크게 보기"}
-      className="fixed inset-0 z-50 flex flex-col bg-black/90 text-white"
+      className="fixed inset-0 z-50 flex flex-col bg-black/90 text-pure-white"
       onClick={onClose}
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
@@ -71,7 +71,7 @@ export function PhotoLightbox({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full bg-white/15 px-3 py-1.5 font-semibold hover:bg-white/25"
+          className="rounded-full bg-pure-white/15 px-3 py-1.5 font-semibold hover:bg-pure-white/25"
         >
           닫기
         </button>
@@ -96,7 +96,7 @@ export function PhotoLightbox({
               event.stopPropagation();
               onIndexChange(index - 1);
             }}
-            className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl hover:bg-white/25 sm:flex"
+            className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-pure-white/15 text-2xl hover:bg-pure-white/25 sm:flex"
           >
             ‹
           </button>
@@ -109,7 +109,7 @@ export function PhotoLightbox({
               event.stopPropagation();
               onIndexChange(index + 1);
             }}
-            className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl hover:bg-white/25 sm:flex"
+            className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-pure-white/15 text-2xl hover:bg-pure-white/25 sm:flex"
           >
             ›
           </button>

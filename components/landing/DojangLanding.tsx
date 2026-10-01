@@ -79,7 +79,8 @@ export function DojangLanding({
 }: DojangLandingProps & { news?: PublicNewsItem[] }) {
   return (
     <DojangNewsContext.Provider value={news}>
-      <div className="relative" data-landing-root="">
+      {/* 관장님이 고른 디자인이라 웹 다크 모드와 상관없이 늘 밝은 색 그대로 그린다. */}
+      <div className="theme-light relative" data-landing-root="">
         <LandingTemplate content={content} preview={preview} />
         {content.logoUrl && content.logoPosition ? (
           <HeroLogo

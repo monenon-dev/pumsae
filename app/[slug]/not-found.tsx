@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function DojangNotFound() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 text-zinc-900">
+    <main className="theme-light flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 text-zinc-900">
       <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
         <p className="text-sm font-semibold tracking-wide text-zinc-500">
           PUMSAE

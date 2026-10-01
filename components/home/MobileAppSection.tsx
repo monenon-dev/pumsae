@@ -48,8 +48,9 @@ export function MobileAppSection() {
         </div>
 
         {/* 앱이 실제로 띄우는 알림과 같은 문구로 그린 모형 */}
+        {/* 실제 앱 알림 화면 그림이라 웹 다크 모드와 상관없이 늘 같은 모습으로 그린다. */}
         <div
-          className="mx-auto w-full max-w-[320px] rounded-[2.5rem] border border-pumsae-line bg-white p-3 shadow-sm"
+          className="theme-light mx-auto w-full max-w-[320px] rounded-[2.5rem] border border-pumsae-line bg-white p-3 shadow-sm"
           aria-label="체험 신청 알림이 온 휴대폰 화면 예시"
           role="img"
         >

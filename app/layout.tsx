@@ -60,6 +60,17 @@ const stylish = Stylish({
 const LINKED_GOOGLE_FONTS_HREF =
   "https://fonts.googleapis.com/css2?family=Song+Myung&family=Black+Han+Sans&family=Gowun+Batang:wght@400;700&family=Gaegu:wght@300;400;700&family=Nanum+Myeongjo:wght@400;700&family=Sunflower:wght@300;700&display=swap";
 
+// 첫 화면을 그리기 전에 다크/라이트를 정해서 깜빡임을 막는다. 저장한 선택이 있으면 그걸,
+// 없으면 기기 설정을 따른다. 도장 공개 페이지(/{slug})는 늘 밝게 보여서 건드리지 않는다.
+const THEME_INIT_SCRIPT = `(function(){try{
+var seg=location.pathname.split('/')[1]||'';
+var app=['','login','register','dashboard','profile','privacy'];
+if(app.indexOf(seg)<0)return;
+var t=localStorage.getItem('pumsae-theme');
+var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+if(d)document.documentElement.classList.add('dark');
+}catch(e){}})();`;
+
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: "PUMSAE",
@@ -72,8 +83,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    // 첫 화면 스크립트가 class="dark"를 붙이므로 서버 HTML과 달라도 경고하지 않게 한다.
+    <html lang="ko" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href={LINKED_GOOGLE_FONTS_HREF} />
