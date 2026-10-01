@@ -9,6 +9,7 @@ import 'features/auth/login_screen.dart';
 import 'features/calendar/calendar_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/dashboard/home_screen.dart';
+import 'features/intro/pumsae_loader.dart';
 import 'features/shell/main_shell.dart';
 import 'features/shell/more_screen.dart';
 import 'features/profile/profile_screen.dart';
@@ -151,8 +152,6 @@ class _SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
+    return const Scaffold(body: PumsaeLoader.overlay());
   }
 }

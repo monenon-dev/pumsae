@@ -8,6 +8,7 @@ import '../albums/album.dart';
 import '../albums/albums_provider.dart';
 import '../calendar/calendar_event.dart';
 import '../calendar/calendar_repository.dart';
+import '../intro/pumsae_loader.dart';
 import '../../theme/app_theme.dart';
 import '../templates/promo_template.dart';
 import '../templates/templates_provider.dart';
@@ -134,9 +135,7 @@ class _GreetingCard extends StatelessWidget {
         ),
         loading: () => const SizedBox(
           height: 70,
-          child: Center(
-            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-          ),
+          child: Center(child: PumsaeLoader(size: 40)),
         ),
         error: (error, stackTrace) => Row(
           children: [
