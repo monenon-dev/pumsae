@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth_provider.dart';
 import '../dashboard/dashboard_provider.dart';
+import '../intro/pumsae_loader.dart';
 
 const _appVersion = 'PUMSAE v1.0.0';
 
@@ -156,7 +157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             loading: () => const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
-                child: CircularProgressIndicator(),
+                child: PumsaeLoader(),
               ),
             ),
             error: (error, stackTrace) => Center(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gal/gal.dart';
 
+import '../intro/pumsae_loader.dart';
 import 'promo_template.dart';
 import 'templates_provider.dart';
 
@@ -36,7 +37,7 @@ class TemplatesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('카드뉴스')),
       body: templates.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PumsaeLoader.overlay(),
         error: (error, stackTrace) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

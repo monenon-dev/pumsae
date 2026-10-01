@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../intro/pumsae_loader.dart';
 import 'album.dart';
 import 'albums_provider.dart';
 
@@ -215,17 +216,17 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen> {
     if (album == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: Center(
-          child: _loadError == null
-              ? const CircularProgressIndicator()
-              : TextButton(
+        body: _loadError == null
+            ? const PumsaeLoader.overlay()
+            : Center(
+                child: TextButton(
                   onPressed: () {
                     setState(() => _loadError = null);
                     _load();
                   },
                   child: const Text('불러오지 못했어요 · 재시도'),
                 ),
-        ),
+              ),
       );
     }
 

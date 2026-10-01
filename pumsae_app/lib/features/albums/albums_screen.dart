@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../intro/pumsae_loader.dart';
 import 'album.dart';
 import 'albums_provider.dart';
 
@@ -31,7 +32,7 @@ class AlbumsScreen extends ConsumerWidget {
         label: const Text('새 앨범'),
       ),
       body: albums.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PumsaeLoader.overlay(),
         error: (error, stackTrace) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../intro/pumsae_loader.dart';
 import 'trial_request.dart';
 import 'trials_provider.dart';
 
@@ -48,7 +49,7 @@ class _TrialsScreenState extends ConsumerState<TrialsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('체험 신청')),
       body: trialsState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PumsaeLoader.overlay(),
         error: (error, stackTrace) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
