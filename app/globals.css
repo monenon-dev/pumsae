@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+
+/* 홈 첫 화면 알림 카드가 천천히 떠다니는 움직임(components/home/HomeHero.tsx) */
+@keyframes hero-chip-float { 50% { transform: translateY(-6px); } }
+.hero-chip-float { animation: hero-chip-float 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hero-chip-float { animation: none; } }
