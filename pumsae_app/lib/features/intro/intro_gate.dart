@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
-import 'intro_mark.dart';
+import 'pumsae_loader.dart';
+import 'tkd_character.dart';
 
 /// 앱 실행 직후 [child](라우터 화면) 위에 인트로를 덮어 보여 주는 위젯.
 ///
@@ -30,13 +31,19 @@ class _IntroGateState extends State<IntroGate> with TickerProviderStateMixin {
     duration: const Duration(milliseconds: 400),
   );
 
-  // 0~60%: 마크가 0.6→1.0으로 커지며 나타나고, 50~100%: 글자가 이어서 나타난다.
-  late final Animation<double> _markScale = Tween(begin: 0.6, end: 1.0).animate(
-    CurvedAnimation(parent: _intro, curve: const Interval(0, 0.6, curve: Curves.easeOutCubic)),
+  // 처음 0.8초: 캐릭터가 아래에서 올라오며 0.8→1.0으로 커지고 나타난다.
+  // 50~100%(0.75~1.5초): 글자가 이어서 나타난다. 전체는 최소 1.5초.
+  static const _markEnd = 800 / 1500;
+  late final CurvedAnimation _markCurve = CurvedAnimation(
+    parent: _intro,
+    curve: const Interval(0, _markEnd, curve: Curves.easeOutCubic),
   );
+  late final Animation<double> _markScale = Tween(begin: 0.8, end: 1.0).animate(_markCurve);
+  late final Animation<Offset> _markRise =
+      Tween(begin: const Offset(0, 0.25), end: Offset.zero).animate(_markCurve);
   late final Animation<double> _markOpacity = CurvedAnimation(
     parent: _intro,
-    curve: const Interval(0, 0.5, curve: Curves.easeOut),
+    curve: const Interval(0, _markEnd, curve: Curves.easeOut),
   );
   late final Animation<double> _textOpacity = CurvedAnimation(
     parent: _intro,
@@ -95,7 +102,13 @@ class _IntroGateState extends State<IntroGate> with TickerProviderStateMixin {
                   children: [
                     FadeTransition(
                       opacity: _markOpacity,
-                      child: ScaleTransition(scale: _markScale, child: const IntroMark()),
+                      child: SlideTransition(
+                        position: _markRise,
+                        child: ScaleTransition(
+                          scale: _markScale,
+                          child: const TkdCharacter(size: kLoaderFull),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     FadeTransition(

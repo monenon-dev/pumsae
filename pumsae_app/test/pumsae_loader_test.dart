@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:pumsae_app/features/intro/intro_mark.dart';
+import 'package:pumsae_app/features/intro/tkd_character.dart';
 import 'package:pumsae_app/features/intro/pumsae_loader.dart';
 import 'package:pumsae_app/theme/app_theme.dart';
 
@@ -13,7 +14,7 @@ double _markOpacity(WidgetTester tester) =>
 void main() {
   testWidgets('inline loader shows the mark right away and keeps animating', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: Center(child: PumsaeLoader())));
-    expect(find.byType(IntroMark), findsOneWidget);
+    expect(find.byType(TkdCharacter), findsOneWidget);
     expect(find.text('PUMSAE'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 250));
     expect(tester.hasRunningAnimations, isTrue);
@@ -65,6 +66,18 @@ void main() {
     // 지연 타이머가 남아 있으면 테스트 종료 시 pending timer로 실패한다.
     await tester.pumpWidget(const MaterialApp(home: Text('DONE')));
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byType(IntroMark), findsNothing);
+    expect(find.byType(TkdCharacter), findsNothing);
+  });
+
+  testWidgets('TkdCharacter draws the dobok SVG on a 12% brandRed circle', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Center(child: TkdCharacter(size: kLoaderFull))));
+    final svg = tester.widget<SvgPicture>(find.byType(SvgPicture));
+    expect((svg.bytesLoader as SvgAssetLoader).assetName, 'assets/images/dobok.svg');
+
+    final circle = tester.widget<Container>(find.byType(Container).first);
+    final decoration = circle.decoration! as BoxDecoration;
+    expect(decoration.shape, BoxShape.circle);
+    expect(decoration.color, AppColors.brandRed.withValues(alpha: 0.12));
+    expect(tester.getSize(find.byType(TkdCharacter)), const Size.square(kLoaderFull));
   });
 }

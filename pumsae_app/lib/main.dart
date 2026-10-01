@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +12,11 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // 로고 캐릭터로 쓰는 Noto Emoji SVG(Apache 2.0)의 라이선스를 오픈소스 라이선스 화면에 올린다.
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString('assets/licenses/noto_emoji_LICENSE.txt');
+    yield LicenseEntryWithLineBreaks(const ['Noto Emoji'], text);
+  });
   await PushService.initialize();
   runApp(const ProviderScope(child: PumsaeApp()));
 }

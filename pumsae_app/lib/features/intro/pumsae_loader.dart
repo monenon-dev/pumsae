@@ -4,8 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../theme/app_theme.dart';
-import 'intro_mark.dart';
+import 'tkd_character.dart';
 
 /// [PumsaeLoader.overlay]가 마크를 띄우기 전에 기다리는 시간.
 /// 릴리스에서는 300ms라 금방 끝나는 로딩에선 로더가 깜빡이지 않고, 디버그 빌드에서는
@@ -22,8 +21,8 @@ const double kLoaderSection = 64;
 /// 버튼·업로드 안의 작은 로딩.
 const double kLoaderInline = 24;
 
-/// [AppColors.brandRed] 12% 원 위에서 도복 마크([IntroMark])가 1초 주기로 통통 튀며
-/// 살짝 기울고, 그 아래에 "PUMSAE" 글자([IntroWordmark])가 붙는 로딩 표시.
+/// 캐릭터([TkdCharacter])의 도복이 원 안에서 1.2초 주기로 통통 튀며 좌우로 기울고 살짝
+/// 커졌다 작아지며, 그 아래에 "PUMSAE" 글자([IntroWordmark])가 붙는 로딩 표시.
 ///
 /// - `PumsaeLoader()`: 카드·본문 안에 바로 놓는 로더.
 /// - `PumsaeLoader.overlay()`: 화면 전체를 덮는 로딩. 시작 후 [kLoaderDelay]가 지나야
@@ -55,11 +54,13 @@ class PumsaeLoader extends StatefulWidget {
 }
 
 class _PumsaeLoaderState extends State<PumsaeLoader> with SingleTickerProviderStateMixin {
-  static const _tilt = 0.08; // rad, 약 4.5°
+  static const _bounce = 4.0; // px
+  static const _tilt = 4 * math.pi / 180; // ±4°
+  static const _pulse = 0.04; // scale 1.0 ↔ 1.04
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 1),
+    duration: const Duration(milliseconds: 1200),
   );
   Timer? _delay;
   late bool _visible = widget.delay == Duration.zero;
@@ -86,33 +87,30 @@ class _PumsaeLoaderState extends State<PumsaeLoader> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final mark = AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final t = _controller.value * 2 * math.pi;
-        // 한 주기에 한 번 위로 튀었다가 내려오고, 좌우로 한 번씩 기운다.
-        // 튀는 높이는 원 안에 머물도록 크기에 비례한다.
-        return Transform.translate(
-          offset: Offset(0, -widget.size * 0.06 * math.sin(t / 2).abs()),
-          child: Transform.rotate(angle: _tilt * math.sin(t), child: child),
-        );
-      },
-      child: IntroMark(size: widget.size * 0.66),
+    final character = TkdCharacter(
+      size: widget.size,
+      figureBuilder: (context, figure) => AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final t = _controller.value * 2 * math.pi;
+          // 한 주기에 한 번 위로 튀며 살짝 커졌다 돌아오고, 좌우로 한 번씩 기운다.
+          final lift = math.sin(t / 2).abs();
+          return Transform.translate(
+            offset: Offset(0, -_bounce * lift),
+            child: Transform.rotate(
+              angle: _tilt * math.sin(t),
+              child: Transform.scale(scale: 1 + _pulse * lift, child: child),
+            ),
+          );
+        },
+        child: figure,
+      ),
     );
     // 원과 글자는 제자리에 있고 마크만 움직여서, 로더 전체 크기는 늘 같다.
     final loader = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: widget.size,
-          height: widget.size,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColors.brandRed.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
-          ),
-          child: mark,
-        ),
+        character,
         SizedBox(height: widget.size * 0.12),
         // 작은 로더에서도 글자가 읽히도록 9px 밑으로는 줄이지 않는다.
         IntroWordmark(fontSize: math.max(widget.size * 0.22, 9), onDark: widget.onDark),

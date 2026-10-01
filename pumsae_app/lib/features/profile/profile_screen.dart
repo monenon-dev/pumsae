@@ -198,7 +198,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   )
                 : const Text('로그아웃'),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+          Center(
+            child: TextButton(
+              onPressed: () => showLicensePage(
+                context: context,
+                applicationName: 'PUMSAE',
+                applicationVersion: _appVersion,
+              ),
+              child: const Text('오픈소스 라이선스'),
+            ),
+          ),
+          const SizedBox(height: 8),
           const Center(
             child: Text(
               _appVersion,
