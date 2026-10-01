@@ -5,7 +5,7 @@ import Link from "next/link";
 const CHIPS = [
   { icon: "🔔", title: "새 체험 신청", body: "김하준 · 초등부", className: "left-0 top-6 sm:-left-4", delay: "0s" },
   { icon: "🏆", title: "카드뉴스 완성", body: "전국대회 금상 소식", className: "right-0 top-1/3 sm:-right-6", delay: "-1.3s" },
-  { icon: "📷", title: "사진 12장 업로드", body: "여름 승급 심사", className: "bottom-8 left-2 sm:-left-8", delay: "-2.6s" },
+  { icon: "📷", title: "사진 업로드", body: "여름 승급 심사", className: "bottom-8 left-2 sm:-left-8", delay: "-2.6s" },
 ];
 
 /** 홈 맨 위: 왼쪽은 소개와 시작 버튼, 오른쪽은 날아차기 캐릭터와 기능 알림 카드. */
