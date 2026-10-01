@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../intro/pumsae_loader.dart';
 import 'calendar_event.dart';
 import 'calendar_repository.dart';
 
@@ -20,6 +21,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late String _selected;
   List<CalendarEvent> _events = const [];
   bool _loading = true;
+  // 한 번이라도 불러왔는지. 처음 불러올 때만 화면 전체 로더를 띄우고, 달을 옮기거나
+  // 새로고침할 때는 기존 달력을 흐리게 둔 채 다시 불러온다.
+  bool _loadedOnce = false;
   bool _loadFailed = false;
   _Filter _filter = _Filter.all;
 
@@ -43,6 +47,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       setState(() {
         _events = events;
         _loading = false;
+        _loadedOnce = true;
         _loadFailed = false;
       });
     } catch (_) {
@@ -111,44 +116,53 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         icon: const Icon(Icons.add),
         label: const Text('일정 추가'),
       ),
-      body: RefreshIndicator(
-        onRefresh: _load,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 96),
-          children: [
-            _MonthHeader(month: _month, onChange: _changeMonth),
-            const SizedBox(height: 8),
-            SegmentedButton<_Filter>(
-              segments: const [
-                ButtonSegment(value: _Filter.all, label: Text('전체')),
-                ButtonSegment(value: _Filter.public, label: Text('학부모 공개')),
-                ButtonSegment(value: _Filter.private, label: Text('관장님만')),
-              ],
-              selected: {_filter},
-              showSelectedIcon: false,
-              onSelectionChanged: (value) => setState(() => _filter = value.first),
+      body: Stack(
+        children: [
+          _buildBody(byDate),
+          if (_loading && !_loadedOnce) const Positioned.fill(child: PumsaeLoader.overlay()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody(Map<String, List<CalendarEvent>> byDate) {
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 96),
+        children: [
+          _MonthHeader(month: _month, onChange: _changeMonth),
+          const SizedBox(height: 8),
+          SegmentedButton<_Filter>(
+            segments: const [
+              ButtonSegment(value: _Filter.all, label: Text('전체')),
+              ButtonSegment(value: _Filter.public, label: Text('학부모 공개')),
+              ButtonSegment(value: _Filter.private, label: Text('관장님만')),
+            ],
+            selected: {_filter},
+            showSelectedIcon: false,
+            onSelectionChanged: (value) => setState(() => _filter = value.first),
+          ),
+          const SizedBox(height: 10),
+          if (_loadFailed)
+            TextButton(onPressed: _load, child: const Text('일정을 불러오지 못했어요 · 재시도')),
+          AnimatedOpacity(
+            opacity: _loading ? 0.5 : 1,
+            duration: const Duration(milliseconds: 150),
+            child: _MonthGrid(
+              month: _month,
+              byDate: byDate,
+              selected: _selected,
+              onSelect: (key) => setState(() => _selected = key),
             ),
-            const SizedBox(height: 10),
-            if (_loadFailed)
-              TextButton(onPressed: _load, child: const Text('일정을 불러오지 못했어요 · 재시도')),
-            AnimatedOpacity(
-              opacity: _loading ? 0.5 : 1,
-              duration: const Duration(milliseconds: 150),
-              child: _MonthGrid(
-                month: _month,
-                byDate: byDate,
-                selected: _selected,
-                onSelect: (key) => setState(() => _selected = key),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _DayAgenda(
-              dateKey: _selected,
-              events: byDate[_selected] ?? const [],
-              onEdit: (event) => _openForm(event: event),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          _DayAgenda(
+            dateKey: _selected,
+            events: byDate[_selected] ?? const [],
+            onEdit: (event) => _openForm(event: event),
+          ),
+        ],
       ),
     );
   }

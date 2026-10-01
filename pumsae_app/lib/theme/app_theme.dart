@@ -15,6 +15,15 @@ class AppColors {
   static const accentDark = Color(0xFF8F1B24);
   static const accentSoft = Color(0xFFF9E8E9);
 
+  // 브랜드 색. 로고 마크(도복)·"PUMSAE" 글자·로딩 표시는 이 이름으로만 색을 쓴다.
+  // 위의 역할별 색과 값이 같은 건 그대로 재사용한다.
+  static const brandRed = accent;
+  static const brandRedDark = accentDark;
+  static const brandBg = bg;
+  static const brandInk = ink;
+  static const brandLine = Color(0xFFE5E2DA);
+  static const brandWhite = card;
+
   // 홈 타일에서 기능을 색으로 구분하는 용도. 아이콘과 그 뒤 옅은 원에만 쓴다.
   static const trials = accent;
   static const calendar = Color(0xFF2563EB);

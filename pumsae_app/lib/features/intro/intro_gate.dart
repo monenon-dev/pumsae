@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_theme.dart';
 import 'intro_mark.dart';
 
 /// 앱 실행 직후 [child](라우터 화면) 위에 인트로를 덮어 보여 주는 위젯.
@@ -87,7 +88,7 @@ class _IntroGateState extends State<IntroGate> with TickerProviderStateMixin {
           child: AbsorbPointer(
             // Material이 기본 글자 스타일을 깔아 줘서, 디버그 모드의 노란 밑줄이 안 생긴다.
             child: Material(
-              color: Colors.white,
+              color: AppColors.brandWhite,
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
