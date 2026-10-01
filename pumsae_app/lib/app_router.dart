@@ -8,6 +8,7 @@ import 'features/albums/albums_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/calendar/calendar_screen.dart';
 import 'features/auth/register_screen.dart';
+import 'features/auth/welcome_screen.dart';
 import 'features/dashboard/home_screen.dart';
 import 'features/intro/pumsae_loader.dart';
 import 'features/shell/main_shell.dart';
@@ -37,6 +38,7 @@ class _AuthRefreshNotifier extends ChangeNotifier {
 }
 
 const _splashPath = '/splash';
+const _welcomePath = '/welcome';
 const _loginPath = '/login';
 const _registerPath = '/register';
 const _homePath = '/home';
@@ -64,14 +66,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // Splash belongs here too — without it, a session restore that
       // resolves to authenticated while still on /splash has nowhere in
       // this switch to send it, and the app is stuck on the spinner forever.
-      final isEntryRoute =
-          location == _splashPath || location == _loginPath || location == _registerPath;
+      final isEntryRoute = location == _splashPath ||
+          location == _welcomePath ||
+          location == _loginPath ||
+          location == _registerPath;
 
       switch (authState.status) {
         case AuthStatus.loading:
           return location == _splashPath ? null : _splashPath;
         case AuthStatus.unauthenticated:
-          return location == _loginPath || location == _registerPath ? null : _loginPath;
+          // 로그인 전에는 시작 화면부터. 로그인·회원가입은 시작 화면에서 들어간다.
+          // 로그아웃·세션 만료 때도 시작 화면으로 돌아온다.
+          final isPublicRoute = location == _welcomePath ||
+              location == _loginPath ||
+              location == _registerPath;
+          return isPublicRoute ? null : _welcomePath;
         case AuthStatus.authenticated:
           return isEntryRoute ? _homePath : null;
       }
@@ -80,6 +89,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: _splashPath,
         builder: (context, state) => const _SplashScreen(),
+      ),
+      GoRoute(
+        path: _welcomePath,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: _loginPath,

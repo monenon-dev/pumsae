@@ -97,7 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextButton(
                   onPressed: _submitting
                       ? null
-                      : () => context.go('/register'),
+                      : () => context.pushReplacement('/register'),
                   child: const Text('계정이 없으신가요? 회원가입'),
                 ),
               ],

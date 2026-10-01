@@ -116,7 +116,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: _submitting ? null : () => context.go('/login'),
+                  onPressed: _submitting ? null : () => context.pushReplacement('/login'),
                   child: const Text('이미 계정이 있으신가요? 로그인'),
                 ),
               ],

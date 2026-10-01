@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pumsae_app/features/auth/login_screen.dart';
 import 'package:pumsae_app/features/auth/register_screen.dart';
+import 'package:pumsae_app/features/auth/welcome_screen.dart';
+import 'package:pumsae_app/features/intro/tkd_character.dart';
 
 void main() {
   testWidgets('login screen shows email/password fields and a submit button',
@@ -34,5 +36,16 @@ void main() {
     expect(find.text('비밀번호'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, '가입하기'), findsOneWidget);
     expect(find.text('이미 계정이 있으신가요? 로그인'), findsOneWidget);
+  });
+
+  testWidgets('welcome screen shows the character, wordmark and both entry buttons',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: WelcomeScreen()));
+
+    expect(find.byType(TkdCharacter), findsOneWidget);
+    expect(find.text('PUMSAE'), findsOneWidget);
+    expect(find.text('태권도장 운영을 한 곳에서'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '로그인'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, '회원가입'), findsOneWidget);
   });
 }
