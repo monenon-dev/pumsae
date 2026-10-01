@@ -3,19 +3,27 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../theme/app_theme.dart';
 import 'intro_mark.dart';
 
-/// 인트로와 같은 마크([IntroMark])가 1초 주기로 통통 튀며 살짝 기우는 로딩 표시.
+/// 인트로와 같은 마크([IntroMark])가 1초 주기로 통통 튀며 살짝 기울고, 그 아래에
+/// "PUMSAE" 글자([IntroWordmark])가 붙는 로딩 표시.
 ///
 /// - `PumsaeLoader()`: 카드·본문 안에 바로 놓는 로더.
 /// - `PumsaeLoader.overlay()`: 화면 전체를 덮는 로딩. 시작 후 300ms가 지나야 마크가
 ///   나타나서, 금방 끝나는 로딩에서는 로더가 깜빡이지 않는다.
 class PumsaeLoader extends StatefulWidget {
-  const PumsaeLoader({super.key, this.size = 48}) : _overlay = false;
+  const PumsaeLoader({super.key, this.size = 48, this.color = AppColors.ink})
+      : _overlay = false;
 
-  const PumsaeLoader.overlay({super.key, this.size = 64}) : _overlay = true;
+  const PumsaeLoader.overlay({super.key, this.size = 64, this.color = AppColors.ink})
+      : _overlay = true;
 
+  /// 마크 크기. 글자 크기와 간격도 이 값에 맞춰 정해진다.
   final double size;
+
+  /// "PUMSAE" 글자 색. 어두운 카드 위에서는 흰색을 넘긴다.
+  final Color color;
   final bool _overlay;
 
   @override
@@ -56,7 +64,7 @@ class _PumsaeLoaderState extends State<PumsaeLoader> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final loader = AnimatedBuilder(
+    final mark = AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
         final t = _controller.value * 2 * math.pi;
@@ -67,6 +75,15 @@ class _PumsaeLoaderState extends State<PumsaeLoader> with SingleTickerProviderSt
         );
       },
       child: IntroMark(size: widget.size),
+    );
+    // 글자는 튀지 않고 제자리에 있어서, 마크만 움직이는 게 또렷이 보인다.
+    final loader = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        mark,
+        SizedBox(height: widget.size * 0.2),
+        IntroWordmark(fontSize: widget.size * 0.3, color: widget.color),
+      ],
     );
 
     if (!widget._overlay) {

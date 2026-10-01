@@ -3,4 +3,6 @@
     <!-- 웹과 같은 브랜드 빨강(tailwind.config.ts의 pumsae.accent) -->
     <color name="pumsae_accent">#B4222E</color>
     <color name="pumsae_icon_background">#FFFFFF</color>
+    <!-- 시스템 스플래시 → Flutter 인트로(흰 배경)가 끊김 없이 이어지도록 같은 흰색 -->
+    <color name="pumsae_splash_background">#FFFFFF</color>
 </resources>

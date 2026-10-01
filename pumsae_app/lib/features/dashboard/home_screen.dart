@@ -135,7 +135,7 @@ class _GreetingCard extends StatelessWidget {
         ),
         loading: () => const SizedBox(
           height: 70,
-          child: Center(child: PumsaeLoader(size: 40)),
+          child: Center(child: PumsaeLoader(size: 36, color: Colors.white)),
         ),
         error: (error, stackTrace) => Row(
           children: [

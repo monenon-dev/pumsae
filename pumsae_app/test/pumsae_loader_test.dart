@@ -11,6 +11,7 @@ void main() {
   testWidgets('inline loader shows the mark right away and keeps animating', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: Center(child: PumsaeLoader())));
     expect(find.byType(IntroMark), findsOneWidget);
+    expect(find.text('PUMSAE'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 250));
     expect(tester.hasRunningAnimations, isTrue);
 

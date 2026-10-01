@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_theme.dart';
 import 'intro_mark.dart';
 
 /// 앱 실행 직후 [child](라우터 화면) 위에 인트로를 덮어 보여 주는 위젯.
@@ -100,15 +99,7 @@ class _IntroGateState extends State<IntroGate> with TickerProviderStateMixin {
                     const SizedBox(height: 20),
                     FadeTransition(
                       opacity: _textOpacity,
-                      child: const Text(
-                        'PUMSAE',
-                        style: TextStyle(
-                          color: AppColors.ink,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 6,
-                        ),
-                      ),
+                      child: const IntroWordmark(),
                     ),
                   ],
                 ),
