@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../theme/app_theme.dart';
-import '../intro/pumsae_loader.dart';
 import '../intro/tkd_character.dart';
 
 /// 로그인하지 않은 상태로 앱을 열면(인트로 다음) 처음 보이는 시작 화면.
@@ -20,7 +19,7 @@ class WelcomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              const Center(child: TkdCharacter(size: kLoaderFull)),
+              const Center(child: _FlyingKick()),
               const SizedBox(height: 20),
               const Center(child: IntroWordmark()),
               const SizedBox(height: 28),
@@ -55,6 +54,25 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// 웹 홈 첫 화면과 같은 날아차기 캐릭터(투명 배경 움직이는 WebP).
+/// 기기에서 애니메이션을 줄이도록 설정했으면 멈춘 한 장면을 보여 준다.
+class _FlyingKick extends StatelessWidget {
+  const _FlyingKick();
+
+  static const _height = 220.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.of(context).disableAnimations;
+    return Image.asset(
+      still ? 'assets/images/flying_kick_still.webp' : 'assets/images/flying_kick.webp',
+      height: _height,
+      fit: BoxFit.contain,
+      semanticLabel: '날아차기를 하는 태권도 캐릭터',
     );
   }
 }
