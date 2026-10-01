@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,9 @@ Future<void> main() async {
   });
   // Firebase 초기화(약 0.6초)를 기다리지 않고 바로 첫 화면을 그린다.
   unawaited(PushService.initialize());
+  // 로그인 쿠키가 든 암호화 저장소는 처음 열 때 오래 걸린다. 첫 화면을 그리는 동안
+  // 미리 열어 두면, 곧이어 세션 복원이 쿠키를 읽을 때 기다리는 시간이 줄어든다.
+  unawaited(const FlutterSecureStorage().readAll());
   runApp(const ProviderScope(child: PumsaeApp()));
 }
 

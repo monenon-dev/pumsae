@@ -36,33 +36,53 @@ class ApiConfig {
 /// Persists cookie_jar's cookie data (the httpOnly refresh_token cookie set
 /// by /auth/*) through flutter_secure_storage instead of plaintext files, so
 /// it stays encrypted at rest between app launches.
+///
+/// Secure storage reads are slow (each one decrypts through the platform
+/// keystore), and the cookie jar reads several keys per request. So [init]
+/// loads every cookie key once with a single readAll() and later reads are
+/// served from memory; writes and deletes still go straight to disk.
 class _SecureCookieStorage implements Storage {
   _SecureCookieStorage(this._secureStorage);
 
   final FlutterSecureStorage _secureStorage;
   String _prefix = '';
+  final Map<String, String> _cache = {};
 
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
     _prefix =
         'pumsae_cookie_ie${ignoreExpires ? 1 : 0}_ps${persistSession ? 1 : 0}_';
+    final all = await _secureStorage.readAll();
+    _cache
+      ..clear()
+      ..addEntries(
+        all.entries
+            .where((entry) => entry.key.startsWith(_prefix))
+            .map((entry) => MapEntry(entry.key.substring(_prefix.length), entry.value)),
+      );
   }
 
   String _key(String key) => '$_prefix$key';
 
   @override
-  Future<String?> read(String key) => _secureStorage.read(key: _key(key));
+  Future<String?> read(String key) async => _cache[key];
 
   @override
-  Future<void> write(String key, String value) =>
-      _secureStorage.write(key: _key(key), value: value);
+  Future<void> write(String key, String value) {
+    _cache[key] = value;
+    return _secureStorage.write(key: _key(key), value: value);
+  }
 
   @override
-  Future<void> delete(String key) => _secureStorage.delete(key: _key(key));
+  Future<void> delete(String key) {
+    _cache.remove(key);
+    return _secureStorage.delete(key: _key(key));
+  }
 
   @override
   Future<void> deleteAll(List<String> keys) async {
     for (final key in keys) {
+      _cache.remove(key);
       await _secureStorage.delete(key: _key(key));
     }
   }
@@ -80,9 +100,10 @@ class ApiClient {
       : _cookieJar = PersistCookieJar(
           storage: _SecureCookieStorage(const FlutterSecureStorage()),
         ) {
-    _dio = Dio(_options)
-      ..interceptors.add(CookieManager(_cookieJar))
-      ..interceptors.add(_AuthInterceptor(this));
+    // 일반 API는 Bearer 액세스 토큰만 쓰고 쿠키가 필요 없어서 CookieManager를 달지
+    // 않는다(요청마다 쿠키 저장소를 거치느라 홈 화면 요청들이 늦게 출발했다).
+    // 쿠키(refresh_token)를 주고받는 /auth/* 요청은 [authDio]로 보낸다.
+    _dio = Dio(_options)..interceptors.add(_AuthInterceptor(this));
 
     // A second, plain Dio used for /auth/refresh and for replaying a
     // request after a 401. It shares the same cookie jar but deliberately
@@ -125,9 +146,14 @@ class ApiClient {
   /// back to whoever triggered the failing request.
   Stream<void> get onSessionExpired => _sessionExpiredController.stream;
 
-  /// The shared Dio instance every API call (other than /auth/refresh
-  /// itself) should be made through.
+  /// The shared Dio instance every API call (other than /auth/*) should be
+  /// made through.
   Dio get dio => _dio;
+
+  /// Dio for /auth/login, /auth/register and /auth/logout: the only calls
+  /// that set or clear the refresh_token cookie, so the only ones (besides
+  /// the internal refresh) that go through the cookie jar.
+  Dio get authDio => _rawDio;
 
   String? get accessToken => _accessToken;
 

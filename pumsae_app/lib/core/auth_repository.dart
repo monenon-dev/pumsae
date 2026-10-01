@@ -53,7 +53,7 @@ class AuthRepository {
 
   Future<User> login({required String email, required String password}) {
     return _authenticate(
-      () => _apiClient.dio.post<Map<String, dynamic>>(
+      () => _apiClient.authDio.post<Map<String, dynamic>>(
         '/auth/login',
         data: {'email': email, 'password': password},
       ),
@@ -67,7 +67,7 @@ class AuthRepository {
     required String password,
   }) {
     return _authenticate(
-      () => _apiClient.dio.post<Map<String, dynamic>>(
+      () => _apiClient.authDio.post<Map<String, dynamic>>(
         '/auth/register',
         data: {
           'dojangName': dojangName,
@@ -92,7 +92,7 @@ class AuthRepository {
 
   Future<void> logout() async {
     try {
-      await _apiClient.dio.post<void>('/auth/logout');
+      await _apiClient.authDio.post<void>('/auth/logout');
     } on DioException {
       // Best-effort: the local session is dropped below regardless.
     } finally {
