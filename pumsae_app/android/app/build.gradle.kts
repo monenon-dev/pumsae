@@ -20,7 +20,7 @@ val keystoreProperties = Properties().apply {
 val hasReleaseKey = keystoreProperties.getProperty("storeFile") != null
 
 android {
-    namespace = "com.monenon.pumsae"
+    namespace = "com.choseohee.pumsae"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -31,7 +31,7 @@ android {
 
     defaultConfig {
         // 스토어에 한 번 올리면 바꿀 수 없다.
-        applicationId = "com.monenon.pumsae"
+        applicationId = "com.choseohee.pumsae"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
