@@ -40,7 +40,7 @@ type LandingEditorProps = {
   initial: DojangLandingContent;
 };
 
-const siteHost = (process.env.NEXT_PUBLIC_SITE_URL ?? "pumsae.vercel.app")
+const siteHost = (process.env.NEXT_PUBLIC_SITE_URL ?? "pumsae.choseohee.com")
   .replace(/^https?:\/\//, "")
   .replace(/\/$/, "");
 

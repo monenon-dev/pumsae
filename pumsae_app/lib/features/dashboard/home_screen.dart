@@ -17,10 +17,8 @@ import '../trials/trials_provider.dart';
 import 'dashboard_provider.dart';
 import 'dojang_summary.dart';
 
-// TODO: point this at pumsae.app once that custom domain is wired up in
-// Vercel — it doesn't resolve yet, so the working production host is used
-// for both the on-screen label and the actual link for now.
-const _publicWebHost = 'pumsae.vercel.app';
+// Public web host, used for both the on-screen label and the actual link.
+const _publicWebHost = 'pumsae.choseohee.com';
 
 const _recentTrials = 3;
 

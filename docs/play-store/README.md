@@ -15,8 +15,8 @@ Play Console에 그대로 붙여 넣을 문구와 설문 답안이다. 그래픽
 - **무료 또는 유료**: 무료
 - **카테고리**: 비즈니스
 - **연락처 이메일**: whtjgml2002@gmail.com
-- **개인정보처리방침 URL**: https://pumsae.vercel.app/privacy
-- **웹사이트**: https://pumsae.vercel.app
+- **개인정보처리방침 URL**: https://pumsae.choseohee.com/privacy
+- **웹사이트**: https://pumsae.choseohee.com
 
 ## 2. 스토어 등록정보
 
@@ -47,7 +47,7 @@ PUMSAE는 태권도장 관장님과 사범님을 위한 도장 관리 앱입니�
 ■ 홈 화면에서 요약 확인
 대기 중인 체험 신청, 다가오는 일정, 사진첩, 도장 홈페이지 주소를 첫 화면에서 한 번에 봅니다.
 
-※ 도장 홈페이지 편집과 카드뉴스 제작은 넓은 화면의 웹(pumsae.vercel.app)에서 할 수 있으며, 앱과 같은 계정을 씁니다.
+※ 도장 홈페이지 편집과 카드뉴스 제작은 넓은 화면의 웹(pumsae.choseohee.com)에서 할 수 있으며, 앱과 같은 계정을 씁니다.
 ※ 이 앱은 도장 운영자(관장·사범)용입니다. 학부모는 앱 설치 없이 도장 홈페이지에서 체험을 신청할 수 있어요.
 ```
 
@@ -127,7 +127,7 @@ PUMSAE 첫 버전입니다.
 
 ```bash
 cd pumsae_app
-flutter build appbundle --release --dart-define=API_BASE_URL=https://pumsae-production.up.railway.app
+flutter build appbundle --release --dart-define=API_BASE_URL=https://pumsae-api.choseohee.com
 # 결과: build/app/outputs/bundle/release/app-release.aab
 ```
 
